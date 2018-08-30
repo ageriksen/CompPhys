@@ -1,0 +1,13 @@
+# Tell git to ignore following
+
+# files without ending
+*
+!/**/
+!/*.*
+
+# folders
+build
+
+#compiled files
+*.o
+*.out
