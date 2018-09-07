@@ -1,9 +1,9 @@
 # Tell git to ignore following
 
-# files without ending
-*
-!/**/
-!/*.*
+# files without ending(doesn't seem to work)
+#*
+#!/**/
+#!/*.*
 
 # folders
 build
@@ -11,3 +11,6 @@ build
 #compiled files
 *.o
 *.out
+*.slo
+*.lo
+*.obj
