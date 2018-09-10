@@ -22,15 +22,6 @@ class TriSubstitution:
         self.c = c
         self.d = d
         
-        #creating empty arrays
-        #for substitution
-#        bT = np.zeros(len(b))
-#        dT = np.zeros(len(d)) 
-#        bT[0] = b[0]
-#        dT[0] = d[0]
-#        self.bT = bT
-#        self.dT = dT
-
     def Substitute(self, n):
         """ Forward substitution of the tridiagonal"""
         #forward substitution
@@ -38,11 +29,6 @@ class TriSubstitution:
         #TIME BEGIN
         for i in range(2, n+1):
             #precalculate repeated operations
-#            print(
-#                'i = ', i, '\n',
-#                'a[',i-1,'] = ', self.a[i-1], '\n',
-#                'b[',i-1,'] = ', self.b[i-1], '\n',
-#                    )
             e = self.a[i-1]/float(self.b[i-1])
             self.b[i] = self.b[i] - e*self.c[i-1]
             self.d[i] = self.d[i] - e*self.d[i-1]
@@ -55,4 +41,4 @@ class TriSubstitution:
         # this makes a total 8n-13 FLOPS, which for large n approximates to 
         # FLOPS: 8n
         FLOPS = 8*n
-        return self.u, FLOPS
+        return self.u, FLOPS #, time
