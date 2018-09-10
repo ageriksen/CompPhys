@@ -8,11 +8,8 @@ import sys
 import numpy as np
 from numba import jit
 import matplotlib.pyplot as plt
-
 #importing project modules
 import TridiagAlgo as tri
-
-
 
 #declare variables
 n = np.zeros(int(sys.argv[1]), dtype=np.int32)
@@ -31,19 +28,23 @@ for i in range(len(n)):
     #exact solution
     f = 100*np.exp(-10*x)
     d = (h[i]**2)*f
-
     #constructing tridiagonal matrix A
     a = -1*np.ones(int(n[i]))
     b = 2*np.ones(int(n[i]+1))
     c = -1*np.ones(int(n[i]))
-    
+    # calling tri module and solving for u
     dcomp = tri.TriSubstitution(u)
     dcomp(a, b, c, d)
     u, FLOPS = dcomp.Substitute(n[i])
     
     u_ex = 1 - (1 - np.exp(-10))*x - np.exp(-10*x)
     
+    #ploting results
     plt.figure()
-    plt.plot(x, u)
-    plt.plot(x, u_ex)
+    plt.plot(x, u, label='numerical')
+    plt.plot(x, u_ex, label='exact')
+    plt.legend()
+    plt.title('numerical and analytical solution of u''=f(x), n = '+str(n[i]))
+    plt.xlabel('position x')
+    plt.ylabel('value solution u')
     plt.show()
