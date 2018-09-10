@@ -47,10 +47,14 @@ for i in range(len(n)):
     # calling tri module and solving for u
     dcomp = tri.TriSubstitution(u)
     dcomp(a, b, c, d)
-    u, FLOPS = dcomp.Substitute(n[i])
+    u, FLOPS = dcomp.general(n[i])
     print('number of FLOPS: ', FLOPS)
     #computing exact sollution of discrete x
     u_ex = 1 - (1 - np.exp(-10))*x - np.exp(-10*x)
     
     #ploting results
     #plotcompare()
+
+    u, FLOPS2 = dcomp.special(n[i])
+    print('number of FLOPS: ', FLOPS)
+    plotcompare
