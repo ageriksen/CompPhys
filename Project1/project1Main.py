@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import TridiagAlgo as tri
 
 #functions:
-def plotter():
+def plotcompare():
     plt.figure()
     plt.plot(x, u, label='numerical')
     plt.plot(x, u_ex, label='exact')
@@ -20,12 +20,6 @@ def plotter():
     plt.title('numerical and analytical solution of u''=f(x), n = '+str(n[i]))
     plt.xlabel('position x')
     plt.ylabel('value solution u')
-    plt.show()
-
-    plt.figure()
-    plt.plot(x,rel_eps)
-    plt.title('relative error epsilon at n = '+str(n[i])+' mesh points')
-    plt.ylabel('relative error')
     plt.show()
 
 
@@ -57,15 +51,6 @@ for i in range(len(n)):
     print('number of FLOPS: ', FLOPS)
     #computing exact sollution of discrete x
     u_ex = 1 - (1 - np.exp(-10))*x - np.exp(-10*x)
-    #enforcing boundary conditions
-    #u_ex[n+1] = 0
-    #u[n+1] = 0
-
-    #relative error
-    eps = u_ex - u
-    rel_eps = np.zeros(len(eps))
-    for j in range(1, len(rel_eps)-1):
-        rel_eps[j] = eps[j]/u_ex[j]
     
     #ploting results
-    plotter()
+    #plotcompare()
