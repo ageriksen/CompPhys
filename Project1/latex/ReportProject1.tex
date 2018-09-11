@@ -16,12 +16,12 @@
 \title{Project 1}
 \author{Anders Eriksen}
 \begin{abstract}
-attempting a sleeker version of the general solver of a tridiagonal matrix reducing the general case from ~8n FLOPS to ~4n. n here being the dimensionality of the matrix
+Attempting a sleeker version of the general solver of a tridiagonal matrix reducing the general case from ~8n FLOPs to ~4n. "n" here being the dimensionality of the matrix
 \end{abstract}
 \maketitle
 
 \section{Introduction}
-This is a rushed report on an unfinished experiment. Repeated issues with programming originating from both the OS and unfamiliarity with the language eventually led to capitulation and falling back on python to attempt to finish in time. I have attempted to organize the scattered results achieved and discussing them. further, I have tried to glean personal developement in the experiment despite the lackluster results. 
+This is a rushed report on an unfinished experiment. Repeated issues with programming originating from both the OS and unfamiliarity with the language eventually led to capitulation and falling back on python to attempt to finish in time. I have attempted to organize the scattered results and discussing them. I have also attempted to glean personal developement in the experiment despite the lackluster results. 
 
 \section{Theory, algorithms and methods}
 We begin with the simple differential equation 
@@ -32,11 +32,11 @@ which we can discretize as
 \begin{equation*}
    -\frac{v_{i+1}+v_{i-1}-2v_i}{h^2} = f_i  \hspace{0.5cm} \mathrm{for} \hspace{0.1cm} i=1,\dot    s, n,
 \end{equation*}
-Where the indexes signify preveious, current or next point in our function u. $f_i$ is the disretized $f(x_i) = f_i$. h is the stepsize and is proportional to the number of mesh-points n we have. Our function comes with the conditions that $x \in [0,1]$ and $u(0)=u(1)=0$. An even stepsize then should be $h = \frac{x_{max}- x_{min}}{n} = \frac{1}{n}$. Luckily for our purposes, u has a closed form sollution 
+Where the indexes signify preveious, current or next point in our function u. $f_i$ is the disretized $f(x_i) = f_i$. "h" is the stepsize and is proportional to the number of mesh-points n. Our function comes with the conditions that $x \in [0,1]$ and $u(0)=u(1)=0$. An even stepsize then should be $h = \frac{x_{max}- x_{min}}{n} = \frac{1}{n}$. Luckily for our purposes, u has a closed form sollution 
 \begin{equation*}
 	u(x) = 1-(1-e^{-10})x-e^{-10x}
 \end{equation*}
-Staring at the discretization for a spell, you can see that the equation can be rewritten as a matrix multiplication of a vector $\vec{u}$: $-\hat{A}\vec{u}=\vec{d}$, with $d_i = h^2\cdot f_i$.  Here, the matrix $\hat{A}$ should be a tri-diagonal matrix of values $a_{11} = b_1 = 2$ along the diagonal and $a_{ii_{\pm 1}} = -1$ to either side. wrting this out index for index makes
+Staring at the discretization for a spell, you can see that the equation can be rewritten as a matrix multiplication of a vector $\vec{u}$: $-\hat{A}\vec{u}=\vec{d}$, with $d_i = h^2\cdot f_i$.  Here, the matrix $\hat{A}$ should be a tri-diagonal matrix of values $a_{11} = b_1 = 2$ along the diagonal and $a_{ii_{\pm 1}} = -1$ to either side. Writing this out index for index makes
 
  \[
 \mathbf{A} = \begin{bmatrix}
@@ -75,7 +75,7 @@ From this, we can make an upper triangular matrix through the Gaussian row reduc
 	\end{aligned}
 \end{equation*}
 This algorithm has a total of $(8n-13)$ FLOPs, which approximates to 8n for large n. This is for the general case, however. In our special case, we can reduse the number of FLOPs quite a bit. By half, in fact. 
-Knowing $a_i = c_{i} = -1$ and $b=2$, $e = -\frac{1}{2}$. this next step, I'm not too sure of. From the precious algorithm, to my mind, $\tilde{b_{i}} = b_{i} - r \cdot c_{i-1}$ should become $\tilde{b_i}=2-\frac{1}{2}=\frac{3}{2}$. This, however is different from an algorithm I found on line 47 of the code examples for project1 2018 on the github page. Here, b is given as $\tilde{b_i} = \frac{(i+1)}{i}$, note that my b is this script's d. The 2 produce different values, but neither is really a good fit. Therefore, though I believe I have managed to halve the number of FLOPs I cannot say the algorithm is the same. see figures 1 and 2 for illustrations of the latests fits.
+Knowing $a_i = c_{i} = -1$ and $b=2$, $e = -\frac{1}{2}$. And this is a point I'm uncertain of. From the previous algorithm, to my mind, $\tilde{b_{i}} = b_{i} - r \cdot c_{i-1}$ should become $\tilde{b_i}=2-\frac{1}{2}=\frac{3}{2}$. This, however is different from an algorithm I found on line 47 of the code examples for project1 2018 on the github page. Here, b is given as $\tilde{b_i} = \frac{(i+1)}{i}$, note that my b is this script's d. The 2 produce different values, but neither is really a good fit. Therefore, though I believe I have managed to halve the number of FLOPs I cannot say the algorithm is the same. see figures 1 and 2 for illustrations of the latests fits.
 
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../specificNumAna_b-halfN10.png}
@@ -89,7 +89,7 @@ Knowing $a_i = c_{i} = -1$ and $b=2$, $e = -\frac{1}{2}$. this next step, I'm no
 This was, unfortunately as far along as I got. The plan further was to compare the CPU time spent on the 2 algorithms for n up to $10^6$ and from there, the base 10 logarithm of the relative error between the exact and the numerical solutions. This point is to locate the point in which the algortihmic error is overtaken by the loss of precision from the computations. Finally, the plan was to perform a different approximation of the solution through LU decomposition rather than the Gaussian row reductions. 
 
 \section{Results and discussions}
-For the general tridiagonal fit, the numerical quickly approaches the numerical solution, increasing steadily up to 10 000 mesh points. for comparison, see figures 3 and 4.
+For the general tridiagonal fit, the numerical quickly approaches the numerical solution, increasing steadily up to 10 000 mesh points. For comparison, see figures 3 and 4.
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../NumAna10.png}
 \caption{General numeric versus exact solution at n=10 mesh points} 
