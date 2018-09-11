@@ -53,8 +53,10 @@ for i in range(len(n)):
     u_ex = 1 - (1 - np.exp(-10))*x - np.exp(-10*x)
     
     #ploting results
-    #plotcompare()
+    #plotcompare(u)
 
-    u, FLOPS2 = dcomp.special(n[i])
+    dcomp2 = tri.TriSubstitution(u)
+    dcomp2(a, b, c, d)
+    u, FLOPS2 = dcomp2.special(n[i])
     print('number of FLOPS: ', FLOPS)
-    plotcompare
+    plotcompare()

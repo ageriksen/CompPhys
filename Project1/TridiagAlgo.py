@@ -49,7 +49,9 @@ class TriSubstitution:
         """ forward & backward substitution of special system, where a[i]=c[i]=-1 & b[i]=2.
         By precalculating vector b, we free up to roughly 4n FLOPS total."""
         n = int(n)
-        self.b -= 0.5
+        #b solve borrowed from Morten's TridiagonalArma.cpp found in codexamples folder from github
+        for i in range(1, n): 
+            self.b[i] = (i+1)/(float(i))
         #TIME BEGIN
         #forward
         for i in range(2, n+1):
@@ -57,6 +59,6 @@ class TriSubstitution:
         #backwards
         self.u[n] = self.d[n]/self.b[n]
         for i in range(n-1, 0, -1):
-            self.u[i] = (self.d[i] - u[i+1])/b[i]
+            self.u[i] = (self.d[i] - self.u[i+1])/self.b[i]
         FLOPS = 4*n
         return self.u, FLOPS #, time
