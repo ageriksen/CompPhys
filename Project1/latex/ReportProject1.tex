@@ -20,6 +20,7 @@ attempting a sleeker version of the general solver of a tridiagonal matrix reduc
 \maketitle
 
 \section{Introduction}
+This is a rushed report on an unfinished experiment. Repeated issues with programming going to both the OS and unfamiliarity with the language led med to eventually capitulate into python to attempt to finish in time. I have attempted to organize the scattered results achieved and discussing them. further, I have tried to glean personal developement in the experiment despite the lackluster results. 
 
 \section{Theory, algorithms and methods}
 We begin with the simple differential equation 
@@ -62,11 +63,49 @@ Staring at the discretization for a spell, you can see that the equation can be 
               		d_n
               \end{bmatrix}              
 \]
-From this, we can make an upper triangular matrix through the Gaussian row reduction going both forward and backward to solve for $\vec{u}$
+From this, we can make an upper triangular matrix through the Gaussian row reduction going both forward and backward to solve for $\vec{u}$, resulting in an algorithm (once properly optimized) of, first with forward substitution and the backwards, after specifically finding the 1st object 
+\begin{equation*}
+	\begin{aligned}
+		e &= \frac{a_{i-1}}{b_{i-1}} \\
+		\tilde{b_i} &= b_i - r\cdot c_{i-1} \\
+		\tilde{d_i} &= d_i - r\cdot\tilde{d_{i-1}} \\ \\
+		u_n &= \frac{\tilde{d_n}}{\tilde{b_n}} \\
+		u_i &= \frac{(\tilde{d_i} - c_i\cdot u_{i+1})}{\tilde{b_i}}
+	\end{aligned}
+\end{equation*}
+This algorithm has a total of $(8n-13)$ FLOPs, which approximates to 8n for large n. This is for the general case, however. In our special case, we can reduse the number of FLOPs quite a bit. By half, in fact. 
+Knowing $a_i = c_{i} = -1$ and $b=2$, $e = -\frac{1}{2}$. this next step, I'm not too sure of. From the precious algorithm, to my mind, $\tilde{b_{i}} = b_{i} - r \cdot c_{i-1}$ should become $\tilde{b_i}=2-\frac{1}{2}=\frac{3}{2}$. This, however is different from an algorithm I found on line 47 of the code examples for project1 2018 on the github page. Here, b is given as $\tilde{b_i} = \frac{(i+1)}{i}$, note that my b is this script's d. The 2 produce different values, but neither is really a good fit. Therefore, though I believe I have managed to halve the number of FLOPs I cannot say the algorithm is the same. see figures 1 and 2 for illustrations of the latests fits.
+
+\begin{figure}[hbtp]
+\includegraphics[scale=0.4]{../specificNumAna_b-halfN10.png}
+\caption{specific algorithm solution for u at n = 10 mesh points with $b=\frac{3}{2}$} 
+\label{fig:specific algorithm solution of u at n = 10 mesh points}
+\end{figure}
+
+\begin{figure}[hbtp]
+\includegraphics[scale=0.4]{../specificNumAna_bip1overiN10.png}
+\caption{specific algorithm solution for u at n = 10 mesh points with $b=\frac{(i+1)}{i}$} 
+\label{fig:n10points}
+\end{figure}
+This was, unfortunately as far along as I got. The plan further was to compare the CPU time spent on the 2 algorithms for n up to $10^6$ and from there, the base 10 logarithm of the relative error between the exact and the numerical solutions. This point is to locate the point in which the algortihmic error is overtaken by the loss of precision from the computations. Finally, the plan was to perform a different approximation of the solution through LU decomposition rather than the Gaussian row reductions. 
 
 \section{Results and discussions}
+For the general tridiagonal fit, the numerical quickly approaches the numerical solution, increasing steadily up to 10 000 mesh points. for comparison, see figures 3 and 4.
+\begin{figure}[hbtp]
+\includegraphics[scale=0.4]{../NumAna10.png}
+\caption{General numeric versus exact solution at n=10 mesh points} 
+\label{fig:specific algorithm solution of u at n = 10 mesh points}
+\end{figure}
+
+\begin{figure}[hbtp]
+\includegraphics[scale=0.4]{../NumAna10000_wide.png}
+\caption{general numerical versus exact solution at n=10 000 mesh points.} 
+\label{fig:n10points}
+\end{figure}
+For the amount of mesh points at this point, there is little delay in running the algorithm. Rather the import and initialization phase outstrips even the last solution with 10 000 points. Because the simulation was only up to 10 000 points, loss of precision from numerical operations could not quite come into play. There is also little to contrast with besides the various runs of n, in which we see a far better fitt with higher n, though this is somewhat trivial. 
 
 \section{conclusions}
+There is little to conclude, as there was no true questions raised. The experiment flatlined before it could even get properly off the ground. One can always find numerous reasons, but I believe the biggest ones was initial issues with the OS. These in turn led to awkward transition into the c++ language once I transfered to a unix system. this caused major delays in the schedule, and I never managed to catch up. I had to switch to python in a last ditch effort to get it done by the deadline, but this was not to be, as I slowly ran out of time wresteling with various issues along the implementation of the algorithm. I am somewhat satisfied with the overall layout of the script, however, as the algorithm was in a separate module, which allowed for easier reading and editing without fear of cutting off a function call somewhere. Furthermore, I have previously had trouble implementing classes and modules into my programming. In this instance, I have gained new ground. All in all, though I have learned some in regards to implementations of algorithms and creating a modular structure, there were a lot of kinks I could not quite solve. 
 
 \section{addendum}
 this is a link to the git repo:

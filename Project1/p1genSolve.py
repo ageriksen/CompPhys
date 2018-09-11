@@ -22,6 +22,17 @@ def plotcompare():
     plt.ylabel('value solution u')
     plt.show()
 
+def arrays():
+    x = np.linspace(0,1,n[i]+2)
+    u = np.zeros(int(n[i]+2))
+    #exact solution
+    f = 100*np.exp(-10*x)
+    d = (h[i]**2)*f
+    #constructing tridiagonal matrix A
+    a = -1*np.ones(int(n[i]))
+    b = 2*np.ones(int(n[i]+1))
+    return x, u, f, d, a, b
+
 
 #declare variables
 n = np.zeros(int(sys.argv[1]), dtype=np.int32)
@@ -35,18 +46,10 @@ for i in range(1, len(n)+1):
 #positional- and function-arrays
 for i in range(len(n)):
     print('length of arrays ~ ', n[i])
-    x = np.linspace(0,1,n[i]+2)
-    u = np.zeros(int(n[i]+2))
-    #exact solution
-    f = 100*np.exp(-10*x)
-    d = (h[i]**2)*f
-    #constructing tridiagonal matrix A
-    a = -1*np.ones(int(n[i]))
-    b = 2*np.ones(int(n[i]+1))
-    c = -1*np.ones(int(n[i]))
+    x, u, f, d, a, b = arrays()
     # calling tri module and solving for u
     dcomp = tri.TriSubstitution(u)
-    dcomp(a, b, c, d)
+    dcomp(a, b, a, d)
     u, FLOPS = dcomp.general(n[i])
     print('number of FLOPS: ', FLOPS)
     #computing exact sollution of discrete x
@@ -54,9 +57,9 @@ for i in range(len(n)):
     
     #ploting results
     #plotcompare(u)
-
+    x, u, f, d, a, b = arrays()
     dcomp2 = tri.TriSubstitution(u)
-    dcomp2(a, b, c, d)
+    dcomp2(a, b, a, d)
     u, FLOPS2 = dcomp2.special(n[i])
     print('number of FLOPS: ', FLOPS)
     plotcompare()

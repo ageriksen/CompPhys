@@ -50,12 +50,16 @@ class TriSubstitution:
         By precalculating vector b, we free up to roughly 4n FLOPS total."""
         n = int(n)
         #b solve borrowed from Morten's TridiagonalArma.cpp found in codexamples folder from github
-        for i in range(1, n): 
-            self.b[i] = (i+1)/(float(i))
+
+        #for i in range(1, n): 
+        #   self.b[i] = (i+1)/(float(i))
+        self.b -= 0.5
+        print(self.b)
+        
         #TIME BEGIN
         #forward
         for i in range(2, n+1):
-            self.d[i] = self.d[i] + 0.5*self.d[i-1]
+            self.d[i] = self.d[i] + self.d[i-1]/self.b[i-1]
         #backwards
         self.u[n] = self.d[n]/self.b[n]
         for i in range(n-1, 0, -1):
