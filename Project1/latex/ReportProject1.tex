@@ -20,13 +20,56 @@ attempting a sleeker version of the general solver of a tridiagonal matrix reduc
 \maketitle
 
 \section{Introduction}
-okay, lets try this on for size
 
 \section{Theory, algorithms and methods}
+We begin with the simple differential equation 
+\begin{equation*}
+-u''(x) = f(x).
+\end{equation*}
+which we can discretize as 
+\begin{equation*}
+   -\frac{v_{i+1}+v_{i-1}-2v_i}{h^2} = f_i  \hspace{0.5cm} \mathrm{for} \hspace{0.1cm} i=1,\dot    s, n,
+\end{equation*}
+Where the indexes signify preveious, current or next point in our function u. $f_i$ is the disretized $f(x_i) = f_i$. h is the stepsize and is proportional to the number of mesh-points n we have. Our function comes with the conditions that $x \in [0,1]$ and $u(0)=u(1)=0$. An even stepsize then should be $h = \frac{x_{max}- x_{min}}{n} = \frac{1}{n}$. Luckily for our purposes, u has a closed form sollution 
+\begin{equation*}
+	u(x) = 1-(1-e^{-10})x-e^{-10x}
+\end{equation*}
+Staring at the discretization for a spell, you can see that the equation can be rewritten as a matrix multiplication of a vector $\vec{u}$: $-\hat{A}\vec{u}=\vec{d}$, with $d_i = h^2\cdot f_i$.  Here, the matrix $\hat{A}$ should be a tri-diagonal matrix of values $a_{11} = b_1 = 2$ along the diagonal and $a_{ii_{\pm 1}} = -1$ to either side. wrting this out index for index makes
+
+ \[
+\mathbf{A} = \begin{bmatrix}
+                    2& -1& 0 &\dots   & \dots &0 \\
+                    -1 & 2 & -1 &0 &\dots &\dots \\
+                    0&-1 &2 & -1 & 0 & \dots \\
+                    & \dots   & \dots &\dots   &\dots & \dots \\
+                    0&\dots   &  &-1 &2& -1 \\
+                    0&\dots    &  & 0  &-1 & 2 \\
+              \end{bmatrix}
+              \begin{bmatrix}
+              		u_1 \\
+              		u_2 \\
+              		\dots \\
+              		\dots \\
+              		\dots \\
+              		u_n
+              \end{bmatrix} =
+			  \begin{bmatrix}
+              		d_1 \\
+              		d_2 \\
+              		\dots \\
+              		\dots \\
+              		\dots \\
+              		d_n
+              \end{bmatrix}              
+\]
+From this, we can make an upper triangular matrix through the Gaussian row reduction going both forward and backward to solve for $\vec{u}$
 
 \section{Results and discussions}
 
 \section{conclusions}
 
+\section{addendum}
+this is a link to the git repo:
+https://github.com/andersgeriksen/CompPhys/tree/master/Project1
 
 \end{document}
