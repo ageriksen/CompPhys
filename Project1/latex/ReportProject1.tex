@@ -1,4 +1,5 @@
-\documentclass[10pt,showpacs,preprintnumbers,footinbib,amsmath,amssymb,aps,prl,twocolumn,groupedaddress,superscriptaddress,showkeys]{revtex4-1}
+\documentclass[10pt, twocolumn]{revtex4-1}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{bm}
@@ -20,7 +21,7 @@ attempting a sleeker version of the general solver of a tridiagonal matrix reduc
 \maketitle
 
 \section{Introduction}
-This is a rushed report on an unfinished experiment. Repeated issues with programming going to both the OS and unfamiliarity with the language led med to eventually capitulate into python to attempt to finish in time. I have attempted to organize the scattered results achieved and discussing them. further, I have tried to glean personal developement in the experiment despite the lackluster results. 
+This is a rushed report on an unfinished experiment. Repeated issues with programming originating from both the OS and unfamiliarity with the language eventually led to capitulation and falling back on python to attempt to finish in time. I have attempted to organize the scattered results achieved and discussing them. further, I have tried to glean personal developement in the experiment despite the lackluster results. 
 
 \section{Theory, algorithms and methods}
 We begin with the simple differential equation 
@@ -79,13 +80,11 @@ Knowing $a_i = c_{i} = -1$ and $b=2$, $e = -\frac{1}{2}$. this next step, I'm no
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../specificNumAna_b-halfN10.png}
 \caption{specific algorithm solution for u at n = 10 mesh points with $b=\frac{3}{2}$} 
-\label{fig:specific algorithm solution of u at n = 10 mesh points}
 \end{figure}
 
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../specificNumAna_bip1overiN10.png}
 \caption{specific algorithm solution for u at n = 10 mesh points with $b=\frac{(i+1)}{i}$} 
-\label{fig:n10points}
 \end{figure}
 This was, unfortunately as far along as I got. The plan further was to compare the CPU time spent on the 2 algorithms for n up to $10^6$ and from there, the base 10 logarithm of the relative error between the exact and the numerical solutions. This point is to locate the point in which the algortihmic error is overtaken by the loss of precision from the computations. Finally, the plan was to perform a different approximation of the solution through LU decomposition rather than the Gaussian row reductions. 
 
@@ -94,13 +93,11 @@ For the general tridiagonal fit, the numerical quickly approaches the numerical 
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../NumAna10.png}
 \caption{General numeric versus exact solution at n=10 mesh points} 
-\label{fig:specific algorithm solution of u at n = 10 mesh points}
 \end{figure}
 
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../NumAna10000_wide.png}
 \caption{general numerical versus exact solution at n=10 000 mesh points.} 
-\label{fig:n10points}
 \end{figure}
 For the amount of mesh points at this point, there is little delay in running the algorithm. Rather the import and initialization phase outstrips even the last solution with 10 000 points. Because the simulation was only up to 10 000 points, loss of precision from numerical operations could not quite come into play. There is also little to contrast with besides the various runs of n, in which we see a far better fitt with higher n, though this is somewhat trivial. 
 
