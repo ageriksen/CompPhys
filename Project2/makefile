@@ -6,8 +6,8 @@ PROG= tridiagMatrix
 # this is the math library in C, not necessary for C++
 LIB = -lm -llapack -lblas -larmadillo
 # Here we make the executable file
-${PROG} :	${PROG}.o
-	${CC} ${PROG}.o ${LIB} -o ${PROG}
+${PROG}.exe :	${PROG}.o
+	${CC} ${PROG}.o ${LIB} -o ${PROG}.exe
 # whereas here we create the object file
 ${PROG}.o :	${PROG}.cpp
 	${CC} -c ${PROG}.cpp
