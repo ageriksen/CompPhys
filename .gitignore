@@ -8,11 +8,9 @@
 # folders
 build
 
-#executables
-*.exe
-
 #compiled files
 *.o
+*.exe
 *.out
 *.slo
 *.lo
