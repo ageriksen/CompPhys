@@ -8,7 +8,10 @@ int main()
 {
     //initializing variables
     int n = 3; // dimension of matrix. chosen to ensure validity before generalizing to larger matrices
-    double h = (double)(1.0/n); d = 2.0/h*h; a = -1.0/h*h; eps_avg;
+    double h = (double)(1.0/n); 
+    double d = 2.0/h*h; 
+    double a = -1.0/h*h;
+    double eps_avg;
    
     //creating and filling matrices
     mat A = zeros(n, n); //what will be our tridiagonal Toeplitz matrix
