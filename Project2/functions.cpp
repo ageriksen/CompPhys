@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     cout << A << endl;
     
     double tolerance = 1.0e-10; 
-    double maxnondiagonal = tolerance*10;
+    double maxnondiagonal = 1; 
     int iterations = 0;
     while ( maxnondiagonal > tolerance )
     {
@@ -28,10 +28,8 @@ int main(int argc, char *argv[])
         jacobi_rotate( A , R , p, q, n);
         iterations++;
     }
-    cout << "after jacobi rotation" << endl;
-    cout << A << endl;
     return 0;
-}
+} // end of main function
 //#############################################################
 //function to set a tridiagonal Toeplitx matrix given diagonal 
 //and "neighbouring" elements values d and a
@@ -122,3 +120,31 @@ void offdiag( mat A, int & p, int & q, int n )
         }
     }
 } // end of offdiag
+
+// ########################################################
+// ########################################################
+// TESTS
+// ################################
+// test of offdiagonal max value function
+void test_maxoffdiag()
+{
+   /*
+    *Function to test that the "offdiag" function actually picks 
+    out the maximum value of the matrix sent in. To do this, I 
+    send in a known 5x5 matrix and ensure that the maximum value
+    picked is the correct one. 
+    */
+    int test_p, test_q, dim, maxvalue;
+    dim = 5;
+    maxvalue = 10;
+    mat testmatrix;
+    testmatrix = eye<mat>(dim,dim);
+    testmatrix(dim - 3, dim -2) = maxvalue;
+    offdiag( testmatrix, test_p, test_q, dim);
+    cout << "test of 'offdiag' function using "<<
+       "simple matrix of dim " << dim << endl;
+    cout << "I chose a maxvalue of "<< maxvalue << 
+        "and assigned it to A("<< dim -3 << ","<< dim -2 << ")" << endl;
+    cout << "offdiag returns values of p, q as " << test_p, test_q << endl;
+    cout << "which corresponds to a maxvalue of " << A(test_p, test_q) << endl;
+} // end of test_maxoffdiag
