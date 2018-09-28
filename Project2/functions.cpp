@@ -1,6 +1,6 @@
 #include "functions.h"
 
-int main()
+int main(int argc, char *argv[])
 {
     //initializing variables
     int n = 5; // dim of matrix. chosen to ensure validity before 
@@ -14,7 +14,7 @@ int main()
     A = zeros<mat>(n, n); //what will be our tridiagonal Toeplitz matrix
     R = zeros<mat>(n, n); //our eigval matrix
     Toeplitztridiag( A, n, d, a );
-    Toeplitztridiag( R, n, d, a );
+    Toeplitztridiag( R, n, 1, 0 );
     cout << "this is our initial matrix A" << endl;
     cout << A << endl;
 
@@ -25,8 +25,8 @@ int main()
     {
         int p, q; 
         offdiag(A, p, q, n);
+        maxnondiagonal = fabs(A(p,q));
         jacobi_rotate( A , R , p, q, n);
-        maxnondiagonal = A(p,q);
         iterations++;
     }
     cout << "after jacobi rotation" << endl;
@@ -110,7 +110,7 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
 // offdiagonal element
 void offdiag( mat A, int & p, int & q, int n )
 {
-    double max; 
+    double max = 0.0; 
     for ( int i = 0; i < n; i++)
     {
         for ( int j = i+1; j < n; j++)

@@ -2,6 +2,7 @@
 #define functions_H
 #include <cmath>
 #include <armadillo>
+#include <iostream>
 
 using namespace std;
 using namespace arma;
