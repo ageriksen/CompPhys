@@ -3,7 +3,7 @@
 int main()
 {
     //initializing variables
-    int n = 3; // dim of matrix. chosen to ensure validity before 
+    int n = 10; // dim of matrix. chosen to ensure validity before 
                // generalizing to larger matrices
     double h, d, a; 
     h = (double)(1.0/n); 
@@ -15,11 +15,13 @@ int main()
     R = zeros<mat>(n, n); //our eigval matrix
     Toeplitztridiag( A, n, d, a );
     Toeplitztridiag( R, n, d, a );
+    cout << "this is our initial matrix A" << endl;
+    cout << A << endl;
 
     double tolerance = 1.0e-10; 
     double maxnondiagonal = tolerance*10;
     int iterations = 0;
-    while ( maxnondiagonal > tolerance && iterations < n ) 
+    while ( maxnondiagonal > tolerance )
     {
         int p, q; 
         offdiag(A, p, q, n);
@@ -27,7 +29,8 @@ int main()
         maxnondiagonal = A(p,q);
         iterations++;
     }
-
+    cout << "after jacobi rotation" << endl;
+    cout << A << endl;
     return 0;
 }
 //#############################################################
