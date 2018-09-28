@@ -1,8 +1,5 @@
 #include "functions.h"
 
-
-//function declarations
-
 int main()
 {
     //initializing variables
@@ -14,8 +11,8 @@ int main()
     a = -1.0/(h*h);
     //creating and filling matrices
     mat A, R;
-    A = zeros(n, n); //what will be our tridiagonal Toeplitz matrix
-    R = zeros(n, n); //our eigval matrix
+    A = zeros<mat>(n, n); //what will be our tridiagonal Toeplitz matrix
+    R = zeros<mat>(n, n); //our eigval matrix
     Toeplitztridiag( A, n, d, a );
     Toeplitztridiag( R, n, d, a );
 
@@ -33,7 +30,9 @@ int main()
 
     return 0;
 }
-
+//#############################################################
+//function to set a tridiagonal Toeplitx matrix given diagonal 
+//and "neighbouring" elements values d and a
 void Toeplitztridiag(mat & Matrix, int n, double d, double a)
 {
     for( int i = 1; i < (n-1); i++)
@@ -45,8 +44,10 @@ void Toeplitztridiag(mat & Matrix, int n, double d, double a)
     // supplying the ends with appropriate appropriate  elements
     Matrix(0,0) = d; Matrix(0,1) = a; 
     Matrix(n-1,n-1) = d; Matrix(n-1,n-2) = a;
-}
-
+} // end of Toeplitztridiag
+//#############################################################
+//function using orthogonal rotations of collumns to produce a
+//tridiagonal matrix within a certain tolerance.
 void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
 {
     //declarations of sin and cos
@@ -101,10 +102,10 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
         R(i,l) = c*r_il + s*r_ik;
     }
 } //end of jacobi_rotate
-
-// off diagonal function using armadillo to find largest 
+//####################################################
+// function using armadillo to find largest 
 // offdiagonal element
-void offdiag( mat & A, int & p, int & q, int n )
+void offdiag( mat A, int & p, int & q, int n )
 {
     double max; 
     for ( int i = 0; i < n; i++)
@@ -118,4 +119,4 @@ void offdiag( mat & A, int & p, int & q, int n )
             }
         }
     }
-}
+} // end of offdiag
