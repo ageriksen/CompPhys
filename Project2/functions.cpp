@@ -6,18 +6,17 @@ int main(int argc, char *argv[])
     int n = 5; // dim of matrix. chosen to ensure validity before 
                // generalizing to larger matrices
     double h, d, a; 
-    h = (double)(1.0/n); 
-    d = 2.0/(h*h); 
-    a = -1.0/(h*h);
+    h = (double)(1.0/n); // step size
+    d = 2.0/(h*h);  // diagonal elements
+    a = -1.0/(h*h); // "neighbour" diagonal elements
     //creating and filling matrices
     mat A, R;
     A = zeros<mat>(n, n); //what will be our tridiagonal Toeplitz matrix
-    R = zeros<mat>(n, n); //our eigval matrix
-    Toeplitztridiag( A, n, d, a );
-    Toeplitztridiag( R, n, 1, 0 );
+    R = eye<mat>(n,n); // identity matrix to contain our eigenvectors
+    Toeplitztridiag( A, n, d, a ); // tridiagonalizing A
     cout << "this is our initial matrix A" << endl;
     cout << A << endl;
-
+    
     double tolerance = 1.0e-10; 
     double maxnondiagonal = tolerance*10;
     int iterations = 0;
