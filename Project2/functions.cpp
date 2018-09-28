@@ -14,8 +14,6 @@ int main(int argc, char *argv[])
     A = zeros<mat>(n, n); //what will be our tridiagonal Toeplitz matrix
     R = eye<mat>(n,n); // identity matrix to contain our eigenvectors
     Toeplitztridiag( A, n, d, a ); // tridiagonalizing A
-    cout << "this is our initial matrix A" << endl;
-    cout << A << endl;
     
     double tolerance = 1.0e-10; 
     double maxnondiagonal = 1; 
@@ -27,6 +25,16 @@ int main(int argc, char *argv[])
         maxnondiagonal = fabs(A(p,q));
         jacobi_rotate( A , R , p, q, n);
         iterations++;
+    }
+    if (argc > 1)
+    {
+        int argument = atoi(argv[1]);
+        cout << "congratulations. you added an argument to the call." << endl;
+        if (argument == 0)
+        {
+            cout << "great! adding a 0 means you want to test the max values are properly picked." << endl;
+            test_maxoffdiag();
+        }
     }
     return 0;
 } // end of main function
@@ -144,7 +152,7 @@ void test_maxoffdiag()
     cout << "test of 'offdiag' function using "<<
        "simple matrix of dim " << dim << endl;
     cout << "I chose a maxvalue of "<< maxvalue << 
-        "and assigned it to A("<< dim -3 << ","<< dim -2 << ")" << endl;
-    cout << "offdiag returns values of p, q as " << test_p, test_q << endl;
-    cout << "which corresponds to a maxvalue of " << A(test_p, test_q) << endl;
+        " and assigned it to testmatrix("<< dim -3 << ","<< dim -2 << ")" << endl;
+    cout << "offdiag returns values of p, q as " << test_p << ", " << test_q << endl;
+    cout << "which corresponds to a maxvalue of " << testmatrix(test_p, test_q) << endl;
 } // end of test_maxoffdiag
