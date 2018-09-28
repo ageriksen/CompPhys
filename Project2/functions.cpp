@@ -2,42 +2,62 @@
 
 int main(int argc, char *argv[])
 {
-    //initializing variables
-    int n = 5; // dim of matrix. chosen to ensure validity before 
-               // generalizing to larger matrices
-    double h, d, a; 
-    h = (double)(1.0/n); // step size
-    d = 2.0/(h*h);  // diagonal elements
-    a = -1.0/(h*h); // "neighbour" diagonal elements
-    //creating and filling matrices
-    mat A, R;
-    A = zeros<mat>(n, n); //what will be our tridiagonal Toeplitz matrix
-    R = eye<mat>(n,n); // identity matrix to contain our eigenvectors
-    Toeplitztridiag( A, n, d, a ); // tridiagonalizing A
     
-    double tolerance = 1.0e-10; 
-    double maxnondiagonal = 1; 
-    int iterations = 0;
-    while ( maxnondiagonal > tolerance )
-    {
-        int p, q; 
-        offdiag(A, p, q, n);
-        maxnondiagonal = fabs(A(p,q));
-        jacobi_rotate( A , R , p, q, n);
-        iterations++;
-    }
+    int dim = 5;
+    double diagonal, semidiagonal, tolerance;
+    mat eigvalmatrix, eigvecmatrix;
+    diagonal = 2.0; semidiagonal = -1.0;
+    setup(dim, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+    tolerance = 1.0e-10;
+    wrapper( tolerance, eigvalmatrix, eigvecmatrix, dim);
+
     if (argc > 1)
     {
         int argument = atoi(argv[1]);
-        cout << "congratulations. you added an argument to the call." << endl;
+        cout << "additional raguments mean initiating tests. " << endl;
         if (argument == 0)
         {
-            cout << "great! adding a 0 means you want to test the max values are properly picked." << endl;
+            cout << "0 tests that max values are properly picked." << endl;
             test_maxoffdiag();
+        }
+        else if (argument == 1)
+        {
+            cout << "1 tests conservation of eigenvalues under jacobi transformations" <<
+                "of Toeplitz matrix." << endl;
+            test_eigvalues();
         }
     }
     return 0;
 } // end of main function
+
+//############################################################
+//setup function to set up necessary variables.
+void setup(int dim, double & diagonal, double & semidiagonal, mat & eigvalmatrix, mat & eigvecmatrix )
+{
+    //setting diagonal and semidiagonal element values
+    double diag, semidiag, step; 
+    diag = diagonal; semidiag = semidiagonal;
+    step = (double)(1.0/dim); // step size
+    diagonal = diag/(step*step);  // diagonal elements
+    semidiagonal = semidiag/(step*step); // "neighbour" diagonal elements
+    //filling matrices
+    eigvalmatrix = zeros<mat>(dim, dim); //what will be our tridiagonal Toeplitz matrix
+    eigvecmatrix = eye<mat>(dim,dim); // identity matrix to contain our eigenvectors
+    Toeplitztridiag( eigvalmatrix, dim, diag, semidiag ); // tridiagonalizing eigenvalues
+} // end of setup
+//#############################################################
+//Wrapper function to loop over iterations of rotations
+void wrapper(double tolerance, mat & eigvalmatrix, mat & eigvecmatrix, int dim )
+{
+    double maxnondiagonal = 1; 
+    while ( maxnondiagonal > tolerance )
+    {
+        int p, q; 
+        offdiag(eigvalmatrix, p, q, dim);
+        maxnondiagonal = fabs(eigvalmatrix(p,q));
+        jacobi_rotate( eigvalmatrix , eigvecmatrix , p, q, dim);
+    }
+}
 //#############################################################
 //function to set a tridiagonal Toeplitx matrix given diagonal 
 //and "neighbouring" elements values d and a
@@ -156,3 +176,42 @@ void test_maxoffdiag()
     cout << "offdiag returns values of p, q as " << test_p << ", " << test_q << endl;
     cout << "which corresponds to a maxvalue of " << testmatrix(test_p, test_q) << endl;
 } // end of test_maxoffdiag
+// ##################################
+// test that correct eigenvalues extracted. 
+void test_eigvalues()
+{
+    /*
+     * This test takes a jacobi rotated matrix and compares the 
+     * eigenvalues along the diagonal and compares it with the 
+     * analytical eigenvalues from the fomula bellow eq (2) in 
+     * the project 2 pdf. 
+     */
+    int dim;
+    double stepsize, diagonal, offdiagonal, tolerance, maxnondiagonal, epsilon;
+    mat testmatrix, testeigmatrix;
+    vec lambda;
+    dim = 5;
+    stepsize = (double) 1.0/dim; diagonal = 2.0/(stepsize*stepsize); offdiagonal = -1.0/(stepsize*stepsize);
+    testmatrix = zeros<mat>(dim, dim); testeigmatrix = eye<mat>(dim, dim);
+    Toeplitztridiag(testmatrix, dim, diagonal, offdiagonal);
+    tolerance = 1.0e-15; maxnondiagonal = 1;
+    lambda = zeros<vec>(dim);
+    for ( int i = 0; i < dim; i++)
+    {
+        lambda(i) = diagonal + 2*offdiagonal*cos(i*M_PI)/(dim+1);
+    }
+    while (maxnondiagonal > tolerance )
+    {
+        int test_q, test_p;
+        offdiag(testmatrix, test_p, test_q, dim);
+        maxnondiagonal = fabs(testmatrix(test_q, test_p));
+        jacobi_rotate(testmatrix, testeigmatrix, test_p, test_q, dim);
+    }
+    for (int i = 0; i < dim; i++)
+    {
+        epsilon += (testmatrix(i,i) - lambda(i))/lambda(i);
+    }
+    epsilon = epsilon/dim;
+    cout << "the average error between analytical and numerical eigenvalues are:" <<
+        epsilon << endl;
+} // end of test_eigvalues
