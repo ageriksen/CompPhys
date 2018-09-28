@@ -3,7 +3,7 @@
 int main()
 {
     //initializing variables
-    int n = 10; // dim of matrix. chosen to ensure validity before 
+    int n = 5; // dim of matrix. chosen to ensure validity before 
                // generalizing to larger matrices
     double h, d, a; 
     h = (double)(1.0/n); 
