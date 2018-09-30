@@ -9,14 +9,15 @@ int main(int argc, char *argv[])
                 << endl; 
         return 1;
     }
-    int dim = 5;
-    double diagonal, semidiagonal, tolerance, step;
+    int dim, maxdistance, iterations; 
+    double diagonal, semidiagonal, tolerance, step, time;
     mat eigvalmatrix, eigvecmatrix;
+    dim = 5; maxdistance = 10; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
-    tolerance = 1.0e-10;
+    tolerance = 1.0e-10; iterations = 0;
  
-    setup(dim, step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
-    wrapper( tolerance, eigvalmatrix, eigvecmatrix, dim);
+    setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+    wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
     
     if (argc > 2)
     {
@@ -44,12 +45,12 @@ int main(int argc, char *argv[])
 
 //############################################################
 //setup function to set up necessary variables.
-void setup(int dim, double & step, double & diagonal, double & semidiagonal, mat & eigvalmatrix, mat & eigvecmatrix )
+void setup(int dim, int maxdistance, double & step, double & diagonal, double & semidiagonal, mat & eigvalmatrix, mat & eigvecmatrix )
 {
     //setting diagonal and semidiagonal element values
     double diag, semidiag; 
     diag = diagonal; semidiag = semidiagonal;
-    step = (double)(1.0/dim); // step size
+    step = (double)(maxdistance/dim); // step size
     diagonal = diag/(step*step);  // diagonal constant from taylor expand of diff-eq.
     semidiagonal = semidiag/(step*step); //  constant for future and past step wit taylor expansion
     //filling matrices
@@ -60,7 +61,7 @@ void setup(int dim, double & step, double & diagonal, double & semidiagonal, mat
 
 //#############################################################
 //Wrapper function to loop over iterations of rotations
-void wrapper(double tolerance, mat & eigvalmatrix, mat & eigvecmatrix, int dim )
+void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatrix, mat & eigvecmatrix, int dim )
 {
     double maxnondiagonal = 1; 
     while ( maxnondiagonal > tolerance )
@@ -69,6 +70,7 @@ void wrapper(double tolerance, mat & eigvalmatrix, mat & eigvecmatrix, int dim )
         offdiag(eigvalmatrix, p, q, dim);
         maxnondiagonal = fabs(eigvalmatrix(p,q));
         jacobi_rotate( eigvalmatrix , eigvecmatrix , p, q, dim);
+        iterations ++;
     }
 }
 
@@ -168,6 +170,18 @@ void offdiag( mat A, int & p, int & q, int n )
     }
 } // end of offdiag
 
+// #######################################################
+// function to write results to file
+void write(string filename, vec output, int dim)
+{
+    ofstream myfile;
+    myfile.open(filename);
+    for (int i = 0; i < dim; i++)
+    {
+        myfile << output(i) << "\n"; 
+    }
+} // end of write
+
 // ########################################################
 // ########################################################
 // TESTS
@@ -207,16 +221,16 @@ void test_eigvalues()
      * analytical eigenvalues from the fomula bellow eq (2) in 
      * the project 2 pdf. 
      */
-    int dim;
-    double diagonal, semidiagonal, tolerance, epsilon, step;
+    int dim, maxdistance, iterations;
+    double diagonal, semidiagonal, tolerance, epsilon, step, time;
     mat testeigvalmatrix, testeigvecmatrix;
     vec lambda, testeigvalvector;
-    dim = 5; diagonal = 2.0; semidiagonal = -1.0; 
-    tolerance = 1.0e-15; 
+    dim = 5; maxdistance = 1;  diagonal = 2.0; semidiagonal = -1.0; 
+    tolerance = 1.0e-15; iterations = 0;
     
-    setup(dim, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix);
+    setup(dim, maxdistance, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix);
 
-    wrapper( tolerance, testeigvalmatrix, testeigvecmatrix, dim);
+    wrapper( tolerance, iterations, time,  testeigvalmatrix, testeigvecmatrix, dim);
     
     lambda = zeros<vec>(dim);
     testeigvalvector = zeros<vec>(dim);
@@ -245,14 +259,14 @@ void test_orthogonality()
      * orthogonality under rotations. The test takes a small matrix and ensures that 
      * columns are orthogonal before and after rotation.
      */
-    int dim;
-    double diagonal, semidiagonal, tolerance, testinnerproduct, step;
+    int dim, maxdistance, iterations;
+    double diagonal, semidiagonal, tolerance, testinnerproduct, step, time;
     mat testeigvalmatrix, testeigvecmatrix;
     vec testeigveccollumn_i, testeigveccollumn_j;
-    dim = 5; diagonal = 2.0; semidiagonal = -1.0; 
-    tolerance = 1.0e-15; 
+    dim = 5; maxdistance = 1; diagonal = 2.0; semidiagonal = -1.0; 
+    tolerance = 1.0e-15; iterations = 0;
 
-    setup( dim, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix);
+    setup( dim, maxdistance, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix);
 
     testeigveccollumn_i = testeigvecmatrix.col(1);
     testeigveccollumn_j = testeigvecmatrix.col(3);
@@ -261,7 +275,7 @@ void test_orthogonality()
     cout << "our initial Toeplitz matrix has an innerproduct between two collumns of" << endl;
     cout << testinnerproduct << endl;
 
-    wrapper( tolerance, testeigvalmatrix, testeigvecmatrix, dim );
+    wrapper( tolerance, iterations, time,  testeigvalmatrix, testeigvecmatrix, dim );
 
     testeigveccollumn_i = testeigvecmatrix.col(1);
     testeigveccollumn_j = testeigvecmatrix.col(3);
