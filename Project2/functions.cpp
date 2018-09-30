@@ -12,13 +12,19 @@ int main(int argc, char *argv[])
     int dim, maxdistance, iterations; 
     double diagonal, semidiagonal, tolerance, step, time;
     mat eigvalmatrix, eigvecmatrix;
-    dim = 5; maxdistance = 10; // maxdistance rho = r/alpha
+    vec outvlaues;
+    dim = 10; maxdistance = 10; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-10; iterations = 0;
  
     setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
     wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
     
+    cout << "diagonlized in " << iterations << " rotations, over " << time << " seconds" << endl;
+    
+    string outfile = argv[1];
+    write(outfile, iterations, time);
+
     if (argc > 2)
     {
         int argument = atoi(argv[2]);
@@ -64,6 +70,7 @@ void setup(int dim, int maxdistance, double & step, double & diagonal, double & 
 void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatrix, mat & eigvecmatrix, int dim )
 {
     double maxnondiagonal = 1; 
+    auto start = chrono::system_clock::now();
     while ( maxnondiagonal > tolerance )
     {
         int p, q; 
@@ -72,6 +79,9 @@ void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatr
         jacobi_rotate( eigvalmatrix , eigvecmatrix , p, q, dim);
         iterations ++;
     }
+    auto end = chrono::system_clock::now();
+    chrono::duration<double> runtime = end - start;
+    time = runtime.count();
 }
 
 //#############################################################
@@ -172,14 +182,12 @@ void offdiag( mat A, int & p, int & q, int n )
 
 // #######################################################
 // function to write results to file
-void write(string filename, vec output, int dim)
+void write(string filename, int iterations, double time)
 {
     ofstream myfile;
     myfile.open(filename);
-    for (int i = 0; i < dim; i++)
-    {
-        myfile << output(i) << "\n"; 
-    }
+    myfile << iterations << "\n"
+           << time << endl;
 } // end of write
 
 // ########################################################
