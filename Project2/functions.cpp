@@ -2,22 +2,25 @@
 
 int main(int argc, char *argv[])
 {
-//    if (argc < 2)
-//    {
-//        cout << "you need to provide arguments. "
-//    }
+    if ( argc < 2 )
+    {
+        cout    << "please supply a filename for storage "
+                << "and optionally numbers for corresponding unit tests"
+                << endl; 
+        return 1;
+    }
     int dim = 5;
     double diagonal, semidiagonal, tolerance, step;
     mat eigvalmatrix, eigvecmatrix;
     diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-10;
-
+ 
     setup(dim, step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
     wrapper( tolerance, eigvalmatrix, eigvecmatrix, dim);
-
+    
     if (argc > 2)
     {
-        int argument = atoi(argv[1]);
+        int argument = atoi(argv[2]);
         cout << "additional raguments mean initiating tests. " << endl;
         if (argument == 0)
         {
@@ -35,8 +38,8 @@ int main(int argc, char *argv[])
             cout << "2 tests orthogonality of eigenvectors under rotation." << endl;
             test_orthogonality();
         }
-    }
-    return 0;
+     }
+     return 0;
 } // end of main function
 
 //############################################################
@@ -47,12 +50,12 @@ void setup(int dim, double & step, double & diagonal, double & semidiagonal, mat
     double diag, semidiag; 
     diag = diagonal; semidiag = semidiagonal;
     step = (double)(1.0/dim); // step size
-    diagonal = diag/(step*step);  // diagonal elements
-    semidiagonal = semidiag/(step*step); // "neighbour" diagonal elements
+    diagonal = diag/(step*step);  // diagonal constant from taylor expand of diff-eq.
+    semidiagonal = semidiag/(step*step); //  constant for future and past step wit taylor expansion
     //filling matrices
     eigvalmatrix = zeros<mat>(dim, dim); //what will be our tridiagonal Toeplitz matrix
     eigvecmatrix = eye<mat>(dim,dim); // identity matrix to contain our eigenvectors
-    Toeplitztridiag( eigvalmatrix, dim, diagonal, semidiagonal ); // tridiagonalizing eigenvalues
+    Toeplitztridiag( eigvalmatrix, dim, step, diagonal, semidiagonal ); // tridiagonalizing eigenvalues
 } // end of setup
 
 //#############################################################
@@ -72,17 +75,19 @@ void wrapper(double tolerance, mat & eigvalmatrix, mat & eigvecmatrix, int dim )
 //#############################################################
 //function to set a tridiagonal Toeplitx matrix given diagonal 
 //and "neighbouring" elements values d and a
-void Toeplitztridiag(mat & Matrix, int n, double d, double a)
+void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double semidiagonal)
 {
-    for( int i = 1; i < (n-1); i++)
+    for( int i = 1; i < (dim-1); i++)
     {
         // filling Toeplitz matrix
-        Matrix(i,i) = d; Matrix(i, i+1) = a; Matrix(i, i-1) = a;
+        Matrix(i,i) = diagonal + (i*step)*(i*step); 
+        Matrix(i, i+1) = semidiagonal; 
+        Matrix(i, i-1) = semidiagonal;
     }
 
     // supplying the ends with appropriate appropriate  elements
-    Matrix(0,0) = d; Matrix(0,1) = a; 
-    Matrix(n-1,n-1) = d; Matrix(n-1,n-2) = a;
+    Matrix(0,0) = diagonal; Matrix(0,1) = semidiagonal; 
+    Matrix(dim-1,dim-1) = diagonal + ((dim-1)*step)*((dim-1)*step); Matrix(dim-1,dim-2) = semidiagonal;
 } // end of Toeplitztridiag
 
 //#############################################################
@@ -265,3 +270,16 @@ void test_orthogonality()
     cout << "our rotated matrix has an innerproduct between two collumns of" << endl;
     cout << testinnerproduct << endl;
 } // end of test_orthogonality
+
+// ############ TEST IDEA: CHECK THAT 2X2 MATRIX NEEDS ONLY 1 ROTATION TO DIAGONALIZE
+// void test_2dimrotation()
+// {
+//      int dim = 2;
+//      double ...;
+//      mat ...; 
+//      iterations = 0;
+//      setup(...); 
+//      wrapper(...); 
+//      if iteration > 1:
+//          break, print( "too many rotations to find eigenvals for 2x2 matrix)
+// } // end of test_2dimrotation
