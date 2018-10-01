@@ -3,6 +3,7 @@
 #include <cmath>
 #include <armadillo>
 #include <iostream>
+#include <iomanip>
 #include <chrono>
 
 using namespace std;
@@ -13,7 +14,7 @@ void wrapper(double , int &, double & , mat & , mat & , int);
 void Toeplitztridiag(mat &, int, double,  double, double);
 void jacobi_rotate( mat &, mat & , int & , int & , int  );
 void offdiag( mat  , int & , int & , int );
-void write(string , int, double);
+void write(string , int, double, int, int );
 
 void test_maxoffdiag();
 void test_eigvalues();

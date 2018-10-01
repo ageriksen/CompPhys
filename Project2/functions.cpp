@@ -2,32 +2,64 @@
 
 int main(int argc, char *argv[])
 {
-    if ( argc < 2 )
+    if ( argc < 3 )
     {
-        cout    << "please supply a filename for storage "
+        cout    << "please supply a mindim, maxdim and a filename for storage "
                 << "and optionally numbers for corresponding unit tests"
                 << endl; 
         return 1;
     }
-    int dim, maxdistance, iterations; 
+    int maxdistance, iterations, maxdim, mindim, dimdifference; 
     double diagonal, semidiagonal, tolerance, step, time;
     mat eigvalmatrix, eigvecmatrix;
-    vec outvlaues;
-    dim = 10; maxdistance = 10; // maxdistance rho = r/alpha
-    diagonal = 2.0; semidiagonal = -1.0;
-    tolerance = 1.0e-10; iterations = 0;
- 
-    setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
-    wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
-    
-    cout << "diagonlized in " << iterations << " rotations, over " << time << " seconds" << endl;
-    
-    string outfile = argv[1];
-    write(outfile, iterations, time);
+    vec outvalues, dim;
 
-    if (argc > 2)
+    maxdistance = 10; // maxdistance rho = r/alpha
+    diagonal = 2.0; semidiagonal = -1.0;
+    tolerance = 1.0e-10; 
+    
+    mindim = atoi(argv[1]);
+    maxdim = atoi(argv[2]);
+    dimdifference = maxdim-mindim;
+    cout << dimdifference << endl;
+    dim = zeros(dimdifference);
+    for (int i = 0; i < dimdifference; i++)
     {
-        int argument = atoi(argv[2]);
+        dim(i) = mindim + i;
+    }
+    for (int i = 0; i < dimdifference; i++)
+    {
+        iterations = 0; 
+        setup(dim(i), maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+        wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim(i));
+        
+        //cout << "diagonlized in " << iterations << " rotations, over " << time << " seconds" << endl;
+        cout    << "A rotation of a matrix with dimensions n: " << dim(i)
+                << " diagonalizes in " << iterations << "rotations.\n"
+                << " These rotations are completed over a period of " << time << " seconds"
+                << endl;
+        
+        string outfile = argv[3];
+        if ( i  == (dimdifference - 1) )
+        {
+        write(outfile, iterations, time, 0, 1);
+        }
+        else
+        {
+            if (i == 0)
+            {
+                write(outfile, iterations, time, 1, 0);
+            }
+            else
+            {
+                write(outfile, iterations, time, 0, 0);
+            }
+        }
+    }
+    
+    if (argc > 4)
+    {
+        int argument = atoi(argv[4]);
         cout << "additional raguments mean initiating tests. " << endl;
         if (argument == 0)
         {
@@ -182,12 +214,23 @@ void offdiag( mat A, int & p, int & q, int n )
 
 // #######################################################
 // function to write results to file
-void write(string filename, int iterations, double time)
+void write(string filename, int iterations, double time, int start, int quit)
 {
     ofstream myfile;
-    myfile.open(filename);
-    myfile << iterations << "\n"
-           << time << endl;
+    if (start == 1)
+    {
+        myfile.open(filename, ios::out);
+        myfile << "iterations" << set(18) << "time" << endl;
+    }
+    else
+    {
+        myfile.open(filename, ios::app);
+    }
+    myfile  << iterations << setw(18) << time << endl;
+    if (quit == 1)
+    {
+        myfile.close();
+    }
 } // end of write
 
 // ########################################################
