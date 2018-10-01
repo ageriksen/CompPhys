@@ -9,57 +9,30 @@ int main(int argc, char *argv[])
                 << endl; 
         return 1;
     }
-    int maxdistance, iterations, maxdim, mindim, dimdifference; 
-    double diagonal, semidiagonal, tolerance, step, time;
+    int maxdistance, iterations, dim; 
+    double diagonal, semidiagonal, tolerance, step, time, sum_off;
     mat eigvalmatrix, eigvecmatrix;
-    vec outvalues, dim;
+    vec outvalues;
 
     maxdistance = 10; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
-    tolerance = 1.0e-10; 
+    tolerance = 1.0e-10; dim = atoi(argv[1]);
     
-    mindim = atoi(argv[1]);
-    maxdim = atoi(argv[2]);
-    dimdifference = maxdim-mindim;
-    cout << dimdifference << endl;
-    dim = zeros(dimdifference);
-    for (int i = 0; i < dimdifference; i++)
-    {
-        dim(i) = mindim + i;
-    }
-    for (int i = 0; i < dimdifference; i++)
-    {
-        iterations = 0; 
-        setup(dim(i), maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
-        wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim(i));
-        
-        //cout << "diagonlized in " << iterations << " rotations, over " << time << " seconds" << endl;
-        cout    << "A rotation of a matrix with dimensions n: " << dim(i)
-                << " diagonalizes in " << iterations << "rotations.\n"
-                << " These rotations are completed over a period of " << time << " seconds"
-                << endl;
-        
-        string outfile = argv[3];
-        if ( i  == (dimdifference - 1) )
-        {
-        write(outfile, iterations, time, 0, 1);
-        }
-        else
-        {
-            if (i == 0)
-            {
-                write(outfile, iterations, time, 1, 0);
-            }
-            else
-            {
-                write(outfile, iterations, time, 0, 0);
-            }
-        }
-    }
+    iterations = 0; 
+    setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+    wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
     
-    if (argc > 4)
+    cout    << "A rotation of a matrix with dimensions n: " << dim
+            << " diagonalizes in " << iterations << "rotations.\n"
+            << " These rotations are completed over a period of " << time << " seconds"
+            << endl;
+    sum_offdiag(eigvalmatrix, dim, sum_off);
+    string outfile = argv[2];
+    vec output(3); output(0) = iterations; output(1) = time; output(2) = sum_off;
+    write(outfile, output);
+    if (argc > 3)
     {
-        int argument = atoi(argv[4]);
+        int argument = atoi(argv[3]);
         cout << "additional raguments mean initiating tests. " << endl;
         if (argument == 0)
         {
@@ -76,6 +49,11 @@ int main(int argc, char *argv[])
         {
             cout << "2 tests orthogonality of eigenvectors under rotation." << endl;
             test_orthogonality();
+        }
+        else if ( argument == 3 )
+        {
+            cout << "3 is a test to confirm 1 rotation for a 2 dim matrix" << endl;
+            test_2dimrotation();
         }
      }
      return 0;
@@ -212,25 +190,27 @@ void offdiag( mat A, int & p, int & q, int n )
     }
 } // end of offdiag
 
+void sum_offdiag( mat eigenvalues, int dim, double & sum_off)
+{
+    for ( int i = 0; i < dim; i++)
+    {
+        for ( int j = i+1; j < dim; j++)
+        {
+            sum_off += eigenvalues(i, j);
+        }
+    }
+
+} // end of sum_offdiag(...)
+
 // #######################################################
 // function to write results to file
-void write(string filename, int iterations, double time, int start, int quit)
+void write(string filename, vec output)
 {
     ofstream myfile;
-    if (start == 1)
-    {
-        myfile.open(filename, ios::out);
-        myfile << "iterations" << set(18) << "time" << endl;
-    }
-    else
-    {
-        myfile.open(filename, ios::app);
-    }
-    myfile  << iterations << setw(18) << time << endl;
-    if (quit == 1)
-    {
-        myfile.close();
-    }
+    myfile.open(filename, ios::out);
+    myfile << "rotations" << setw(9) << "time" << setw(18) << "ofdiagonal sum" << endl;
+    myfile  << output(0) << setw(18) << output(1) << setw(18) << output(2) << endl;
+    myfile.close();
 } // end of write
 
 // ########################################################
@@ -338,13 +318,15 @@ void test_orthogonality()
 
 // ############ TEST IDEA: CHECK THAT 2X2 MATRIX NEEDS ONLY 1 ROTATION TO DIAGONALIZE
 // void test_2dimrotation()
-// {
-//      int dim = 2;
-//      double ...;
-//      mat ...; 
-//      iterations = 0;
-//      setup(...); 
-//      wrapper(...); 
-//      if iteration > 1:
-//          break, print( "too many rotations to find eigenvals for 2x2 matrix)
-// } // end of test_2dimrotation
+void test_2dimrotation()
+{
+    int iterations, dim;
+    double diagonal, semidiagonal, tolerance, step, time;
+    mat eigvalmatrix, eigvecmatrix; 
+    diagonal = 2.0; semidiagonal = -1.0;
+    tolerance = 1.0e-16; dim = 2; iterations = 0;
+    setup(dim, 1, step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+    wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
+    cout << "test of 2 dim rotation reveals " << iterations 
+         << " rotations before we have the eigenvalues" << endl;
+} // end of test_2dimrotation()    

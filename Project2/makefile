@@ -1,13 +1,13 @@
-# makefile for JacobiMethodEigenvalues
-#
-# compiler option, libraries and target
-CC = c++ -Wall
-PROG = JacobiMethodEigenvalues
-#Libraries to include:
+# Comment lines
+# General makefile for c - choose PROG =   name of given program
+# Here we define compiler option, libraries and the  target
+CC= c++ -Wall
+PROG= functions
+# this is the math library in C, not necessary for C++
 LIB = -lm -llapack -lblas -larmadillo
-#executable
+# Here we make the executable file
 ${PROG}.exe :	${PROG}.o
 	${CC} ${PROG}.o ${LIB} -o ${PROG}.exe
-#Object file
-${PROG}.o : ${PROG}.cpp
+# whereas here we create the object file
+${PROG}.o :	${PROG}.cpp
 	${CC} -c ${PROG}.cpp
