@@ -9,33 +9,67 @@ int main(int argc, char *argv[])
                 << endl; 
         return 1;
     }
+
+    // initializing variables
     int maxdistance, iterations, dim; 
     double diagonal, semidiagonal, tolerance, step, time, sum_off;
     mat eigvalmatrix, eigvecmatrix;
-    vec outvalues;
-
+    vec outvalues, eigenvalues, eigenstate1, eigenstate2, eigenstate3;
+    uvec eigval_index; 
+    
+    // establishing necessary elements
     maxdistance = 10; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-10; dim = atoi(argv[1]);
-    
     iterations = 0; 
+    // setup and execution of jacobi method
     setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
     wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
-    
-    cout    << "A rotation of a matrix with dimensions n: " << dim
-            << " diagonalizes in " << iterations << "rotations.\n"
-            << " These rotations are completed over a period of " << time << " seconds"
-            << endl;
     sum_offdiag(eigvalmatrix, dim, sum_off);
-    // write result to file:
-    string outfile = argv[2];
-    ofstream myfile;
-    myfile.open(outfile, ios::out);
-    myfile << "rotations" << setw(20) << "time" << setw(20) << "ofdiagonal sum" << endl;
-    myfile  << iterations << setw(20) << time << setw(20) << sum_off << endl;
-    myfile.close();
+    
+    // finding the lowest eigenstates of the HO system.
+    eigenvalues = zeros(dim);
+    for ( unsigned i = 0; i < eigenvalues.size(); i++)
+    {
+        eigenvalues(i) = eigvalmatrix(i, i);
+    }
+    cout << eigenvalues << endl;
+    eigval_index = sort_index(eigenvalues);
+    //eigenstate1 = eigvecmatrix.col(eigval_index(0));
+    //eigenstate2 = eigvecmatrix.col(eigval_index(1));
+    //eigenstate3 = eigvecmatrix.col(eigval_index(2));
 
+    ////print results
+    //cout    << "A rotation of a matrix with dimensions n: " << dim
+    //        << " diagonalizes in " << iterations << "rotations.\n"
+    //        << " These rotations are completed over a period of " << time << " seconds"
+    //        << endl;
 
+    //// write result to file:
+    //string outfile = argv[2];
+    //ofstream myfile;
+    //myfile.open(outfile, ios::out);
+    //myfile << "eigenstate1" << setw(20)
+    //       << "eigenstate2" << setw(20)
+    //       << "eigenstate3" << setw(20)
+    //       << "rotations" << setw(20) 
+    //       << "time" << setw(20) 
+    //       << "ofdiagonal sum" << endl;
+    //myfile << eigenstate1(0) << setw(20)
+    //       << eigenstate2(0) << setw(20)
+    //       << eigenstate3(0) << setw(20)
+    //       << iterations << setw(20) 
+    //       << time << setw(20) 
+    //       << sum_off << endl;
+    //for ( unsigned i = 1; i < eigenstate1.size(); i++)
+    //{
+    //    myfile << eigenstate1(i) << setw(20)
+    //           << eigenstate2(i) << setw(20)
+    //           << eigenstate3(i) << endl;
+    //}
+    //myfile.close();
+
+    // if test to check if tests should be run.
     if (argc > 3)
     {
         int argument = atoi(argv[3]);
