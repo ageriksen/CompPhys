@@ -15,7 +15,6 @@ void Toeplitztridiag(mat &, int, double,  double, double);
 void jacobi_rotate( mat &, mat & , int & , int & , int  );
 void offdiag( mat  , int & , int & , int );
 void sum_offdiag( mat , int , double &);
-void write(string , vec );
 
 void test_maxoffdiag();
 void test_eigvalues();

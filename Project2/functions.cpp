@@ -27,10 +27,14 @@ int main(int argc, char *argv[])
             << " These rotations are completed over a period of " << time << " seconds"
             << endl;
     sum_offdiag(eigvalmatrix, dim, sum_off);
+    // write result to file:
     string outfile = argv[2];
-    vec output(3); output(0) = iterations; output(1) = time; output(2) = sum_off;
+    ofstream myfile;
+    myfile.open(outfile, ios::out);
+    myfile << "rotations" << setw(20) << "time" << setw(20) << "ofdiagonal sum" << endl;
+    myfile  << iterations << setw(20) << time << setw(20) << sum_off << endl;
+    myfile.close();
 
-    write(outfile, output);
 
     if (argc > 3)
     {
@@ -109,7 +113,7 @@ void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double
     for( int i = 1; i < (dim-1); i++)
     {
         // filling Toeplitz matrix
-        Matrix(i,i) = diagonal; // + ((i+1)*step)*((i+1)*step); 
+        Matrix(i,i) = diagonal + ((i+1)*step)*((i+1)*step); 
         Matrix(i, i+1) = semidiagonal; 
         Matrix(i, i-1) = semidiagonal;
     }
@@ -117,7 +121,7 @@ void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double
     // supplying the ends with appropriate appropriate  elements
     Matrix(0,0) = diagonal + (step*step);  
     Matrix(0,1) = semidiagonal; 
-    Matrix(dim-1,dim-1) = diagonal;// + ((dim-1)*step)*((dim-1)*step); 
+    Matrix(dim-1,dim-1) = diagonal + ((dim-1)*step)*((dim-1)*step); 
     Matrix(dim-1,dim-2) = semidiagonal;
 } // end of Toeplitztridiag
 
@@ -211,17 +215,6 @@ void sum_offdiag( mat eigenvalues, int dim, double & sum_off)
     }
 
 } // end of sum_offdiag(...)
-
-// #######################################################
-// function to write results to file
-void write(string filename, vec output)
-{
-    ofstream myfile;
-    myfile.open(filename, ios::out);
-    myfile << "rotations" << setw(9) << "time" << setw(18) << "ofdiagonal sum" << endl;
-    myfile  << output(0) << setw(18) << output(1) << setw(18) << output(2) << endl;
-    myfile.close();
-} // end of write
 
 // ########################################################
 // ########################################################

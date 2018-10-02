@@ -1,2 +1,2 @@
 rotations     time    ofdiagonal sum
-159       0.000943216         8.667e-11
+68410           45.8544       2.04084e-09
