@@ -29,7 +29,9 @@ int main(int argc, char *argv[])
     sum_offdiag(eigvalmatrix, dim, sum_off);
     string outfile = argv[2];
     vec output(3); output(0) = iterations; output(1) = time; output(2) = sum_off;
+
     write(outfile, output);
+
     if (argc > 3)
     {
         int argument = atoi(argv[3]);
@@ -55,6 +57,11 @@ int main(int argc, char *argv[])
             cout << "3 is a test to confirm 1 rotation for a 2 dim matrix" << endl;
             test_2dimrotation();
         }
+        else if ( argument == 4 )
+        {
+            cout << "4 to test rotations to matrix dimensions" << endl;
+            test_jacobiiterations();
+        }
      }
      return 0;
 } // end of main function
@@ -66,7 +73,7 @@ void setup(int dim, int maxdistance, double & step, double & diagonal, double & 
     //setting diagonal and semidiagonal element values
     double diag, semidiag; 
     diag = diagonal; semidiag = semidiagonal;
-    step = (double)(maxdistance/dim); // step size
+    step = ((double)maxdistance/dim); // step size
     diagonal = diag/(step*step);  // diagonal constant from taylor expand of diff-eq.
     semidiagonal = semidiag/(step*step); //  constant for future and past step wit taylor expansion
     //filling matrices
@@ -81,9 +88,9 @@ void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatr
 {
     double maxnondiagonal = 1; 
     auto start = chrono::system_clock::now();
+    int p, q; 
     while ( maxnondiagonal > tolerance )
     {
-        int p, q; 
         offdiag(eigvalmatrix, p, q, dim);
         maxnondiagonal = fabs(eigvalmatrix(p,q));
         jacobi_rotate( eigvalmatrix , eigvecmatrix , p, q, dim);
@@ -102,14 +109,16 @@ void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double
     for( int i = 1; i < (dim-1); i++)
     {
         // filling Toeplitz matrix
-        Matrix(i,i) = diagonal + (i*step)*(i*step); 
+        Matrix(i,i) = diagonal; // + ((i+1)*step)*((i+1)*step); 
         Matrix(i, i+1) = semidiagonal; 
         Matrix(i, i-1) = semidiagonal;
     }
 
     // supplying the ends with appropriate appropriate  elements
-    Matrix(0,0) = diagonal; Matrix(0,1) = semidiagonal; 
-    Matrix(dim-1,dim-1) = diagonal + ((dim-1)*step)*((dim-1)*step); Matrix(dim-1,dim-2) = semidiagonal;
+    Matrix(0,0) = diagonal + (step*step);  
+    Matrix(0,1) = semidiagonal; 
+    Matrix(dim-1,dim-1) = diagonal;// + ((dim-1)*step)*((dim-1)*step); 
+    Matrix(dim-1,dim-2) = semidiagonal;
 } // end of Toeplitztridiag
 
 //#############################################################
@@ -176,12 +185,13 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
 // offdiagonal element
 void offdiag( mat A, int & p, int & q, int n )
 {
-    double max = 0.0; 
+    double max = 0.0;
+    double aij; 
     for ( int i = 0; i < n; i++)
     {
         for ( int j = i+1; j < n; j++)
         {
-            double aij = fabs( A(i,j) );
+            aij = fabs( A(i,j) );
             if ( aij > max )
             {
                 max = aij; p = i; q = j;
@@ -270,6 +280,7 @@ void test_eigvalues()
         lambda(i) = diagonal + 2*semidiagonal*cos( (double(i)+1)*M_PI /( double(dim)+1 ));
         testeigvalvector(i) = testeigvalmatrix(i,i);
     }
+    cout << lambda << endl;
     epsilon = (mean(testeigvalvector)-mean(lambda))/mean(lambda); // relative difference between means
                                                                   // of analyrical and numerical eigvals.
     
@@ -330,3 +341,36 @@ void test_2dimrotation()
     cout << "test of 2 dim rotation reveals " << iterations 
          << " rotations before we have the eigenvalues" << endl;
 } // end of test_2dimrotation()    
+
+void test_jacobiiterations()
+{
+    int maxdistance, iterations, dim;
+    double diagonal, semidiagonal, tolerance, step, time;
+    mat eigvalmatrix, eigvecmatrix;
+    vec outvalues;
+
+    maxdistance = 0; // maxdistance rho = r/alpha
+    diagonal = 2.0; semidiagonal = -1.0;
+    tolerance = 1.0e-5; 
+
+    vec repeatarray = linspace(2, 100, 99);
+    vec rotations = zeros(repeatarray.size());
+    vec timed = zeros(repeatarray.size());
+    for (unsigned i = 0; i < (repeatarray.size() - 1); i++ )
+    {
+        dim = repeatarray(i);
+        iterations = 0; 
+        setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix);
+        wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
+        rotations(i) = iterations;
+        timed(i) = time;
+    }
+    ofstream myfile;
+    myfile.open("DimRotationTime.txt");
+    myfile << "dimensions" << setw(20) << "rotations" << "time spent" << endl;
+    for ( unsigned i = 0; i < rotations.size(); i++ )
+    {
+        myfile << repeatarray(i) << setw(20) << rotations(i) << setw(20) << timed(i) << endl;
+    }
+    myfile.close();
+} // end of test_jacobiiterations

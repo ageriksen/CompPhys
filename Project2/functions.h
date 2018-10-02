@@ -21,4 +21,5 @@ void test_maxoffdiag();
 void test_eigvalues();
 void test_orthogonality();
 void test_2dimrotation();
+void test_jacobiiterations();
 #endif

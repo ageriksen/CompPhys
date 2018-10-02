@@ -1,0 +1,2 @@
+rotations     time    ofdiagonal sum
+501            11.294              -nan

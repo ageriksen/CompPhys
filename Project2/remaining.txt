@@ -1,0 +1,7 @@
+extract eigenvalue vector
+vec eigval_index = sort_index(eigenvalues) 
+eigenvector.col(eigval_index(0))
+
+plot(rho, eigencollumn(0)
+ca. 3 første eigenvalues
+lagre og tid og iterasjoner
