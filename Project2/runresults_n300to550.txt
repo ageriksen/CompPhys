@@ -1,0 +1,36 @@
+./functions.exe 300 testfile.txt
+relative error for orbital states 1 2 and 3:
+-0.000115755-0.000248079-0.000385251
+A rotation of a matrix with dimensions n: 300 diagonalizes in 156093rotations.
+ These rotations are completed over a period of 274.62 seconds
+➜  Project2 git:(master) ✗ ./functions.exe 400 testfile.txt
+relative error for orbital states 1 2 and 3:
+-6.51087e-05-0.000139529-0.000216667
+A rotation of a matrix with dimensions n: 400 diagonalizes in 278970rotations.
+ These rotations are completed over a period of 877.202 seconds
+➜  Project2 git:(master) ✗ ./functions.exe 3500 testfile.txt
+^C
+➜  Project2 git:(master) ✗ ./functions.exe 350 testfile.txt 
+relative error for orbital states 1 2 and 3:
+-8.50418e-05-0.00018225-0.000283012
+A rotation of a matrix with dimensions n: 350 diagonalizes in 212778rotations.
+ These rotations are completed over a period of 491.829 seconds
+➜  Project2 git:(master) ✗ vim functions.cpp 
+➜  Project2 git:(master) ✗ make
+c++ -Wall -c functions.cpp
+c++ -Wall functions.o -lm -llapack -lblas -larmadillo -o functions.exe
+➜  Project2 git:(master) ✗ ./functions.exe 450 testfile.txt
+relative error for orbital states 1 2 and 3:
+-5.14432e-05      -0.000110242      -0.000171186
+A rotation of a matrix with dimensions n: 450 diagonalizes in 353964rotations.
+ These rotations are completed over a period of 1474.22 seconds
+➜  Project2 git:(master) ✗ ./functions.exe 500 testfile.txt
+relative error for orbital states 1 2 and 3:
+-4.16685e-05      -8.92938e-05      -0.000138656
+A rotation of a matrix with dimensions n: 500 diagonalizes in 437584rotations.
+ These rotations are completed over a period of 2394.26 seconds
+➜  Project2 git:(master) ✗ ./functions.exe 550 testfile.txt
+relative error for orbital states 1 2 and 3:
+-3.44365e-05      -7.37954e-05      -0.000114589
+A rotation of a matrix with dimensions n: 550 diagonalizes in 531807rotations.
+ These rotations are completed over a period of 3500.39 seconds

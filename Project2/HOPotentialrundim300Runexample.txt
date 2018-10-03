@@ -1,0 +1,7 @@
+Stored values in 300DimEigvals.txt, changed name to 1HO* first
+
+./functions.exe 300
+relative error for orbital states 1 2 and 3:
+-0.000115755      -0.000248079      -0.000385251
+A rotation of a matrix with dimensions n: 300 diagonalizes in 156093rotations.
+ These rotations are completed over a period of 279.871 seconds

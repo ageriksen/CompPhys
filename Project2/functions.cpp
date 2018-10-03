@@ -2,17 +2,17 @@
 
 int main(int argc, char *argv[])
 {
-    if ( argc < 3 )
+    if ( argc < 2 )
     {
-        cout    << "please supply a mindim, maxdim and a filename for storage "
-                << "and optionally numbers for corresponding unit tests"
+        cout    << "please supply a dimension for matrix size and integration step length."
+                << "as well as the name of file written, as 'n'DimEigval.txt"
                 << endl; 
         return 1;
     }
 
     // initializing variables
     int maxdistance, iterations, dim; 
-    double diagonal, semidiagonal, tolerance, step, time, sum_off;
+    double diagonal, semidiagonal, tolerance, step, time, sum_off, eps_rel1, eps_rel2, eps_rel3;
     mat eigvalmatrix, eigvecmatrix;
     vec outvalues, eigenvalues, eigenstate1, eigenstate2, eigenstate3;
     uvec eigval_index; 
@@ -33,46 +33,54 @@ int main(int argc, char *argv[])
     {
         eigenvalues(i) = eigvalmatrix(i, i);
     }
-    cout << eigenvalues << endl;
     eigval_index = sort_index(eigenvalues);
-    //eigenstate1 = eigvecmatrix.col(eigval_index(0));
-    //eigenstate2 = eigvecmatrix.col(eigval_index(1));
-    //eigenstate3 = eigvecmatrix.col(eigval_index(2));
+    eigenstate1 = eigvecmatrix.col(eigval_index(0));
+    eigenstate2 = eigvecmatrix.col(eigval_index(1));
+    eigenstate3 = eigvecmatrix.col(eigval_index(2));
 
-    ////print results
-    //cout    << "A rotation of a matrix with dimensions n: " << dim
-    //        << " diagonalizes in " << iterations << "rotations.\n"
-    //        << " These rotations are completed over a period of " << time << " seconds"
-    //        << endl;
+    // investigating whether or not the lowest 3 eigenvalues are correct to within
+    // 4 leading digits. 
+    eps_rel1 = ( eigenvalues(eigval_index(0)) - 3.0 )/3.0;
+    eps_rel2 = ( eigenvalues(eigval_index(1)) - 7.0 )/7.0;
+    eps_rel3 = ( eigenvalues(eigval_index(2)) - 11.0 )/11.0;
+    // reporting error
+    cout << "relative error for orbital states 1 2 and 3:" << endl;
+    cout << eps_rel1 << setw(18) << eps_rel2 << setw(18) << eps_rel3 << endl;
 
-    //// write result to file:
-    //string outfile = argv[2];
-    //ofstream myfile;
-    //myfile.open(outfile, ios::out);
-    //myfile << "eigenstate1" << setw(20)
-    //       << "eigenstate2" << setw(20)
-    //       << "eigenstate3" << setw(20)
-    //       << "rotations" << setw(20) 
-    //       << "time" << setw(20) 
-    //       << "ofdiagonal sum" << endl;
-    //myfile << eigenstate1(0) << setw(20)
-    //       << eigenstate2(0) << setw(20)
-    //       << eigenstate3(0) << setw(20)
-    //       << iterations << setw(20) 
-    //       << time << setw(20) 
-    //       << sum_off << endl;
-    //for ( unsigned i = 1; i < eigenstate1.size(); i++)
-    //{
-    //    myfile << eigenstate1(i) << setw(20)
-    //           << eigenstate2(i) << setw(20)
-    //           << eigenstate3(i) << endl;
-    //}
-    //myfile.close();
+    //print results
+    cout    << "A rotation of a matrix with dimensions n: " << dim
+            << " diagonalizes in " << iterations << "rotations.\n"
+            << " These rotations are completed over a period of " << time << " seconds"
+            << endl;
+
+    // write result to file:
+    string outfile = (string)argv[1]+"dimEigval.txt";
+    ofstream myfile;
+    myfile.open(outfile, ios::out);
+    myfile << "eigenstate1" << setw(20)
+           << "eigenstate2" << setw(20)
+           << "eigenstate3" << setw(20)
+           << "rotations" << setw(20) 
+           << "time" << setw(20) 
+           << "ofdiagonal sum" << endl;
+    myfile << eigenstate1(0) << setw(20)
+           << eigenstate2(0) << setw(20)
+           << eigenstate3(0) << setw(20)
+           << iterations << setw(20) 
+           << time << setw(20) 
+           << sum_off << endl;
+    for ( unsigned i = 1; i < eigenstate1.size(); i++)
+    {
+        myfile << eigenstate1(i) << setw(20)
+               << eigenstate2(i) << setw(20)
+               << eigenstate3(i) << endl;
+    }
+    myfile.close();
 
     // if test to check if tests should be run.
-    if (argc > 3)
+    if (argc > 2)
     {
-        int argument = atoi(argv[3]);
+        int argument = atoi(argv[2]);
         cout << "additional raguments mean initiating tests. " << endl;
         if (argument == 0)
         {
@@ -142,20 +150,23 @@ void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatr
 //#############################################################
 //function to set a tridiagonal Toeplitx matrix given diagonal 
 //and "neighbouring" elements values d and a
-void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double semidiagonal)
+void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double semidiagonal, double omega)
 {
     for( int i = 1; i < (dim-1); i++)
     {
-        // filling Toeplitz matrix
-        Matrix(i,i) = diagonal + ((i+1)*step)*((i+1)*step); 
+        // filling Toeplitz matrix((i+1)*step)*((i+1)*step); 
+        double rho = (double)i*step;
+        Matrix(i,i) = diagonal + omega*(rho*rho) + 1.0/rho;
         Matrix(i, i+1) = semidiagonal; 
         Matrix(i, i-1) = semidiagonal;
     }
 
     // supplying the ends with appropriate appropriate  elements
-    Matrix(0,0) = diagonal + (step*step);  
+    rho = step;
+    Matrix(0,0) = diagonal + omega*(rho*rho) + 1.0/rho;  
     Matrix(0,1) = semidiagonal; 
-    Matrix(dim-1,dim-1) = diagonal + ((dim-1)*step)*((dim-1)*step); 
+    rho = (double)(dim-1)*step;
+    Matrix(dim-1,dim-1) = diagonal + omega*(rho*rho) + 1.0/rho; 
     Matrix(dim-1,dim-2) = semidiagonal;
 } // end of Toeplitztridiag
 
@@ -394,7 +405,9 @@ void test_jacobiiterations()
     }
     ofstream myfile;
     myfile.open("DimRotationTime.txt");
-    myfile << "dimensions" << setw(20) << "rotations" << "time spent" << endl;
+    myfile << "dimensions" << setw(20) 
+           << "rotations" << setw(20)
+           << "time spent" << endl;
     for ( unsigned i = 0; i < rotations.size(); i++ )
     {
         myfile << repeatarray(i) << setw(20) << rotations(i) << setw(20) << timed(i) << endl;
