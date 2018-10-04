@@ -26,7 +26,11 @@
 
 \section{Theory, algorithms and methods}
 %"Discussion of methods used and their basis/suitability" (20pts)
-We examine a boundary, or eigenvalue problem. 
+We examine  2-point boundary value systems. this leads to discrete energies, in effect eigenvalues. Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions and is therefore a good start to test our methods. Our starting point is:
+\[
+\gamma \frac{d^2 u(x)}{dx^2} = -F u(x),
+\]
+with $\gamma$ as a system constant, the force F working on the beam at it's endpoint, a distance L from the origin, and $u(x)$ is the displacement of the beam in the y direction. We do impose the Dirichlet boundary conditions and set the exremes $u(0) = u(L) = 0$. 
 
 \section{Code, implementation and tests}
 %"Readability of code, implementation, testing and discussion of benchmarks" (20)
@@ -38,6 +42,7 @@ We examine a boundary, or eigenvalue problem.
 \section{conclusions}
 %"conclusions, Discussion and critical comments on what was learned about the method used and results obtained. Possible directions for future improvement? (10pts)
 
+\end{document}
 %%%%
 %"clarity of figures and general presentation. too much vs too little. (10pts)
 
