@@ -25,8 +25,6 @@
 
 \end{abstract}
 
-\nocite{*}
-
 \section{Introduction}
 %"status of problem, major objectives" (10pts)
 
@@ -34,7 +32,7 @@
 %"Discussion of methods used and their basis/suitability" (20pts)
 We examine  2-point boundary value systems.this leads to discrete energies, in effect eigenvalues. 
 Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions 
-and is therefore a good start to test our methods. Our starting point is:
+and is therefore a good start to test our methods. Our starting point is\cite{project2pdf}:
 \[
 \gamma \frac{d^2 u(x)}{dx^2} = -F u(x),
 \]
@@ -77,17 +75,19 @@ operations to extract sollutions.
 \label{eq:matrixse} 
 \end{equation}
 Where our tridiagonal matrix has elements "d" along the diagonal, naturally, and a along the 
-off diagonals. I don't fully see the naming convention, but it makes linking the research 
-through the course resources far easier. In my code, I refer to these elements as "diagonal" 
-and "semidiagonal" to clarify. We set $d = \frac{2}{h^2}$ and $a = -\frac{1}{h^2}$. We also keep 
-the $0^{th}$ and $N^{th}$ elements out of the matrix, in part as our endpoints are known, but 
-also because they are set. They will never change, because they are fastened. 
+off diagonals. We set $d = \frac{2}{h^2}$ and $a = -\frac{1}{h^2}$. We also keep the $0^{th}$ 
+and $N^{th}$ elements out of the matrix, in part as our endpoints are known, but also because 
+they are set. They will never change, because they are fastened. In my code, I refer to these 
+elements as "diagonal" and "semidiagonal" to clarify. 
 
-The method we wish to use here, is the Jacobi method. It makes use of unitary transformations to 
-rotate the matrix until we've reduced the rows of our tridiagonal matrix to a full diagonal matrix. 
-The numbers remaining on the diagonal is then our eigenvectors. In addition, we maintain the 
-rotations on an identity matrix, which then takes in our eigenvectors corresponding to the 
-eigenvalues in the original matrix. 
+This setup has analytical eigenvalues. They follow the form
+\[ \lambda_j = d + 2acos(\frac{j\pi}{N+1}) \;\; j = 1, 2, \cdots, N-1 \]\\
+
+
+There is a solution to these matrices, where a matrix A can be transformed through a similarity 
+transformation so that $\hat{S}^T \hat{A} \hat{S} = \hat{B}$ where $\hat{B}$ is a diagonal matrix 
+with eigenvalues $\lambda$ along the diagonal. A similarity transformation also requires that 
+$\hat{S}^T\hat{S} = \mathds{1}$, or $\hat{S}$ is unitary. 
 
 first off, we must show that the unitatry transformations retain orthogonality. 
 
@@ -106,23 +106,44 @@ $\vec{w_{i}}^T = \vec{v_{i}}^T\hat{U}^T$ we have
 \]
 \[
     \vec{w_i}^T\vec{w_j} = \vec{v_i}^T\vec{v_j} = \delta_{i,j}
-\]
-    
+\]\\
+
+In other words, as long as our transformations are unitary, the vectors retain 
+orthogonality. They are still orthogonal, but not the same. \\
+
+Now, $1$ similarity transformation is not necessarily enough, but several repeated such can 
+bring us where we want to go. This is where Jacobis's method comes into play. The matrix we use is
+an identity matrix, where $4$ elements have been changed. $a_{ll} = a_{kk} = \cos(\theta)$, 
+$a_{kl} = -a_{lk} = -\sin(\theta)$, $j \neq k$. One similarity transformation leads to a change in 
+the following elements: 
+\[ b_{ii} = a_{ii} \; \; i \neq k, i \neq l \]
+\[ b_{ik} = a_{ik}\cos(\theta) - a_{il}\sin(\theta) \; \; i \neq k, i \neq l \]
+\[ b_{il} = a_{il}\cos(\theta) + a_{ik}\sin(\theta) \; \; i \neq k, i \neq l \]
+\[ b_{kk} = a_{kk}\cos^2(\theta) - 2a_{kl}\cos(\theta)\sin(\theta) + a_{ll}\sin^2(\theta) \]
+\[ b_{ll} = a_{ll}\cos^2(\theta) + 2a_{kl}\cos(\theta)\sin(\theta) + a_{kk}\sin^2(\theta) \]
+\[ b_{kl} = (a_{kk} - a_{ll})\cos(\theta)\sin(\theta) + a_{kl}(\cos^2(\theta) - \sin^2(\theta)) \]
+
+For each such rotation, we choose our angles so that $a_{kl} = 0$. this is repeated until each non-diagonal
+matrix element becomes 0, or at least within a tolerance of 0. The one real snag in our 
+
+
 \section{Code, implementation and tests}
 %"Readability of code, implementation, testing and discussion of benchmarks" (20)
 
 \section{Analysis}
-%"Analysis of the results and effectiveness of selection and presentation. Results well understood and discussed" (20pts)
+%"Analysis of the results and effectiveness of selection and presentation. Results well 
+% understood and discussed" (20pts)
 
 
 \section{conclusions}
-%"conclusions, Discussion and critical comments on what was learned about the method used and results obtained. Possible directions for future improvement? (10pts)
+%"conclusions, Discussion and critical comments on what was learned about the method used 
+% and results obtained. Possible directions for future improvement?" (10pts)
 
 
 \bibliography{mybib}
 \bibliographystyle{plain}
 \end{document}
 %%%%
-%"clarity of figures and general presentation. too much vs too little. (10pts)
+%"clarity of figures and general presentation. too much vs too little." (10pts)
 
-%"referencing: relevant works cited accurately? (5pts)
+%"referencing: relevant works cited accurately?" (5pts)
