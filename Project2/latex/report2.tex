@@ -1,10 +1,12 @@
-\documentclass[10pt, twocolumn]{revtex4-1}
+\documentclass[10pt, twocolumn]{article}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{bm}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
 \usepackage{color}
+\usepackage[numbers]{natbib}
+\usepackage{dsfont}
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{filename.extension}
@@ -15,23 +17,97 @@
 \begin{document}
 \title{Project 1}
 \author{Anders Eriksen}
+
+\maketitle
+
 \begin{abstract}
 %"Accurate and informative" (5pts)
 
 \end{abstract}
-\maketitle
+
+\nocite{*}
 
 \section{Introduction}
 %"status of problem, major objectives" (10pts)
 
 \section{Theory, algorithms and methods}
 %"Discussion of methods used and their basis/suitability" (20pts)
-We examine  2-point boundary value systems. this leads to discrete energies, in effect eigenvalues. Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions and is therefore a good start to test our methods. Our starting point is:
+We examine  2-point boundary value systems.this leads to discrete energies, in effect eigenvalues. 
+Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions 
+and is therefore a good start to test our methods. Our starting point is:
 \[
 \gamma \frac{d^2 u(x)}{dx^2} = -F u(x),
 \]
-with $\gamma$ as a system constant, the force F working on the beam at it's endpoint, a distance L from the origin, and $u(x)$ is the displacement of the beam in the y direction. We do impose the Dirichlet boundary conditions and set the exremes $u(0) = u(L) = 0$. 
+with $\gamma$ as a system constant, the force F working on the beam at it's endpoint, a distance L 
+from the origin, and $u(x)$ is the displacement of the beam in the y direction. We impose the 
+Dirichlet boundary conditions and set the exremes $u(0) = u(L) = 0$. Naturally, our position 
+$x \in \{ 0, L \}$. As an example to explore solutions to boundary value problems, we naturally 
+treat the values $\gamma$, $F$ and $L$ as known quantities. \\
 
+Our first step in our towards a solution, is to scale the function. And the first toe of this 
+footstep is to introduce a dimensionless variable $ \rho = \frac{r}{L} $, which necessarily follows 
+$\rho \in [0,1]$. Next comes introducing $\lambda = \frac{FL^2}{R}$. This leads to the eigenvalue 
+problem
+\[
+\frac{d^2u(\rho )}{d\rho^2} = -\lambda u(\rho)
+\]
+
+This can be approximated through a Taylor expansion and inserting the '-' sign from in front of our 
+$\lambda$:
+\[
+u'' = \frac{-u(\rho + h) - u(\rho - h) + 2u(\rho)}{h^2} + {O}(h^2)
+\]
+With h as our stepsize.\
+
+intending to walk from $\rho = 0$ to $1$ in $N$ steps, we naturally derive our steplength as 
+$h = \frac{\rho_N - \rho_0}{N} = \frac{1}{N}$. Letting $i \in \{ 1, 2, \ldots, N\}$ for 
+\[\rho_i = \rho_0 + ih = ih\] and
+\[ -\frac{u_{i+1} + u_{i-1} - 2u_{i}}{h^2} = \lambda u_i\]
+This relationship can be conveniently converted into a matrix format, which is handy in linalg 
+operations to extract sollutions. 
+\begin{equation}
+    \begin{bmatrix} d& a & 0   & 0    & \cdots  &0     & 0 \\
+                                a & d & a & 0    & \cdots  &0     &0 \\
+                                0   & a & d & a  &0       &\cdots & 0\\
+                                \dots  & \cdots & \cdots & \cdots  &\cdots      &\cdots & \cdots\\
+                                0   & \cdots & \cdots & \cdots  &a  &d & a\\
+                                0   & \cdots & \cdots & \cdots  &\cdots       &a & d\end{bmatrix} 
+                                 \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix} 
+                                     = \lambda \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix} . 
+\label{eq:matrixse} 
+\end{equation}
+Where our tridiagonal matrix has elements "d" along the diagonal, naturally, and a along the 
+off diagonals. I don't fully see the naming convention, but it makes linking the research 
+through the course resources far easier. In my code, I refer to these elements as "diagonal" 
+and "semidiagonal" to clarify. We set $d = \frac{2}{h^2}$ and $a = -\frac{1}{h^2}$. We also keep 
+the $0^{th}$ and $N^{th}$ elements out of the matrix, in part as our endpoints are known, but 
+also because they are set. They will never change, because they are fastened. 
+
+The method we wish to use here, is the Jacobi method. It makes use of unitary transformations to 
+rotate the matrix until we've reduced the rows of our tridiagonal matrix to a full diagonal matrix. 
+The numbers remaining on the diagonal is then our eigenvectors. In addition, we maintain the 
+rotations on an identity matrix, which then takes in our eigenvectors corresponding to the 
+eigenvalues in the original matrix. 
+
+first off, we must show that the unitatry transformations retain orthogonality. 
+
+We start off with an assumed orthonormal set $v_i$, so
+\[
+\vec{v_i}^T \cdot \vec{v_j} = \delta_{ij}
+\]
+A unitary transformation means an operator $U$ working on $v_i$.
+With a $\vec{w_{i}} = \hat{U}\vec{v_{i}}$, for which 
+$\vec{w_{i}}^T = \vec{v_{i}}^T\hat{U}^T$ we have 
+\[
+    \vec{w_{i}}^T\vec{w_{j}} = \vec{v_i} \hat{U}^T \hat{U} \vec{v_j} 
+\]
+\[
+    \hat{U}^T \hat{U} = \mathds{1} 
+\]
+\[
+    \vec{w_i}^T\vec{w_j} = \vec{v_i}^T\vec{v_j} = \delta_{i,j}
+\]
+    
 \section{Code, implementation and tests}
 %"Readability of code, implementation, testing and discussion of benchmarks" (20)
 
@@ -42,6 +118,9 @@ with $\gamma$ as a system constant, the force F working on the beam at it's endp
 \section{conclusions}
 %"conclusions, Discussion and critical comments on what was learned about the method used and results obtained. Possible directions for future improvement? (10pts)
 
+
+\bibliography{mybib}
+\bibliographystyle{plain}
 \end{document}
 %%%%
 %"clarity of figures and general presentation. too much vs too little. (10pts)
