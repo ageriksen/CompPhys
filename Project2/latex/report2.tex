@@ -123,9 +123,28 @@ the following elements:
 \[ b_{ll} = a_{ll}\cos^2(\theta) + 2a_{kl}\cos(\theta)\sin(\theta) + a_{kk}\sin^2(\theta) \]
 \[ b_{kl} = (a_{kk} - a_{ll})\cos(\theta)\sin(\theta) + a_{kl}(\cos^2(\theta) - \sin^2(\theta)) \]
 
-For each such rotation, we choose our angles so that $a_{kl} = 0$. this is repeated until each non-diagonal
-matrix element becomes 0, or at least within a tolerance of 0. The one real snag in our 
+For each such rotation, we choose our angles so that $a_{kl} = 0$. This is repeated until each non-diagonal
+matrix element becomes 0, or at least within a tolerance of 0. Note that the elements $b_{il} \& b_{ik}$
+change with each rotation as well. This means that for each rotation, we isturb slightly a few other 
+elements. When transforming a matrix as such, with each rotation we find the largest element and designate
+this as our $a_{kl}$. Eventually, As the elements perturbed by each transformation are scaled by numbers less
+than 1, we must eventually reach a point where the only remainder is the diagonlal. At which point, we have
+our $\hat{B}$ with eigenvalues. With each step, the sum of all off-diagonal elements in $\hat{B}$ be given 
+as $off(\hat{B})^2 = off(\hat{A})^2 - 2a_{kl}$ and we see that per iteration, the sum of off daigonal elements 
+decreases. 
 
+If we want $b_{kl}$ to be null, we can rearrange the expression into one for $\cot(2x)$\cite{rottmann2006matematisk}, 
+which gives us $\cot(2\theta) = \tau = \frac{a_{ll} - a_{kl}}{2a_{kl}}$. We also make similar approximations to 
+$\tan$, $\cos$ and $\sin$, as $t, c, s$ respectively. with $t = \frac{s}{c} $. The expression for $\cot(2\theta)$
+can be rewritten as $cot(2\theta) = \frac{1}{2}(\cot(\theta) - \tan(\theta))$ which can be solved for $t$ as 
+\[ t^2 + 2\tau t - 1 = 0 \]
+\[ t = - \tau \pm \sqrt{1 + \tau^2} \]
+And from this, we get $c = \frac{1}{\sqrt{1 + t^2}} \& s = tc$
+
+Our algorithm then must choose the largest nondiagonal matrix element and set this as our $a_kl$ before rotating the 
+matrix so that this element is 0, finding here the values for $s$ and $c$. After inserting the values into the 
+relevant elements, we go back to the top. This repeats as long as the largest offdiagonal is greater than a tolerance 
+for 0.
 
 \section{Code, implementation and tests}
 %"Readability of code, implementation, testing and discussion of benchmarks" (20)
