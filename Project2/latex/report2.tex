@@ -24,23 +24,46 @@
 
 \begin{abstract}
 %"Accurate and informative" (5pts)
+    Approaching boundary value problems and extracting resulting eigenvalues from scaled 
+    equations to different systems. Reinterpret the scaled equations through
+    discretization and rewriting them as matrix operations on vectors. Finally, through
+    similarity transformations, the eigenpairs of the system is extracted. To build
+    intuition, the Jacobi method is used to approximate a diagonal matrix through 
+    rotations of matrix elements.
 
 \end{abstract}
 
 \section{Introduction}
 %"status of problem, major objectives" (10pts)
+The main motivation of the endeavour is to understand and deconstruct eigenvalue problems through
+boundary values systems as well as furthering understanding of similarity transformations to extract
+eigenpairs from scaled equations. Finally, to make use of unit testing to ensure mathematical 
+precision and to clarify code.\\
+
+I begin by examining a system with a buckling beam, whose energetic values are extracted through 
+scaling the basic differential equation and taylor approximating. Next, creating a tridiagonal 
+Toeplitz matrix of the discretized approximation. After confirming the mathematical precision of my 
+methods, I look towards a more complex equation for an electron in a sphreically symmetric harmonic
+oscillator potential.\\
+The equation is scaled and we return very close to the scaled equation of the
+buckling beam. With an added piece to the current position's effect on the outcome. We discretize and 
+create a new tridiagonal matrix, with an additional variable along the diagonal elements.\\
+Finally, we move on to a system of 2 electrons caught in a potential. A so-called quantum dot. This we 
+also scale, discretize and form a tridiagonal matrix around. Again we find the only real change is another added
+variable along the diagonal. 
 
 \section{Theory, algorithms and methods}
 %"Discussion of methods used and their basis/suitability" (20pts)
-We examine  2-point boundary value systems.This leads to discrete energies, in effect eigenvalues. 
-Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions 
-and is therefore a good start to test our methods. Our starting point is\cite{project2pdf}:
+2-point boundary value problems are applicable to numerous systems and are notable in that they leaed to
+discrete eigenvalues. As such they are ideal for solving eigenvalue problems for, e.g.\ energies.
+Our initial methods model is a buckling beam between 2 fastened points. This has analytical solutions 
+and is therefore a good start to test our methods. We begin with the equation\cite{project2pdf}:
 \[
 \gamma \frac{d^2 u(x)}{dx^2} = -F u(x),
 \]
 with $\gamma$ as a system constant, the force F working on the beam at it's endpoint, a distance L 
-from the origin, and $u(x)$ is the displacement of the beam in the y direction. We impose the 
-Dirichlet boundary conditions and set the exremes $u(0) = u(L) = 0$. Naturally, our position 
+from the origin. $u(x)$ is the displacement of the beam in the y direction. We impose the 
+Dirichlet boundary conditions and set the exremes $u(0) = u(L) = 0$, our position 
 $x \in \{ 0, L \}$. As an example to explore solutions to boundary value problems, we naturally 
 treat the values $\gamma$, $F$ and $L$ as known quantities. \\
 
@@ -73,17 +96,17 @@ operations to extract sollutions.
                                 0   & \cdots & \cdots & \cdots  &a  &d & a\\
                                 0   & \cdots & \cdots & \cdots  &\cdots       &a & d\end{bmatrix} 
                                  \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix} 
-                                     = \lambda \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix} . 
+                                     = \lambda \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix}
 \label{eq:matrixse} 
 \end{equation}
-Our tridiagonal matrix has elements "d" along the diagonal and a along the 
+Our tridiagonal matrix has elements $d$ along the diagonal and a along the 
 off diagonals. We set $d = \frac{2}{h^2}$ and $a = -\frac{1}{h^2}$. We also keep the $0^{th}$ 
 and $N^{th}$ elements out of the matrix, in part as our endpoints are known, but also because 
 they are set. They will never change, because they are fastened. In my code, I refer to these 
-elements as "diagonal" and "semidiagonal" to clarify. 
+elements as \textit{diagonal} and \textit{semidiagonal} to clarify. 
 
 This setup has analytical eigenvalues. They follow the form
-\[ \lambda_j = d + 2acos(\frac{j\pi}{N+1}) \;\; j = 1, 2, \cdots, N-1 \]\\
+\[ \lambda_j = d + 2acos(\frac{j\pi}{N+1}) \;\; j = 1, 2, \ldots, N-1 \]\\
 
 
 There is a solution to these matrices, where a matrix A can be transformed through a similarity 
@@ -92,7 +115,6 @@ with eigenvalues $\lambda$ along the diagonal. A similarity transformation also 
 $\hat{S}^T\hat{S} = \mathds{1}$, or $\hat{S}$ is unitary. 
 
 First off, we must show that the unitatry transformations retain orthogonality. 
-
 We start off with an assumed orthonormal set $v_i$, so
 \[
 \vec{v_i}^T \cdot \vec{v_j} = \delta_{ij}
@@ -109,7 +131,6 @@ $\vec{w_{i}}^T = \vec{v_{i}}^T\hat{U}^T$ we have
 \[
     \vec{w_i}^T\vec{w_j} = \vec{v_i}^T\vec{v_j} = \delta_{i,j}
 \]\\
-
 In other words, as long as our transformations are unitary, the vectors retain 
 orthogonality. They are still orthogonal, but not the same. \\
 
@@ -132,7 +153,7 @@ elements. When transforming a matrix as such, with each rotation, we find the la
 this as our $a_{kl}$. Eventually, as the elements perturbed by each transformation are scaled by numbers less
 than 1, we must eventually reach a point where the only remainder is the diagonlal. At which point, we have
 our $\hat{B}$ with eigenvalues. With each step, the sum of all off-diagonal elements in $\hat{B}$ be given 
-as $off(\hat{B})^2 = off(\hat{A})^2 - 2a_{kl}$ and we see that per iteration, the sum of off daigonal elements 
+as $off{(\hat{B})}^2 = off{(\hat{A})}^2 - 2a_{kl}$ and we see that per iteration, the sum of off daigonal elements 
 decreases. 
 
 If we want $b_{kl}$ to be null, we can rearrange the expression into one for $\cot(2x)$\cite{rottmann2006matematisk}, 
@@ -170,7 +191,7 @@ for 0.
         \[ a_{qq} = s^2\, a\_ pp + 2.0\, c\, s\, a_{kl} + c^2\, a\_ qq \]
         \[ a_{kl} = 0.0 \]
         \[ a_{lk} = 0.0 \]
-        \For{ $i=0$ \KwTo $n-1$ }{
+        \For{ $i=0$ \KwTo{} $n-1$ }{
             \uIf{ $i \neq p$ \bf{and} $i \neq q$ }{
                 \[ a\_ ip = a_{ip} \]
                 \[ a\_ iq = a_{iq} \]
@@ -186,14 +207,29 @@ for 0.
         }
         iterations ++
     }
+    \caption{Algorithm to perform a Jacobi transformation on a tridiagonal matrix A, as well as with 
+        a matrix R to store the eigenvectors}
 \end{algorithm}
 
 %insert algo for tridiagonlization without HO potential, with HO potential and for 2 particles.
+\begin{algorithm}
+    \[ a_{00} = d + potential{(0)} \]
+    \[ a_{{(N-1)}{(N-1)}} = d + potential{(N-1)} \]
+    \[ a_{01} = a = a_{{(N-1)}{(N-2)}} \]
+    \For{ $i = 1$ \KwTo{} $i < {(N-1)}$}{
+        \[ a_{ii} = d + potential{(i)} \]
+        \[ a_{i{(i+1)}} = a  = a_{i{(i-1)}} \]
+    }
+    \caption{Algortihm for creating a tridiagonal Toeplitz matrix from an $n\times n$ dimensional matrix. 
+        The potential here refers to either nothing, as in the case of the buckling beam, $\rho^2$ as in the
+        single particle harmonic oscillator and also $\omega_r^2\, \rho^2 + \frac{1}{\rho}$ for the case with 
+        2 particles.}
+\end{algorithm}
 
 Along the way here, it is necesary to ensure that our code follows the mathematical rules 
 established prior. To do this, we need to implement unit tests. Good ones could be ensuring 
 that orthogonality is preserved, that we actually find our eigen values and that we do in fact
-pick out the larges off diagonal element in each step. A last test, is that for a 2X2 matrix, 
+pick out the larges off diagonal element in each step. A last test, is that for a $2\times 2$ matrix, 
 there should only ever be 1 rotation necessary for jacob's method. 
 
 Once we have written our algorithm for extracting the eigen pairs, we can set our sights to 
@@ -215,7 +251,7 @@ We introduce dimensionless variables and scale the equations until we get
 Which means we essentially only need to add a term $\rho^2$ to the diagonal element of our 
 matrix, and we can find the energies and energy eigentsates of the system. 
 
-Further on, we can model a 2-particle system, much like a quantum gate %% cite!!
+Further on, we can model a 2-particle system, a so called quantum dot\cite{project2pdf},
 where we now need to scale a sum of the 2 electron quantum states. 
 
 After some hullaballoo, we get to the expression 
@@ -230,34 +266,43 @@ Otherwise, the system is the same.
 \section{Results and discussion}
 %"Analysis of the results and effectiveness of selection and presentation. Results well 
 % understood and discussed" (20pts)
-The first implementation gave us [] iterations for "N" steps. This evolves as such: []
+The recorded rotations for the $1^{st}$ iteration of my program were deleted, so I have no direct records 
+of the runtimes and the earliest ones contain some blatant errors, where all elements were set to infinity or 
+$NaN$. I do have records from runs throughout the iterations. In particular from when I was testing for number
+of steps necessary to get within 4 leading digits of the eigenvalues. for 300 steps, I recorded $156093 \sim 1.73N^2$
+rotations. for 400 steps, I got $278970 \sim 1.74N^2$ rotations. For 500 steps, I got $437584 \sim 1.75N^2$. These 
+numbers are slowly increasing, but not near the average number of rotations suggested in the project 
+literature\cite{hjorth2000computational} of 3 to 5 $N^2$. These rotations took about  275 seconds from 300 steps, to 
+3500 seconds at 500 steps. This is, in other words a rather demanding task, Though I cannot say wxactly why this is, 
+I doubt I have stumbled upon a hidden efficiency in the algorithm and rather some error I did not pick up in my tests. 
 
-per iteration, we have []N FLOPS resulting in an average of []. Comparing this with the average values 
-found in the project text %%\cite{}
-We can see a general overlapping trend. The averages are estimations, after all. Though a deviation 
-could hint at a problem in the code, so we need to ensure unit testing. The tests ran were for
-preservatoion of orthogonality, checking that the scalar product of 2 collumns returned 0 for any $i \neq j$.
-I also made sure that I successfully captured the largest off-diagonal element in each run, so that the while loop 
-ran accordingly. 
-Finally we check that the eigenvalues we find correspond to the analytical ones. And another one to ensure that it
-needs 1 rotation for a 2x2 matrix. This last one returns 2, but that is mainly because of the way I set my maxoffdiag 
-in the beginning. A better solution would probably be to run 1  rotation and then check that the result is as it should be. 
+The tests I did run, checked the likes of preservation of orthogonality, checking that the scalar product of 2 collumns 
+returned 0 for any $i \neq j$. I also made sure that I successfully captured the largest off-diagonal element in each 
+run, so that the while loop ran accordingly. Finally we check that the eigenvalues we find correspond to the analytical 
+ones. And another one to ensure that it needs 1 rotation for a $2\times 2$ matrix. This last one returns 2, but that is '
+mainly because of the way I set my maxoffdiag in the beginning. A better solution would probably be to run 1  rotation 
+and then check that the result is as it should be. 
 
-These tests are calibrated for the system of the buckling beam, and sadly I cold not find a good way to split it. Therefore the tests of eigenvalues is not going to return the proper values.\\
+These tests are calibrated for the system of the buckling beam, and sadly I cold not find a good way to split it. 
+Therefore the tests of eigenvalues is not going to return the proper values.\\
 
 Moving onto the QM system of a particle in a harmonic oscillator potential. The main difference in the program is a change along the diagonal. 
-This means that the eigenvalues will change, though one can find them analytically as 3, 5, 11, 15, .. %%\cite{}
+This means that the eigenvalues will change, though one can find them analytically as 3, 5, 11, 15, ..\cite{project2pdf}
 We have to make sure that our eigenvalues still correspond to the analytical ones, and this is also a test of the program on heavier matrices. 
 To get within 4 leading digits of the result, the steps have to go towards 500. This makes the jacobi rotations themselves run for an hour, 
-with memory allocation and the like, this brings it even further. []\\
+as seen previously.
 
-So we know that our program follows the eigenvalues even with a change in system.
-Now we want to explore the behaviour of electrons within such a 
-potential.  [Need a table with N and $\rho$ along each axis and energies for the corresponding to show that the lowes eigenvalue is ~3]
-Our interest is really only in the ground state n=1, so this leaves l and m as 00, which means that the states have noe degeneracy. 
+One thing that should have been tested for, but which unfortunately was not, is that the system is stable for choices of $\rho$ and $N$, 
+where the lowest energies should nonetheless lie at $~3$ throughout. The strange behaviour of figure 1 points to this. 
 
-[figure of plot with GS probabilities over rho for various omega. ]
-comment on graphs of probability, what with increasing potential strength and similar. 
+\begin{figure}[hbtp]
+\includegraphics[scale=0.4]{ProbvsDistanceFreq.png}
+\caption{The probabilities of finding the electrons in a state $\psi$ with relative distance $\rho$ between eachother.
+        There does seem to be a slight issue, in that the greater frequencies and thus also the greater potentials 
+        seem to have a preference towards greater distance. A steeper curve on the potential should lead to a squeeze 
+        towards the center of the potential and thus also less distance between them.} 
+\label{honestly, I don't know what label does}
+\end{figure}
 
 \section{Conclusions}
 %"conclusions, Discussion and critical comments on what was learned about the method used 
@@ -265,10 +310,15 @@ comment on graphs of probability, what with increasing potential strength and si
 The jacobi method is a direct method. It takes the whole matrix and operates on it untill it is in the shape we want. 
 This also means that for more comlplex problemts, the FLOPS increase greatly. As we can see with the amount of time it took to get any 
 particular precision with the single particle HO potential system, the method has sombottle necks.  Especially since we know our 
-matrices are tridagonal, which have convenient properties that can be utilized by e.g. the bisection method [this is so far 
-ungroundde, I have not looked at this don ot keep this if you do not get the time to read up on it.].
-[look at plot and determine if system behaves as it should. ]
-Personally, I feel the program lost a lot of oversigth as the project went on, but had trouble making it clearer. I think segmenting 
+matrices are tridagonal, which have convenient properties that can be utilized by other methods, e.g. guaranteed convergence.\\
+
+As stated in figure 1, the probabilities do not seem to comply with the intuition of the system, and there is, if anything a greater relative
+distance between the electrons with a greater oscillator frequency. There seem to be an inversion of sorts of the attractive force on the
+electrons. While the direction of the integration seems to be off, I did ensure to test the general acccuracy of the approximation to 0
+for the off-diagonal elemetns. The average sum of all non-diagonal elements at this stage is around the $10^{-10}$ and so at the very least,
+the eigenvalues extracted through the method should hold. the fault probably then lies somewhere in the tridiagonalization of the matrix. \\
+
+As a final thought, I personally feel the program lost a lot of oversigth as the project went on, but had trouble making it clearer. I think segmenting 
 the main and the remaining funcitons would go a long way in cleaning this up. Furthermore, I would have liked to send in a function call to 
 my toeplitz tridiagonal function, which would tell it which potentials to add to the diagonal elements. This would have made the unit 
 tests maintain clarity and improved the readability of my code. As a personal note, I think a more comprehensive journal as well as a 
