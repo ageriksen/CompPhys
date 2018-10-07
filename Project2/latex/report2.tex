@@ -7,6 +7,8 @@
 \usepackage{color}
 \usepackage[numbers]{natbib}
 \usepackage{dsfont}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{filename.extension}
@@ -30,7 +32,7 @@
 
 \section{Theory, algorithms and methods}
 %"Discussion of methods used and their basis/suitability" (20pts)
-We examine  2-point boundary value systems.this leads to discrete energies, in effect eigenvalues. 
+We examine  2-point boundary value systems.This leads to discrete energies, in effect eigenvalues. 
 Our initial methods model a buckling beam between 2 fastened points. This has analytical solutions 
 and is therefore a good start to test our methods. Our starting point is\cite{project2pdf}:
 \[
@@ -43,21 +45,21 @@ $x \in \{ 0, L \}$. As an example to explore solutions to boundary value problem
 treat the values $\gamma$, $F$ and $L$ as known quantities. \\
 
 Our first step in our towards a solution, is to scale the function. And the first toe of this 
-footstep is to introduce a dimensionless variable $ \rho = \frac{r}{L} $, which necessarily follows 
+footstep is to introduce a dimensionless varialle $ \rho = \frac{r}{L} $, which necessarily follows 
 $\rho \in [0,1]$. Next comes introducing $\lambda = \frac{FL^2}{R}$. This leads to the eigenvalue 
 problem
 \[
 \frac{d^2u(\rho )}{d\rho^2} = -\lambda u(\rho)
 \]
 
-This can be approximated through a Taylor expansion and inserting the '-' sign from in front of our 
+This can be approximated through a Tallor expansion and inserting the '-' sign from in front of our 
 $\lambda$:
 \[
 u'' = \frac{-u(\rho + h) - u(\rho - h) + 2u(\rho)}{h^2} + {O}(h^2)
 \]
-With h as our stepsize.\
+with h as our stepsize.
 
-intending to walk from $\rho = 0$ to $1$ in $N$ steps, we naturally derive our steplength as 
+Intending to walk from $\rho = 0$ to $1$ in $N$ steps,we derive our steplength as 
 $h = \frac{\rho_N - \rho_0}{N} = \frac{1}{N}$. Letting $i \in \{ 1, 2, \ldots, N\}$ for 
 \[\rho_i = \rho_0 + ih = ih\] and
 \[ -\frac{u_{i+1} + u_{i-1} - 2u_{i}}{h^2} = \lambda u_i\]
@@ -74,7 +76,7 @@ operations to extract sollutions.
                                      = \lambda \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ \dots \\ u_{N-2} \\ u_{N-1}\end{bmatrix} . 
 \label{eq:matrixse} 
 \end{equation}
-Where our tridiagonal matrix has elements "d" along the diagonal, naturally, and a along the 
+Our tridiagonal matrix has elements "d" along the diagonal and a along the 
 off diagonals. We set $d = \frac{2}{h^2}$ and $a = -\frac{1}{h^2}$. We also keep the $0^{th}$ 
 and $N^{th}$ elements out of the matrix, in part as our endpoints are known, but also because 
 they are set. They will never change, because they are fastened. In my code, I refer to these 
@@ -89,7 +91,7 @@ transformation so that $\hat{S}^T \hat{A} \hat{S} = \hat{B}$ where $\hat{B}$ is 
 with eigenvalues $\lambda$ along the diagonal. A similarity transformation also requires that 
 $\hat{S}^T\hat{S} = \mathds{1}$, or $\hat{S}$ is unitary. 
 
-first off, we must show that the unitatry transformations retain orthogonality. 
+First off, we must show that the unitatry transformations retain orthogonality. 
 
 We start off with an assumed orthonormal set $v_i$, so
 \[
@@ -125,9 +127,9 @@ the following elements:
 
 For each such rotation, we choose our angles so that $a_{kl} = 0$. This is repeated until each non-diagonal
 matrix element becomes 0, or at least within a tolerance of 0. Note that the elements $b_{il} \& b_{ik}$
-change with each rotation as well. This means that for each rotation, we isturb slightly a few other 
-elements. When transforming a matrix as such, with each rotation we find the largest element and designate
-this as our $a_{kl}$. Eventually, As the elements perturbed by each transformation are scaled by numbers less
+change with each rotation as well. This means that for each rotation we disturb slightly a few other 
+elements. When transforming a matrix as such, with each rotation, we find the largest element and designate
+this as our $a_{kl}$. Eventually, as the elements perturbed by each transformation are scaled by numbers less
 than 1, we must eventually reach a point where the only remainder is the diagonlal. At which point, we have
 our $\hat{B}$ with eigenvalues. With each step, the sum of all off-diagonal elements in $\hat{B}$ be given 
 as $off(\hat{B})^2 = off(\hat{A})^2 - 2a_{kl}$ and we see that per iteration, the sum of off daigonal elements 
@@ -135,34 +137,153 @@ decreases.
 
 If we want $b_{kl}$ to be null, we can rearrange the expression into one for $\cot(2x)$\cite{rottmann2006matematisk}, 
 which gives us $\cot(2\theta) = \tau = \frac{a_{ll} - a_{kl}}{2a_{kl}}$. We also make similar approximations to 
-$\tan$, $\cos$ and $\sin$, as $t, c, s$ respectively. with $t = \frac{s}{c} $. The expression for $\cot(2\theta)$
-can be rewritten as $cot(2\theta) = \frac{1}{2}(\cot(\theta) - \tan(\theta))$ which can be solved for $t$ as 
+$\tan$, $\cos$ and $\sin$, as $t, c, s$ respectively. With $t = \frac{s}{c} $. The expression for $\cot(2\theta)$
+can be rewritten as $\cot(2\theta) = \frac{1}{2}(\cot(\theta) - \tan(\theta))$ which can be solved for $t$ as 
 \[ t^2 + 2\tau t - 1 = 0 \]
 \[ t = - \tau \pm \sqrt{1 + \tau^2} \]
 And from this, we get $c = \frac{1}{\sqrt{1 + t^2}} \& s = tc$
 
-Our algorithm then must choose the largest nondiagonal matrix element and set this as our $a_kl$ before rotating the 
+Our algorithm then must choose the largest nondiagonal matrix element and set this as our $a_{kl}$ before rotating the 
 matrix so that this element is 0, finding here the values for $s$ and $c$. After inserting the values into the 
 relevant elements, we go back to the top. This repeats as long as the largest offdiagonal is greater than a tolerance 
 for 0.
 
-\section{Code, implementation and tests}
-%"Readability of code, implementation, testing and discussion of benchmarks" (20)
+\begin{algorithm}
+    \While{ $ \max(| a_{ij}| ) > \epsilon $ }{
+        $p, q = indices(\max(|a_{ij}))$
+        \eIf{$ a_{kl} \neq 0.0$ }{
+            \[\tau = \frac{a_{qq} - a_{pp} }{2\, a_{pq} }\]
+            \eIf{ $\tau \geq 0$ }{
+                \[t = \frac{1.0}{ \tau + \sqrt{ 1 + \tau^2 } }\]
+            }{
+                \[t = -\frac{1.0}{ - \tau + \sqrt{ 1 + \tau^2 } }\]
+            }
+            \[c = \frac{1.0}{ 1.0 t^2}\]
+            \[s = c\, t\]
+        }{
+            \[c = 1.0\]
+            \[s = 0.0\]
+        }
+        \[ a\_ pp = a_{pp} \]
+        \[ a \_ qq = a_{qq} \]
+        \[ a_{pp} = c^2\, a\_ pp - 2.0\, c\,s\, a_{kl} + s^2\, a\_ qq \]
+        \[ a_{qq} = s^2\, a\_ pp + 2.0\, c\, s\, a_{kl} + c^2\, a\_ qq \]
+        \[ a_{kl} = 0.0 \]
+        \[ a_{lk} = 0.0 \]
+        \For{ $i=0$ \KwTo $n-1$ }{
+            \uIf{ $i \neq p$ \bf{and} $i \neq q$ }{
+                \[ a\_ ip = a_{ip} \]
+                \[ a\_ iq = a_{iq} \]
+                \[ a_{ip} = c\, a\_ ip - s\, a\_ iq \]
+                \[ a_{ip} = c\, a\_ iq + s\, a\_ ip \]
+                \[ a_{pi} = a_{ip} \]
+                \[ a_{qi} = a_{iq} \]
+            }
+            \[ r\_ ip = r_{ip} \]
+            \[ r\_ iq = r_{iq} \]
+            \[ a_{ip} = c\, r\_ ip - s\, r\_ iq \]
+            \[ a_{iq} = c\, r\_ iq + s\, r\_ ip \]
+        }
+        iterations ++
+    }
+\end{algorithm}
 
-\section{Analysis}
+%insert algo for tridiagonlization without HO potential, with HO potential and for 2 particles.
+
+Along the way here, it is necesary to ensure that our code follows the mathematical rules 
+established prior. To do this, we need to implement unit tests. Good ones could be ensuring 
+that orthogonality is preserved, that we actually find our eigen values and that we do in fact
+pick out the larges off diagonal element in each step. A last test, is that for a 2X2 matrix, 
+there should only ever be 1 rotation necessary for jacob's method. 
+
+Once we have written our algorithm for extracting the eigen pairs, we can set our sights to 
+more interesting problems, such as electrons in spherically symetrical harmonic oscillator 
+potentials. To begin, we need to incorporate the radial solution of the Schroedinger equation
+
+\begin{equation*}
+  -\frac{\hbar^2}{2 m} \left ( \frac{1}{r^2} \frac{d}{dr} r^2
+  \frac{d}{dr} - \frac{l (l + 1)}{r^2} \right )R(r) 
+     + V(r) R(r) = E R(r).
+\end{equation*}
+
+We introduce dimensionless variables and scale the equations until we get 
+
+\begin{equation*}
+  -\frac{d^2}{d\rho^2} u(\rho) + \rho^2u(\rho)  = \lambda u(\rho) 
+\end{equation*}
+
+Which means we essentially only need to add a term $\rho^2$ to the diagonal element of our 
+matrix, and we can find the energies and energy eigentsates of the system. 
+
+Further on, we can model a 2-particle system, much like a quantum gate %% cite!!
+where we now need to scale a sum of the 2 electron quantum states. 
+
+After some hullaballoo, we get to the expression 
+\begin{equation*}
+  -\frac{d^2}{d\rho^2} \psi(\rho) + \omega_r^2\rho^2\psi(\rho) +\frac{1}{\rho} = \lambda \psi(\rho)
+\end{equation*}
+
+where  $\psi(\rho)$ is the state, and analogous to our $u(\rho)$ previously. Which, if we stare at it for a little
+while, means that we need to add $\omega_r^2\rho^2+1/\rho$ to our diagonal insteafd of merely $\rho^2$. 
+Otherwise, the system is the same. 
+
+\section{Results and discussion}
 %"Analysis of the results and effectiveness of selection and presentation. Results well 
 % understood and discussed" (20pts)
+The first implementation gave us [] iterations for "N" steps. This evolves as such: []
 
+per iteration, we have []N FLOPS resulting in an average of []. Comparing this with the average values 
+found in the project text %%\cite{}
+We can see a general overlapping trend. The averages are estimations, after all. Though a deviation 
+could hint at a problem in the code, so we need to ensure unit testing. The tests ran were for
+preservatoion of orthogonality, checking that the scalar product of 2 collumns returned 0 for any $i \neq j$.
+I also made sure that I successfully captured the largest off-diagonal element in each run, so that the while loop 
+ran accordingly. 
+Finally we check that the eigenvalues we find correspond to the analytical ones. And another one to ensure that it
+needs 1 rotation for a 2x2 matrix. This last one returns 2, but that is mainly because of the way I set my maxoffdiag 
+in the beginning. A better solution would probably be to run 1  rotation and then check that the result is as it should be. 
 
-\section{conclusions}
+These tests are calibrated for the system of the buckling beam, and sadly I cold not find a good way to split it. Therefore the tests of eigenvalues is not going to return the proper values.\\
+
+Moving onto the QM system of a particle in a harmonic oscillator potential. The main difference in the program is a change along the diagonal. 
+This means that the eigenvalues will change, though one can find them analytically as 3, 5, 11, 15, .. %%\cite{}
+We have to make sure that our eigenvalues still correspond to the analytical ones, and this is also a test of the program on heavier matrices. 
+To get within 4 leading digits of the result, the steps have to go towards 500. This makes the jacobi rotations themselves run for an hour, 
+with memory allocation and the like, this brings it even further. []\\
+
+So we know that our program follows the eigenvalues even with a change in system.
+Now we want to explore the behaviour of electrons within such a 
+potential.  [Need a table with N and $\rho$ along each axis and energies for the corresponding to show that the lowes eigenvalue is ~3]
+Our interest is really only in the ground state n=1, so this leaves l and m as 00, which means that the states have noe degeneracy. 
+
+[figure of plot with GS probabilities over rho for various omega. ]
+comment on graphs of probability, what with increasing potential strength and similar. 
+
+\section{Conclusions}
 %"conclusions, Discussion and critical comments on what was learned about the method used 
 % and results obtained. Possible directions for future improvement?" (10pts)
-
+The jacobi method is a direct method. It takes the whole matrix and operates on it untill it is in the shape we want. 
+This also means that for more comlplex problemts, the FLOPS increase greatly. As we can see with the amount of time it took to get any 
+particular precision with the single particle HO potential system, the method has sombottle necks.  Especially since we know our 
+matrices are tridagonal, which have convenient properties that can be utilized by e.g. the bisection method [this is so far 
+ungroundde, I have not looked at this don ot keep this if you do not get the time to read up on it.].
+[look at plot and determine if system behaves as it should. ]
+Personally, I feel the program lost a lot of oversigth as the project went on, but had trouble making it clearer. I think segmenting 
+the main and the remaining funcitons would go a long way in cleaning this up. Furthermore, I would have liked to send in a function call to 
+my toeplitz tridiagonal function, which would tell it which potentials to add to the diagonal elements. This would have made the unit 
+tests maintain clarity and improved the readability of my code. As a personal note, I think a more comprehensive journal as well as a 
+closer planning of the code beforehand would have helped a lot in expediting the code. Secondly, I should have focused more on simply 
+finishing a working example of the code early to prepare for implementing the various changes. Overall, I should have made more 
+schematics of my workflow to highlight important parts of the project early on.
 
 \bibliography{mybib}
 \bibliographystyle{plain}
 \end{document}
 %%%%
+
+% Code, implementation and tests
+%"Readability of code, implementation, testing and discussion of benchmarks" (20)
+
 %"clarity of figures and general presentation. too much vs too little." (10pts)
 
 %"referencing: relevant works cited accurately?" (5pts)
