@@ -36,12 +36,14 @@ def plot_2particleHO():
     prob1 = stateomega0**2; prob2 = stateomega1**2; prob3 = stateomega2**2; prob4 = stateomega3**2;
     rho = np.linspace(0, 10, number[0])
     plt.figure()
-    plt.plot(rho, prob1)
-    plt.plot(rho, prob2)
-    plt.plot(rho, prob3)
-    plt.plot(rho, prob4)
+    plt.plot(rho, prob1, label=r"$\omega_0$")
+    plt.plot(rho, prob2, label=r"$\omega_1$")
+    plt.plot(rho, prob3, label=r"$\omega_2$")
+    plt.plot(rho, prob4, label=r"$\omega_3$")
     plt.xlabel(r"$\rho$")
     plt.ylabel(r"$|\psi |^2$")
+    plt.title("probability distribution in harmonic oscillator")
+    plt.legend()
     plt.show()
 
     return 0

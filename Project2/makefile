@@ -1,7 +1,7 @@
 # Comment lines
 # General makefile for c - choose PROG =   name of given program
 # Here we define compiler option, libraries and the  target
-CC= c++ -Wall
+CC= c++ -Wall -O3
 PROG= functions
 # this is the math library in C, not necessary for C++
 LIB = -lm -llapack -lblas -larmadillo

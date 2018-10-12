@@ -1,0 +1,4 @@
+lowest eigenvalues                time
+9179.73           0.0314822
+36635.2
+82378.7

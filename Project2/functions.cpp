@@ -83,6 +83,31 @@ int main(int argc, char *argv[])
                    << eigenstate3(i) << endl;
         }
         myfile.close();
+
+        // finding eigenvalues with armadillo
+        mat armadilloeigenvalues(dim, dim, fill::zeros);
+        mat armaeigvecmat(dim,dim, fill::zeros);
+        vec armaeigval(dim, fill::zeros);
+        Toeplitztridiag( armadilloeigenvalues, dim, step, diagonal, semidiagonal, omega(i)); 
+//        cout << armadilloeigenvalues << endl;
+        auto start = chrono::system_clock::now();
+        eig_sym(armaeigval, armaeigvecmat, armadilloeigenvalues);
+        auto end = chrono::system_clock::now();
+        chrono::duration<double> runtime = end - start;
+        time = runtime.count();
+        uvec indices = sort_index(armaeigval);
+        cout << "armadillo's eigenvalues found" << endl;
+
+        //write 
+        string writefile= "EigvectorsEigvaluesArmadilloOmega"+to_string(i)+".txt";
+        ofstream thisfile;
+        thisfile.open(writefile, ios::out);
+        thisfile << "lowest eigenvalues" << setw(20) << "time" << endl;
+        thisfile << armaeigval(indices(0)) << setw(20) << time << endl;
+        thisfile << armaeigval(indices(1)) << endl;
+        thisfile << armaeigval(indices(2)) << endl;
+        thisfile.close();
+
     }
     // if test to check if tests should be run.
     if (argc > 2)
