@@ -9,4 +9,6 @@
 using namespace std;
 using namespace arma;
 
+double acceleration(vec, double);
+
 #endif
