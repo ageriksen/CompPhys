@@ -1,14 +1,19 @@
 \documentclass[10pt, twocolumn]{revtex4-1}
+\listfiles               %  print all files needed to compile this document
+
 \usepackage{amsmath}
+\usepackage{xparse}
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{bm}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
 \usepackage{color}
-\usepackage[numbers]{natbib}
-\usepackage{dsfont}
+\usepackage{physics}
 \usepackage{algorithm2e}
 \usepackage{algpseudocode}
+\usepackage{natbib}
+
+\setcitestyle{numbers}
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{test1.pdf}
@@ -16,15 +21,30 @@
 %\label{fig:n10points}
 %\end{figure}
 
+
 \begin{document}
+
 \title{Project 1}
 \author{Anders Eriksen}
-\begin{abstract}
-\end{abstract}
+\maketitle
+
+%\begin{abstract}
+%\end{abstract}
 
 \section{Introduction}
 
-\section{Methods}
+\section{Theory and methods}
+
+The main point of focus in the project is the developement of methods to
+solve ordinary differential equations (ODEs) from an object oriented way
+mainly through the philosophy of "write once, run repeatedly". The system
+we are stydying for this, is a model solar system where the main assumptions
+are that the planets being point particles as well as the motion being coplanar. 
+We naturally also assume no other forces at play besides gravity. 
+\[
+F_G=\frac{GM_{\odot}M_{\mathrm{Earth}}}{r^2},
+\]
+
 
 \section{Results and discusion}
 
@@ -32,4 +52,5 @@
 
 \section{appendix}
 
+\bibliography{\string~/Documents/bibliography/Bibliography}
 \end{document}
