@@ -1,0 +1,5 @@
+CXX = c++
+CXXFLAGS = -Wall
+LDLIBS = -larmadillo
+
+main : main.o solarsystem.o celestialbody.o vec3.o
