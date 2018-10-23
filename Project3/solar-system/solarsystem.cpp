@@ -59,18 +59,33 @@ double SolarSystem::kineticEnergy() const
     return m_kineticEnergy;
 }
 
-void SolarSystem::writeToFile(CelestialBody & body )
+//void SolarSystem::writeToFile(CelestialBody & body )
+void SolarSystem::writeToFile()
 {
-    if(!m_file.good()) 
+//    if(!m_file.good()) 
+//    {
+//        m_file.open(body.name+".dat", ofstream::out);
+//        if(!m_file.good()) 
+//        {
+//            cout << "Error opening file " << body.name+".dat" << ". Aborting!" << endl;
+//            terminate();
+//        }
+//    }
+    for( CelestialBody & body : m_bodies)
     {
-        m_file.open(body.name+".dat", ofstream::out);
         if(!m_file.good()) 
         {
-            cout << "Error opening file " << body.name+".dat" << ". Aborting!" << endl;
-            terminate();
+            m_file.open(body.name+".dat", ofstream::out);
+            if(!m_file.good()) 
+            {
+                cout << "Error opening file " << body.name+".dat" << ". Aborting!" << endl;
+                terminate();
+            }
         }
+        cout << body.name << endl;
+        m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
     }
-    m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
+    //m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
 //    m_file << numberOfBodies() << endl;
 //    m_file << "Comment line that needs to be here. Balle." << endl;
 //    for(CelestialBody &body : m_bodies) {

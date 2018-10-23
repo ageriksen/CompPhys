@@ -17,6 +17,7 @@ int main(int numArguments, char **arguments)
 
     string name = "sun";
     CelestialBody &sun = solarSystem.createCelestialBody( vec3(0,0,0), vec3(0,0,0), 1.0, name);
+    cout << sun.name ;
 
     // We don't need to store the reference, but just call the function without a left hand side
     solarSystem.createCelestialBody( vec3(1, 0, 0), vec3(0, 2*M_PI, 0), 3e-6, "earth");
@@ -34,11 +35,12 @@ int main(int numArguments, char **arguments)
     Solver integrator(dt);
     for(int timestep=0; timestep<numTimesteps; timestep++) {
         integrator.Euler(solarSystem);
-        for( CelestialBody & body: solarSystem.bodies() )
-        {
-            cout << "writing for planet " << body.name << "\n";
-            solarSystem.writeToFile(body);
-        }
+        solarSystem.writeToFile();
+//        for( CelestialBody & body: solarSystem.bodies() )
+//        {
+//            //cout << "writing for planet " << body.name << "\n";
+//            solarSystem.writeToFile(body);
+//        }
     }
 
     cout << "solar system has " << solarSystem.bodies().size() << " objects." << endl;
