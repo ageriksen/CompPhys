@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <fstream>
 #include "solarsystem.h"
 #include "solver.h"
 

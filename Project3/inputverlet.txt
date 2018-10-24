@@ -1,4 +1,0 @@
-0
-y
-verlet.txt
-1

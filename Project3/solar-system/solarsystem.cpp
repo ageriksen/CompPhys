@@ -18,6 +18,7 @@ void SolarSystem::calculateForcesAndEnergy()
     m_kineticEnergy = 0;
     m_potentialEnergy = 0;
     m_angularMomentum.zeros();
+    m_c = 173*365; // speed of light in AU/yr
 
     for(CelestialBody &body : m_bodies) {
         // Reset forces on all bodies
@@ -26,6 +27,7 @@ void SolarSystem::calculateForcesAndEnergy()
 
     for(int i=0; i<numberOfBodies(); i++) 
     {
+        vec3 Force;
         CelestialBody &body1 = m_bodies[i];
         for(int j=i+1; j<numberOfBodies(); j++) 
         {
@@ -33,6 +35,11 @@ void SolarSystem::calculateForcesAndEnergy()
             vec3 deltaRVector = body1.position - body2.position;
             double dr = deltaRVector.length();
             // Calculate the force and potential energy here
+            m_angularMomentum += body1.mass*(body1.velocity.cross(body1.position)) + body2.mass*(body2.velocity.cross(body2.position));
+            Force += (-body1.mass*4*pow(M_PI,2)*body2.mass*deltaRVector/pow(dr, 3))*(1 + (3*pow(m_angularMomentum.length(), 3)/(pow(dr, 2)*pow(m_c,2))));
+            body1.force += Force;
+            body2.force -= Force;
+            m_potentialEnergy -= 4*pow(M_PI, 2)*body1.mass*body2.mass/dr;
         }
 
         m_kineticEnergy += 0.5*body1.mass*body1.velocity.lengthSquared();
@@ -59,37 +66,15 @@ double SolarSystem::kineticEnergy() const
     return m_kineticEnergy;
 }
 
-//void SolarSystem::writeToFile(CelestialBody & body )
-void SolarSystem::writeToFile()
+void SolarSystem::writeToFile(string runName)
 {
-//    if(!m_file.good()) 
-//    {
-//        m_file.open(body.name+".dat", ofstream::out);
-//        if(!m_file.good()) 
-//        {
-//            cout << "Error opening file " << body.name+".dat" << ". Aborting!" << endl;
-//            terminate();
-//        }
-//    }
     for( CelestialBody & body : m_bodies)
     {
-        if(!m_file.good()) 
-        {
-            m_file.open(body.name+".dat", ofstream::out);
-            if(!m_file.good()) 
-            {
-                cout << "Error opening file " << body.name+".dat" << ". Aborting!" << endl;
-                terminate();
-            }
-        }
-        cout << body.name << endl;
-        m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
+        std::ofstream file;
+        file.open(runName + body.name + ".dat", ofstream::out | ofstream::app);
+        file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
+        file.close(); 
     }
-    //m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
-//    m_file << numberOfBodies() << endl;
-//    m_file << "Comment line that needs to be here. Balle." << endl;
-//    for(CelestialBody &body : m_bodies) {
-//        m_file << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";
 }
 
 vec3 SolarSystem::angularMomentum() const

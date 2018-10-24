@@ -1,4 +1,0 @@
-1
-y
-euler.txt
-1

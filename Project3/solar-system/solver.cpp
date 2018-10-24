@@ -23,12 +23,8 @@ void Solver::Verlet(SolarSystem & system)
 	for ( CelestialBody & body: system.bodies() )
 	{
 		ai = body.force/body.mass;
-		body.position += body.velocity*m_dt;
-			+ 0.5*m_dt*m_dt*ai;
-	}
-	system.calculateForcesAndEnergy();
-	for ( CelestialBody & body: system.bodies() )
-	{
+		body.position += body.velocity*m_dt + 0.5*m_dt*m_dt*ai;
+        system.calculateForcesAndEnergy();
 		aii = body.force/body.mass;
 		body.velocity += 0.5*m_dt*(aii + ai);
 	}
