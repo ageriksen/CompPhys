@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\title{Project 1}
+\title{Project 3}
 \author{Anders Eriksen}
 \begin{abstract}
     An examination of the accuracy of the veolcity verlet using object orientation on a model
@@ -186,7 +186,7 @@ sun of $0.3075\,\mathrm{AU}$. As a controll of the resolution, we can compare wi
 \section{Results and discusion}
 
 For the initial incarnation of the solution, just a simple run of either Verlet or Euler with the Earth-Sun system, we can see a change in the distance
-for the Euler solution, but not so for the Verlet solver. This indicates that the energy really is conserved in the integration. for 2 body problem, the
+for the Euler solution, but not for the Verlet solver. This indicates that the energy really is conserved in the integration. For the 2 body problem, the
 question of a circular orbit is fairly simple, merely following the sentripetal acceleration $a = \frac{v^2}{r}$ which gives us a velocity of 
 $v = \frac{2\pi }{r}$
 
@@ -201,7 +201,7 @@ $v = \frac{2\pi }{r}$
 
 The Forward Eulre integration has a clear drift over time as seen in figure 1, stemming from a failiure to conserve the energy of the system. 
 The velocity verlet, however maintains the energy, see figure 2, as well as having a numerical error proportional to steplength $h^2$, as 
-opposed to Euler's $h$. We can also see that the resulting orbit is circular, as we should expect from the initial velocity of the simpe system. 
+opposed to Euler's $h$. We can also see that the resulting orbit is circular, as we should expect from the initial velocity of the simple system. 
 
 
 \begin{figure}[hbtp]
@@ -216,7 +216,7 @@ opposed to Euler's $h$. We can also see that the resulting orbit is circular, as
 
 When calculating escape velociy, I used a distance $r= 1AU$ and used the fact that the energy would need to be either $0$
 or greater if the planet was to escape. Therefore, I sat $E_k = E_p$ and found a velocity of $v = \sqrt{\frac{8\pi^2}{r}}$,
-the initial distance meant $v = 2\sqrt{2}\pi$. This is ilustrated in figure 3, where we see that the motion is less and 
+the initial distance meant $v = 2\sqrt{2}\pi$. This is illustrated in figure 3, where we see that the motion is less and 
 less affected by the star with distance. As this is the exact escape velocity, it will not disappear until the distance is at 
 infinity. Currently, the velocity goes according to $v \propto \frac{1}{\sqrt{r}}$, but if we were to increase the density
 dropoff of the gravitational force according to the cube of the distance, then the escape velocity would approach 
@@ -257,7 +257,7 @@ the Verlet method still holds even under these strange developements.
 As we have now more or less verified our numericals for various systems and number of planets, we can begin to add in both the motion 
 of the sun as well as the remaining planets(excluding Pluto which is currently not within this deifnition) in figures 6 and 7. We can observe a gap between
 the orbits that seem to almost increase exponentially with the distance form the sun. We can also see that the 5 decades of time developement 
-does not seem to be enough to complete the orbits of the furthest. planets. This makes sense, as the gravitational field reduces with 
+does not seem to be enough to complete the orbits of the furthest planets. This makes sense, as the gravitational field reduces with 
 $\frac{1}{r}$, and so the resulting velocities that remain bound to the system have to be significantly lower, as the kinetic energy is 
 proportional to the square of the velocities. we can also see, that the initial assumption of coplanar motion is off, but not by terribly 
 much over all, with some tilt in either direction. 
@@ -283,15 +283,15 @@ much over all, with some tilt in either direction.
 A final consideration, is the accuracy of our potential calculations. We assumed the system followed the newtonian gravity, which seems 
 to be fairly accurate on the whole. But there are corrections that can be made with regards to the theories of relativity. In particular, 
 an important test of Einsteins theories was the perihelion precession of Mercury. The perihelion precession was measured to be $43''$ per century.
-Newtonian gravity predicts several oreders of magnitude less in this timeframe. To examine this, I ran a system of pure Sun-Mercury and set Mercury's 
+Newtonian gravity predicts several orders of magnitude less in this timeframe. To examine this, I ran a system of pure Sun-Mercury and set Mercury's 
 initial values as those in the perihelion. Letting the simulation run for a century with a sampling of $1e8-1e9$ points, I found a precession of 
 $42.8''$ for the relativistically corrected equation presented in the theory above. While the newtonian system predicts a precession of $0.02''$.
 this shows that the relativistic model is about $1 000$ more accurate at predicting systems of this magnitude than newton's. 
 
 \section{conclusion}
 As we built up our program and system, we saw that the velocity Verlet method vastly outperformed the Forward Euler, maintaining a good approximation
-to the plante's path with around a few hundred integration points a day during our revolutions around the star and maintaining a near constant angular
-momentum through the years in out isolated system. \\
+to the planet's path with around a few hundred integration points a day during our revolutions around the star and maintaining a near constant angular
+momentum through the years in our isolated system. \\
 
 As we added complexity to our system, we also developed a program with objects that could 
 compartmentalize the required tasks and feed the finished results into eachother, resulting in a program that could near seemlessly add planets and 
