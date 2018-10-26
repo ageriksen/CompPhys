@@ -1,0 +1,15 @@
+> ./main.exe 
+The position of sun is[-0.000591916, 0.00738554, -6.15423e-05]; with velocity [-0.00283155, 0.00078177, 7.16385e-05];
+The position of mercury is[-0.283026, 0.199994, 0.0415871]; with velocity [-7.88834, -8.0564, 0.0650914];
+The position of venus is[-0.19798, 0.698365, 0.0208104]; with velocity [-7.12633, -2.06798, 0.382767];
+The position of earth is[0.756887, 0.648395, -0.000101983]; with velocity [-4.1621, 4.77224, -0.000315596];
+The position of mars is[1.38877, 0.155624, -0.0310456]; with velocity [-0.349901, 5.51614, 0.124155];
+The position of jupiter is[-2.53023, -4.72491, 0.0761943]; with velocity [2.39556, -1.16888, -0.0487187];
+The position of saturn is[1.85024, -9.88152, 0.0981642]; with velocity [1.88959, 0.368336, -0.0816472];
+The position of uranus is[17.0584, 10.1835, -0.183172]; with velocity [-0.746388, 1.16573, 0.0140215];
+The position of neptune is[28.9655, -7.54541, -0.512156]; with velocity [0.281108, 1.11565, -0.0293087];
+do you want to printi(y/n)?
+y
+name the run: fullSystem
+initial angular momentum [-0.00458536, -0.00144466, -0.175387]; and afterwards [-0.00458536, -0.00144466, -0.175387];
+angular momentum is conserved! with a relative change of 2.6199e-08 over 50 years.

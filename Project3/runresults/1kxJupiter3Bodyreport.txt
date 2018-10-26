@@ -1,0 +1,9 @@
+> ./main.exe 
+The position of sun is[0, 0, 0]; with velocity [0, 0, 0];
+The position of earth is[0.756887, 0.648395, -0.000101983]; with velocity [-4.1621, 4.77224, -0.000315596];
+The position of jupiter is[-2.53023, -4.72491, 0.0761943]; with velocity [2.39556, -1.16888, -0.0487187];
+do you want to printi(y/n)?
+y
+name the run: 1kxJupiter3Body
+initial angular momentum [-0.606582, -0.112591, -27.1252]; and afterwards [-0.606704, -0.112614, -27.1306];
+angular momentum is conserved! with a relative change of 0.000200371 over 50 years.
