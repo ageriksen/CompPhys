@@ -37,39 +37,46 @@
 \title{Project 1}
 \author{Anders Eriksen}
 \begin{abstract}
+    An examination of the accuracy of the veolcity verlet using object orientation on a model
+    solar system. 
 \end{abstract}
 \maketitle
 
 
 \section{Introduction}
+This is an exercise in numerical integration on a system that lends itself well to object orientation. 
+The main motivations are to study the velocity Verlet method in contrast to a simpler Euler solution 
+to integration as well as implement a system of classes to pass objects to and fro where general 
+solutions are applied to the specific objects on a case by case basis. To this extent, we will generate
+at least three classes. A "planet builder" to create our planets, a "system" to put our planets into and
+a "solver" to evolve our system over time. 
 
 \section{Theory and methods}
 
-The main point of focus in the project is the developement of methods to
-solve ordinary differential equations (ODEs) from an object oriented way
-mainly through the philosophy of "write once, run repeatedly". The system
-we are stydying for this, is a model solar system where the main assumptions
-are that the planets being point particles as well as the motion being coplanar. 
-We naturally also assume no other forces at play besides gravity. 
+The main point of focus for the project is developing methods to
+solve ordinary differential equations (ODEs) through object orientation with the philosophy "write once and run repeatedly".
+Our object of study this time around is a model solar system, with the assumpion that there are no other objects in the universe
+and that the planets are all point particles. Finally, we assume that the only force at work is the conservative gravitational force. 
 \[
 F_G=\frac{GM_{\odot}M_{\mathrm{Earth}}}{r^2},
 \]
-Initially, we also neglect the motion of the sun, as it is overwhelmingly massive.
-The origin of the suns orbit is far inside it's radius, which we have assumed to be 
-zero. This will be gone into further detail on later, but for a 2 body system of earth 
-and sun, we use newtons equations of motion (eom) to get: 
+We initially also assume that the sun is far too massive to be affected in any meaningful degree by the planets orbiting it. 
+Observations of solar motion inform us that this is not too far off, as the focal point of the suns motion lies far within the 
+solar radius. We will eventually give position and velocity to the sun, but for our initial purposes and to test the soluions, it 
+is satisfactory. The Newtonian equations of motion (eom) give: 
 \[
     \frac{d^2\vec{r}}{dt^2}=\frac{\vec{F_{G}}}{M_{\mathrm{Earth}}},
 \]
 
-
-When modeling systems of this size, meters and kilograms are not the best units, as they
-are far too small. Instead, we will use astronomical units(AU), sun masses($M_{\odot}$) and years(yr) as our
-measurement values. We have then,
+For systems of this size, meters and kilograms are fare too fine as measurement devices go. We utilize astronomical units ($AU$)
+and years ($yrs$). 
 \[
     1 AU = 1.5\times 10^{11} \quad 1 M_{\odot} = 2\times 10^{30}
 \]
-For reference, I include the masses and orbits of relevant planets.\cite{project3pdf}\\
+
+A list of orbital disatance and masses of relevant planets are provided as reference. \cite{project3pdf} These masses will be converted
+into solar masses in our program. \\
+
 \begin{tabular}{lcc}
 \hline
 \multicolumn{1}{c}{ Planet } & \multicolumn{1}{c}{ Mass, kg } & \multicolumn{1}{c}{ Distance to sun, AU } \\
@@ -85,18 +92,35 @@ Neptun  & $M_{\mathrm{Neptun}}=1.03\cdot 10^{26}$   & 30.06         \\
 \hline
 \end{tabular}\\
 
-Initially, we ensure that our integration methods work, we make a special solution of the earth sun system, implementing
-the Forward Euler and velocity Verlet integration methods. Before that, however, we need to discretize our functions. 
+The first point of order is to examine and contrast the integration methods. At this point, we merely want to build a working 
+system for for the 2-body problem of the Earth and Sun, which we can further generalize and object orient. Before all this, however,
+we need to discretize our equations. 
 
 If we assume ciruclar motion, then we can rewrite the force as 
 \[
 F_G= \frac{M_{\mathrm{Earth}}v^2}{r}=\frac{GM_{\odot}M_{\mathrm{Earth}}}{r^2},
 \]
-and use this to get 
+using sentripetal acceleration $\frac{v^2}{r}$ and use this to get 
 \[
 v^2r=GM_{\odot}=4\pi^2\mathrm{AU}^3/\mathrm{yr}^2.
 \]
-here, $4\pi$ has the dimensions listed. This comes from earth's period being $1 yr$ and it's distance is $1 AU$. 
+Giving $4\pi$ the dimensions $\mathrm{AU}^3/\mathrm{yr}^2$ and use this to eliminate the gravitational constant from our equations. 
+\[ F_G = \frac{4\pi^2 M_{\mathrm{Earth}}}{r^2} \]
+With the force sorted, I can look into the Forward Euler and velocty Verlet integration algorithms. Both are based on Taylor expansions
+around a point. 
+\[ x(t \pm h ) = x(t) + h\dot{x} + \frac{h^2}{2!}\ddot{x} \pm O(h^3) \]
+For Euler, we use the base equation and find 
+\begin{align}
+    v &+= a\cdot h \\
+    x &+= v\cdot h
+\end{align}
+while the Verlet, with the velocities added, through a taylor expansion of both the velocity and acceleration about the point, as well
+as the sum $x(t+h) + x(t-h)$
+\begin{align}
+    x_{i+1} &+= v_i\cdot h + 0.5\cdot h^2 \cdot a(x_i) \\
+    v_{i+1} &+= 0.5 \cdot h \cdot (a(x_{i+1}) + a(x_i) )
+\end{align}
+implementing these, we can set up algorithms as following. 
 
 \begin{algorithm}
     \caption{a Forward Euler integration}
@@ -118,7 +142,7 @@ here, $4\pi$ has the dimensions listed. This comes from earth's period being $1 
         \[\vec{a_{i+1}} = \vec{a}(\vec{r_{i+1}})\]
         \[\vec{v_{i+1}} += h*(a_i + a_{i+1})/2 \]
     }
-\end{algorithm}
+\end{algorithm}\\\\
 
 After ensuring that the algortihms are implemented correctly, I need to generalize the code into an object oriented (OO)
 implementation. This should constitute a main file which takes the various objects and binds them together. After looking
