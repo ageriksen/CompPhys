@@ -142,57 +142,45 @@ implementing these, we can set up algorithms as following.
         \[\vec{a_{i+1}} = \vec{a}(\vec{r_{i+1}})\]
         \[\vec{v_{i+1}} += h*(a_i + a_{i+1})/2 \]
     }
-\end{algorithm}\\\\
+\end{algorithm}
 
-After ensuring that the algortihms are implemented correctly, I need to generalize the code into an object oriented (OO)
-implementation. This should constitute a main file which takes the various objects and binds them together. After looking
-through examples and some discussion amongst peers, I have elected to use the methods presented, providing my own "solver" class
-and otherwise encorporating code into my experiments. This is in part due to time constraint, but also because using and tweaking
-these objects is gonna bring a quicker working knowledge through usage and familiarity. building from scratch can come later.
-The main idea in the objects used, is to have one to create a type "planet", which one can then store in another object, the 
-"solar system". There is a 3rd one, a "solver" which can find the next position of the planets after a time dt has passed using
-the combined gravitational force on the objects from the rest of thes system and the individual positions and velocities. 
+After ensuring that the algortihms are implemented correctly, we generalize the code into an object oriented (OO)
+implementation. This should constitute a main file to coordinate all the dispersed parts, a "creator" to create the planets, 
+a "system" to hold the planets and to extract interactions between them and finally a "solver" to evolve our system over time. 
+To get a bit og a head start we begin with a main outline from examples found on the course github repository\cite{coursegithub}. 
 
-As this is an exploration of the numerical methods, we need to explore the results. One way to do this, is to controll for the 
-velocity resulting in circular orbit, both through trial and error, as well as through analytical calculation. This would be of interest
-comparing Verlet and Euler as well as the time needed to run each, in conjunction with th eamount of FLOPS needed per step in the loops. 
-After exploring the 2 methods, further on, we'll use the Verlet method, as this maintains energy conservation. 
+One way to controll the acuracy of integration over various timesteps, is to let the planets move along paths which we can predict through
+proper restrictions, such as circular orbits. Next, we can explore the situation of escape velocity, as this is another analytically solvable problem,
+we can ensure that we get are on the right track, if the planet does escape at the velocity we find and not before. 
 
-Having explored the requirements for circular orbit, we now examine the case for escape velocity. Both through experimentation and analytical analysis. 
-As an additional analysis, we will explore how the escape velocity changes as we change the power of r in our expression of force, especially when we lett 
-the power approach 3. 
-
-Having verified our equations, we can now complicate our image through adding another body to our problem. We want to add the greatest single contributor
-besides the sun, Jupiter. The 3-body problem is far more difficult to process thant the 2-body problem. with 2 bodies, the earthen orbit is stable and
+After exploring our methods, we complicate the system furter through adding another body to our problem. The greatest single contributor
+besides the sun, Jupiter. The 3-body problem is far more difficult to process than the 2-body problem. with 2 bodies, the earthen orbit is stable and
 unchanging. Adding in Jupiter, we need to take into account how much of an effect Jupiter has on the earth. Thus, we need the total force as the 
 vector sum of the forces from the sun and Jupiter. Now we have pull from different directions over time, and this should affect the orbit of the planet.
 The force contribution of Jupiter is on the form
 \[
-F_{\mathrm{Earth-Jupiter}}=\frac{GM_{\mathrm{Jupiter}}M_{\mathrm{Earth}}}{r_{\mathrm{Earth-Jupiter}}^2},
+F_{\mathrm{Earth-Jupiter}}=\frac{4\pi^2 M_{\mathrm{Jupiter}}M_{\mathrm{Earth}}}{r_{\mathrm{Earth-Jupiter}}^2},
 \]
-And we can ensure that the solutions remain stable, by checking that the energy of the system is conserved throuhgt the velocity verlet. 
+Where the masses are given in relation to the sun. To ensure that the solution is stable, we record the momentum and check the drift over time. 
 
-Once we know that our sollutions are stable for more complicated systems, we can center our system around a center of mass, instead of a stationary sun.
-Thus, we now shift the positions to be in regard to the center of mass (COM) of the system. With this, the center of mass will serve as a "stationary" 
-point, while all other bodies will revolve around it. To ensure the motion is conserved, we add a velocity to the sun so that the total momentum of the 
-system is 0.Finally, we add in the remaining planets of the solar system. The initial positions are all taken from Mathias Vege after some discussion on
-Slack.\cite{MathiasPlanetvalues}. 
+The next step in our system model, is to move the sun out of the center and into it's proper place before adding the remainder of the planets. To do this, 
+we use a list of positions and velocities provided by NASA initially, but which I received from Mathias Vege\cite{MathiasPlanetvalues}.
 
 
-Now that we have a good working system for our planets, we want to go into some detail on a phenomenon that was crucial to the success of the theory of
-relativity, namely the precession of Mercury's perihelion. When all classical effects are accounted for, the observed value of the perihelion precession
-is at around 43" per century. This arises from a small perturbation of the $1/r^2$ dependency of the gravitationsl force which results in the effective 
-precession of the elipse. The correction to the force becomes 
+As we have added most of the desired complexity to our system, we want to end with taking a closer look at the forces we have been working with throughout the 
+project. To do this, we look at a problem which was important to support Einsteins theory of relativity, the perihelion precession of Mercury, which is about
+$43''$ larger per century than what the Newtonian system predicts. This arises from a small perturbation of the $1/r^2$ dependency of the gravitationsl 
+force which results in the effective precession of the elipse. The correction to the force becomes 
 \[
 F_G = \frac{GM_\mathrm{Sun}M_\mathrm{Mercury}}{r^2}\left[1 + \frac{3l^2}{r^2c^2}\right]
 \]
-Where $l=|\vec{r}\times\vec{v}|$ is the magnitude of Mercury's orbital angular momentum per unit mass, with c as the speed of light in vacuum. We trac the
+Where $l=|\vec{r}\times\vec{v}|$ is the magnitude of Mercury's orbital angular momentum per unit mass, with c as the speed of light in vacuum. We track the
 angle of perihelion $\theta_P$ with 
 \[
 \tan \theta_\mathrm{p} = \frac{y_\mathrm{p}}{x_\mathrm{p}}
 \]
 or the ratio of Mercury's x and y position at perihelion. Using the perihelion speed of Mercury as $12.44\,\mathrm{AU}/\mathrm{yr}$ with a distance to the 
-sun of $0.3075\,\mathrm{AU}$. As a controll of the reoslution, we can compare with the precession of the perihelion without the correction. 
+sun of $0.3075\,\mathrm{AU}$. As a controll of the resolution, we can compare with the precession of the perihelion without the correction. 
 
 
 \section{Results and discusion}
@@ -252,10 +240,9 @@ initial conditions. Therefore, I use information on planet positions and velocit
     Jupiter's mass approaches that of the sun, it destabilizes the system. }
     \label{}
 \end{figure}
-Varying Jupiter's mass, we can see that it provides increasingly greater distractions from the sun with regards to the Earth untill
-Jupiter is as massive as the sun. At this point, the system breaks down and spirals outwards. What we can notice throughout these, is
-that the momentum of the system remains the same to a relative error $\epsilon < 1e-5$, which means that the Verlet method still holds 
-even under these strange developements. 
+Varying Jupiter's mass, perturbs Earth's orbit untill Jupiter is as massive as the sun. At this point, the system breaks down and spirals outwards. 
+What we can notice throughout these, is that the momentum of the system remains the same to a relative error $\epsilon < 1e-5$, which means that 
+the Verlet method still holds even under these strange developements. 
 
 \begin{figure}[hbtp]
     \includegraphics[scale=0.4]{stationarySun3Body.png}
