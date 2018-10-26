@@ -12,8 +12,9 @@
 \usepackage{algorithm2e}
 \usepackage{algpseudocode}
 \usepackage{natbib}
+\usepackage{pgfplots}
 
-\setcitestyle{numbers}
+\pgfplotsset{compat=1.15}
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{test1.pdf}
@@ -21,15 +22,24 @@
 %\label{fig:n10points}
 %\end{figure}
 
+%\begin{tikzpicture}
+%    \begin{axis}[
+%            title= Earth-Sun system, Forward Euler integration,
+%            xlabel={$x$},
+%            ylabel={$y$},
+%        ]
+%        \addplot table {../runresults/earthEuler2body.dat}
+%    \end{axis}
+%\end{tikzpicture}
 
 \begin{document}
 
 \title{Project 1}
 \author{Anders Eriksen}
+\begin{abstract}
+\end{abstract}
 \maketitle
 
-%\begin{abstract}
-%\end{abstract}
 
 \section{Introduction}
 
@@ -59,24 +69,21 @@ measurement values. We have then,
 \[
     1 AU = 1.5\times 10^{11} \quad 1 M_{\odot} = 2\times 10^{30}
 \]
-For reference, I include the masses and orbits of relevant planets.\cite{project3pdf}
-\begin{quote}
-\begin{tabular}{ccc}
+For reference, I include the masses and orbits of relevant planets.\cite{project3pdf}\\
+\begin{tabular}{lcc}
 \hline
-\multicolumn{1}{c}{ Planet } & \multicolumn{1}{c}{ Mass in kg } & \multicolumn{1}{c}{ Distance to  sun in AU } \\
+\multicolumn{1}{c}{ Planet } & \multicolumn{1}{c}{ Mass, kg } & \multicolumn{1}{c}{ Distance to sun, AU } \\
 \hline
-Earth   & $M_{\mathrm{Earth}}=6\times 10^{24}$ kg     & 1AU                    \\
-Jupiter & $M_{\mathrm{Jupiter}}=1.9\times 10^{27}$ kg & 5.20 AU                \\
-Mars    & $M_{\mathrm{Mars}}=6.6\times 10^{23}$ kg    & 1.52 AU                \\
-Venus   & $M_{\mathrm{Venus}}=4.9\times 10^{24}$ kg   & 0.72 AU                \\
-Saturn  & $M_{\mathrm{Saturn}}=5.5\times 10^{26}$ kg  & 9.54 AU                \\
-Mercury & $M_{\mathrm{Mercury}}=3.3\times 10^{23}$ kg & 0.39 AU                \\
-Uranus  & $M_{\mathrm{Uranus}}=8.8\times 10^{25}$ kg  & 19.19 AU               \\
-Neptun  & $M_{\mathrm{Neptun}}=1.03\times 10^{26}$ kg & 30.06 AU               \\
-Pluto   & $M_{\mathrm{Pluto}}=1.31\times 10^{22}$ kg  & 39.53 AU               \\
+Earth   & $M_{\mathrm{Earth}}=6\cdot 10^{24}$       & 1             \\
+Jupiter & $M_{\mathrm{Jupiter}}=1.9\cdot 10^{27}$   & 5.20          \\
+Mars    & $M_{\mathrm{Mars}}=6.6\cdot 10^{23}$      & 1.52          \\
+Venus   & $M_{\mathrm{Venus}}=4.9\cdot 10^{24}$     & 0.72          \\
+Saturn  & $M_{\mathrm{Saturn}}=5.5\cdot 10^{26}$    & 9.54          \\
+Mercury & $M_{\mathrm{Mercury}}=3.3\cdot 10^{23}$   & 0.39          \\
+Uranus  & $M_{\mathrm{Uranus}}=8.8\cdot 10^{25}$    & 19.19         \\
+Neptun  & $M_{\mathrm{Neptun}}=1.03\cdot 10^{26}$   & 30.06         \\
 \hline
-\end{tabular}
-\end{quote}
+\end{tabular}\\
 
 Initially, we ensure that our integration methods work, we make a special solution of the earth sun system, implementing
 the Forward Euler and velocity Verlet integration methods. Before that, however, we need to discretize our functions. 
@@ -93,10 +100,24 @@ here, $4\pi$ has the dimensions listed. This comes from earth's period being $1 
 
 \begin{algorithm}
     \caption{a Forward Euler integration}
+    N $=$ nr. of timesteps \\
+    $h = (t_{end} - t_{start})/N $ // steplength \\
+    \For{ $i=0$ \KwTo{ $i=N-1$} }{
+        \[\vec{ v_{i+1} } += \vec{ a_i } \cdot h\]
+        \[\vec{ r_{i+1} } += \vec{ v{i+1} } \cdot h\]
+    }
 \end{algorithm}
 
 \begin{algorithm}
     \caption{a velocity Verlet integration}
+    N $=$ nr. of timesteps \\
+    $h = (t_{end} - t_{start})/N $ // steplength \\
+    \For{ $i=0$ \KwTo{ $i=N-1$ }}{
+        \[\vec{a_i} = \vec{a}(\vec{r_i}i)\]
+        \[\vec{r_i{+1}} += h\cdot \vec{v_i} h^2a_i/2\]
+        \[\vec{a_{i+1}} = \vec{a}(\vec{r_{i+1}})\]
+        \[\vec{v_{i+1}} += h*(a_i + a_{i+1})/2 \]
+    }
 \end{algorithm}
 
 After ensuring that the algortihms are implemented correctly, I need to generalize the code into an object oriented (OO)
@@ -130,8 +151,8 @@ And we can ensure that the solutions remain stable, by checking that the energy 
 Once we know that our sollutions are stable for more complicated systems, we can center our system around a center of mass, instead of a stationary sun.
 Thus, we now shift the positions to be in regard to the center of mass (COM) of the system. With this, the center of mass will serve as a "stationary" 
 point, while all other bodies will revolve around it. To ensure the motion is conserved, we add a velocity to the sun so that the total momentum of the 
-system is 0.Finally, we add in the remaining planets of the solar system. The initial positions are all taken from the NASA link 
-provided\cite{NASAPlanetvalues}. 
+system is 0.Finally, we add in the remaining planets of the solar system. The initial positions are all taken from Mathias Vege after some discussion on
+Slack.\cite{MathiasPlanetvalues}. 
 
 
 Now that we have a good working system for our planets, we want to go into some detail on a phenomenon that was crucial to the success of the theory of
@@ -152,7 +173,131 @@ sun of $0.3075\,\mathrm{AU}$. As a controll of the reoslution, we can compare wi
 
 \section{Results and discusion}
 
+For the initial incarnation of the solution, just a simple run of either Verlet or Euler with the Earth-Sun system, we can see a change in the distance
+for the Euler solution, but not so for the Verlet solver. This indicates that the energy really is conserved in the integration. for 2 body problem, the
+question of a circular orbit is fairly simple, merely following the sentripetal acceleration $a = \frac{v^2}{r}$ which gives us a velocity of 
+$v = \frac{2\pi }{r}$
+
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{2bodyEuler.png}
+    \caption{Forward Euler integration of the 2 body system of a stationary sun and earth. 
+        There is a clear drift as time goes by, which empathizes the drif in energy of the 
+        system with the Euler, since the integrations are done in a conservative potential
+        field.} 
+    \label{}
+\end{figure}
+
+The Forward Eulre integration has a clear drift over time as seen in figure 1, stemming from a failiure to conserve the energy of the system. 
+The velocity verlet, however maintains the energy, see figure 2, as well as having a numerical error proportional to steplength $h^2$, as 
+opposed to Euler's $h$. We can also see that the resulting orbit is circular, as we should expect from the initial velocity of the simpe system. 
+
+
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{2bodyVerlet.png}
+    \caption{Velocity Verlet integration of the 2 body system of a stationary sun and earth.
+        This integration is run with as many steps as figure 1, which shows how much more robust
+        the Verlet solution is compared to the Forward Euler. We can also see from the axes that 
+        despite the seeming eliptical orbit, this has more to do with improper scaling. The radius
+        is 1 AU in all directions. } 
+    \label{}
+\end{figure}
+
+When calculating escape velociy, I used a distance $r= 1AU$ and used the fact that the energy would need to be either $0$
+or greater if the planet was to escape. Therefore, I sat $E_k = E_p$ and found a velocity of $v = \sqrt{\frac{8\pi^2}{r}}$,
+the initial distance meant $v = 2\sqrt{2}\pi$. This is ilustrated in figure 3, where we see that the motion is less and 
+less affected by the star with distance. As this is the exact escape velocity, it will not disappear until the distance is at 
+infinity. Currently, the velocity goes according to $v \propto \frac{1}{\sqrt{r}}$, but if we were to increase the density
+dropoff of the gravitational force according to the cube of the distance, then the escape velocity would approach 
+$v \propto \frac{1}{r}$.
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{escapevelocity.png}
+    \caption{this is the earths "orbit" around the sun with an escape velocity so $E_k = E_p \rightarrow E=0$.
+        For a system at a distance of $1 AU$, escape velocity is, as stated in the title. Measurements show that 
+        just below leads to a stable orbit with a change from $2 \rightarrow 1.9$ in front of the square root.} 
+    \label{}
+\end{figure}
+
+At this point, we begin to leave the realm of analytical solutions explored by Newton and his contemporaries. Here, we see that 
+the inclusion of Jupiter squishes the circular orbit of the Earth into an elipse. This is also a challenge to pick good values for 
+initial conditions. Therefore, I use information on planet positions and velocities\cite{MathiasPlanetvalues} as mentioned above. 
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{jupiterXmass4.png}
+    \caption{The orbits of Earth and Jupiter around a stationary sun for varying masses of jupiter. We can see 
+    as we increase the mass from Jupoter's regular mass(top left) by $10$(top right) and $1 000$(botom row) 
+    respectively, we get increasingly rampant orbits, with the lower spiraling out completely. We can see that as
+    Jupiter's mass approaches that of the sun, it destabilizes the system. }
+    \label{}
+\end{figure}
+Varying Jupiter's mass, we can see that it provides increasingly greater distractions from the sun with regards to the Earth untill
+Jupiter is as massive as the sun. At this point, the system breaks down and spirals outwards. What we can notice throughout these, is
+that the momentum of the system remains the same to a relative error $\epsilon < 1e-5$, which means that the Verlet method still holds 
+even under these strange developements. 
+
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{stationarySun3Body.png}
+    \caption{An enlarged version of the first plot in figure 4. We can see, that the previously circular orbit of
+        the earth is pushed to be eliptical. We also see some slight axial tilt in the axis. the Verlet method retains
+        angular momentum to a great deal, and this should be close to the effect of the planet, rather than iancuracies 
+        in the numerical method.}
+    \label{}
+\end{figure}
+
+
+As we have now more or less verified our numericals for various systems and number of planets, we can begin to add in both the motion 
+of the sun as well as the remaining planets(excluding Pluto which is currently not within this deifnition) in figures 6 and 7. We can observe a gap between
+the orbits that seem to almost increase exponentially with the distance form the sun. We can also see that the 5 decades of time developement 
+does not seem to be enough to complete the orbits of the furthest. planets. This makes sense, as the gravitational field reduces with 
+$\frac{1}{r}$, and so the resulting velocities that remain bound to the system have to be significantly lower, as the kinetic energy is 
+proportional to the square of the velocities. we can also see, that the initial assumption of coplanar motion is off, but not by terribly 
+much over all, with some tilt in either direction. 
+
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{fullSystemSameAngle.png}
+    \caption{The full solar system (excluding Pluto). The data is gathered over 5 decades, which is not quite enough 
+        time for the outermost planets to complete an orbit, but we see that Saturn and closer planets have seemingly 
+        closed orbits. There is a distinct distance between the outer planets Neptune, Uranus, Saturn and, to a degree, 
+        Jupiter and the inner planets beginning with mars. This inner part has far tighter orbits in comparison.} 
+    \label{}
+\end{figure}
+
+
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{fullSystemNewAngle.png}
+    \caption{A shifted angle of the same plot as figure 6, in an attempt to better showcase the inner "nucleus". 
+        We can see a progressively closer orbits as we approach the sun, almost seeming to follow an inverse proportionality 
+        to the distance from the sun. } 
+    \label{}
+\end{figure}
+
+A final consideration, is the accuracy of our potential calculations. We assumed the system followed the newtonian gravity, which seems 
+to be fairly accurate on the whole. But there are corrections that can be made with regards to the theories of relativity. In particular, 
+an important test of Einsteins theories was the perihelion precession of Mercury. The perihelion precession was measured to be $43''$ per century.
+Newtonian gravity predicts several oreders of magnitude less in this timeframe. To examine this, I ran a system of pure Sun-Mercury and set Mercury's 
+initial values as those in the perihelion. Letting the simulation run for a century with a sampling of $1e8-1e9$ points, I found a precession of 
+$42.8''$ for the relativistically corrected equation presented in the theory above. While the newtonian system predicts a precession of $0.02''$.
+this shows that the relativistic model is about $1 000$ more accurate at predicting systems of this magnitude than newton's. 
+
 \section{conclusion}
+As we built up our program and system, we saw that the velocity Verlet method vastly outperformed the Forward Euler, maintaining a good approximation
+to the plante's path with around a few hundred integration points a day during our revolutions around the star and maintaining a near constant angular
+momentum through the years in out isolated system. \\
+
+As we added complexity to our system, we also developed a program with objects that could 
+compartmentalize the required tasks and feed the finished results into eachother, resulting in a program that could near seemlessly add planets and 
+calculate their positions and velocities over time without more than an added line. This object orientation mainly revolced around 4 objects. A "celestial 
+body" class, which took in the planets and assigned them positions, velocities and other physical observables which could then be accessed down the line. 
+A "system" class which stored all the planets and could work out the forces inbetween each of them and a "Solver" class, which could solve the equations of 
+motion for the planets in the system a step forwards in time. This way of handling things allowed for far less repetition of definitions and helped insulate
+mistakes.\\
+
+While the systems we set up worked well, there are a few things that I did not have the time to fully automate, such as the force used, or the calls to various 
+amounts of planets. Ideally, I envision a system in which I can give a filename and the program will implement a planet with name, position, vellocity and 
+other attributes to create the system I wish to study. further, I would like to customize the span of the integration in both length and timestep or number of
+steps. The main issue I encountered on this front, was in innterpreting the input. I believe a sollution here could be a textfile as input, with relevant info
+such as data files, integration length and similar, while the system itself has perhaps another object that can interpret input from file and put the results
+where they ought to go. Finally, I should have specified a folder to write the results into. \\
+Another solution could be a python script to handle inputs and outputs, with plots as necessary. This would be a more involved project than what time allows 
+for this time around. 
 
 \section{appendix}
 
