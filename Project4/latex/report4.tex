@@ -55,7 +55,28 @@ the latice. J is a coupling constant and, as we are currently investigating ferr
 As we will investigate changes in the system, the equation can be solved as
 \[ \Delta E = 2 Js_l^1 \sum_{<k>}^N s_k \].
 
-These 
+The numerical issues we focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into 
+%these and discuss here. 
+
+As with most systems, we begin with a simple iteration. For the ising model of ferromagnets, we start out with a $2\times 2$ lattice to find $\ev{E}$
+as well as the mean average magnetic moment, $\abs{M}$, henceforth "mean magnetism". Additional valuable properties are the specific heat capacity, $C_V$
+as well as succeptability. $\chi$ as functions of T, with periodic boundary conditions. 
+
+Having studied simple system, we will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We 
+want to accurately extract the properties found previously, for a scaled temperature $T = 1 \qq{with dimensions} \qty[ T ] = \frac{ J }{ kT }$. Here, 
+k is the Boltzman constant. This will allow us to cancel out the k in future calculations. Another important step, is to log the number of Monte Carlo
+(MC) cycles we run. 
+
+Having Benchmarked and controlled our program for a simple system, we up the lattice size $L\times L$ to $L=20$. Because there is little value in studying 
+a system not in equilibrium for our purposes and in order to not waste cpu cycles on usesless info that will at best be thrown out, we need to determine the
+time the system needs to reach equilibrium. The simplest method here, is to just plot the various expectation values as functions of the number of MC cycles.
+and determining by-eye when the system reaches the desired stability. We measure time in sweeps per lattice of MC cycles. An interesting question, is whether
+or not the equilibration time depends on the starting position. Whether this is ordered so all spins point in the same direction or random configuration.
+These first tests will be run with the initial temperature $T=1$. We will also investigate the temperature $T = 2.4$ and whether or not it is possible to 
+estimate equilibration time. Here, we want to plot the total number of accepted MC cycles as a function of the total number of MC cycles run, so as to 
+investigate whether or not we can attest to the accepted configurations depending on T. 
+
+Additionally we want to 
 
 
 \section{Results and discussion}
