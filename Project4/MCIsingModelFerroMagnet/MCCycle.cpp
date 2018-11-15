@@ -27,8 +27,9 @@ int main(int argc, char *argv[]){
     for( double Temp = initialTemp; Temp <= finalTemp; Temp += TempStep )
     {
         string Filename = runName+std::to_string(Temp)+".bin";
-        vec Expectationvalues = zeros<mat>(6);
+        vec Expectationvalues = zeros<mat>(5);
         MonteCarloMetropolis( runName, NSpins, MCCycles, Temp, Expectationvalues );
+        cout << "Final energy: " << Expectationvalues(0)/MCCycles << endl;
 //        Expectationvalues /= MCCycles;
 //        fileDump( Filename, Expectationvalues, Expectationvalues.size() );
     }
@@ -57,7 +58,7 @@ void MonteCarloMetropolis(
     //Array for possible changes in energy
     vec EnergyProb = zeros<mat>(17);
     for( int dE = -8; dE <= 8; dE += 4 ) EnergyProb(dE+8) = exp(-dE/Temp);
-    int tenth = MCCycles*0.1;
+    int tenth = MCCycles*0.001;
 
     //Begin Monte Carlo cycle
     for( int cycle = 1; cycle <= MCCycles; cycle ++)
@@ -67,12 +68,13 @@ void MonteCarloMetropolis(
         {
             int x = (int)( RNG(gen)*(double)NSpins );
             int y = (int)( RNG(gen)*(double)NSpins );
+
             int DeltaE = 2*SpinMatrix(x, y)*
                 (
                  SpinMatrix( x, PeriodicBoundary( y, NSpins, -1) )
                  + SpinMatrix( PeriodicBoundary( x, NSpins, -1), y )
                  + SpinMatrix( x, PeriodicBoundary( y, NSpins, 1) )
-                 + SpinMatrix( PeriodicBoundary( y, NSpins, 1), y )
+                 + SpinMatrix( PeriodicBoundary( x,  NSpins, 1), y )
                 );
             if( RNG(gen) <= EnergyProb(DeltaE + 8) )
             {
@@ -82,12 +84,11 @@ void MonteCarloMetropolis(
             }
         }
         //Update expectation values, local node
-        Expectationvalues(0) = cycle;
-        Expectationvalues(1) += Energy;
-        Expectationvalues(2) += Energy*Energy;
-        Expectationvalues(3) += MagneticMoment;
-        Expectationvalues(4) += MagneticMoment*MagneticMoment;
-        Expectationvalues(5) += fabs(MagneticMoment);
+        Expectationvalues(0) += Energy;
+        Expectationvalues(1) += Energy*Energy;
+        Expectationvalues(2) += MagneticMoment;
+        Expectationvalues(3) += MagneticMoment*MagneticMoment;
+        Expectationvalues(4) += fabs(MagneticMoment);
 
         if( cycle % tenth == 0)
         {
@@ -124,6 +125,7 @@ void initializeLattice( int NSpins, mat & SpinMatrix, double & Energy, double & 
                 );
         }
     }
+    cout << "initial energy is: " << Energy << endl;
 } // end initializeLattice
 
 void fileDump(
