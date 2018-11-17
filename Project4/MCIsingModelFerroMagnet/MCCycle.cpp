@@ -8,79 +8,165 @@ inline int PeriodicBoundary(int i, int limit, int add)
 
 int main(int argc, char *argv[]){
 
-    string runName;
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    string path, runName, mode;
     int NSpins, MCCycles;
-    double initialTemp, finalTemp, TempStep;
+    double initialTemp, finalTemp, TempStep, Rate;
+    vec ExpectEnergy, ExpectEnergySquared, ExpectMagnet, ExpectMagnetSquared, AbsMagnet;
+    vec Accepted, MCTime;
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cout << "please input: \n"
-            << "read runName, Number-of-Spins, MC-cycles, "
-            << "initial-temperature, final-temperature "
-            << "and temperature-step." << endl;
+            << "path, runName, mode, Nspins, MCCycles, Rate, InitialTemp, "
+            << "finalTemp and TempStep." << endl;
+    cin >> path;
     cin >> runName;
+    cin >> mode;
     cin >> NSpins;
     cin >> MCCycles;
+    cin >> Rate;
     cin >> initialTemp;
     cin >> finalTemp;
     cin >> TempStep;
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    cout << "necessary values read." << endl;
 
+    cout << "with a fraction of " << Rate << endl;
+    cout << "and a max number of cycles " << MCCycles << endl;
+    cout << "\n \n The length of our arrays are: " << MCCycles*Rate << "\n" << endl;
+    // Initializing arrays for writing:
+    Accepted = zeros<vec>(MCCycles*Rate);
+    ExpectEnergy = zeros<vec>(MCCycles*Rate);
+    ExpectEnergySquared = zeros<vec>(MCCycles*Rate);
+    ExpectMagnet = zeros<vec>(MCCycles*Rate);
+    ExpectMagnetSquared = zeros<vec>(MCCycles*Rate);
+    AbsMagnet = zeros<vec>(MCCycles*Rate);
+    MCTime = zeros<vec>(MCCycles*Rate);
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    cout << "arrays initialized. " << endl;
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // run MC cycles over temperature range
+    int TempCount = 0;
     for( double Temp = initialTemp; Temp <= finalTemp; Temp += TempStep )
     {
-        string Filename = runName+std::to_string(Temp)+".bin";
+        cout << "let's run the Monte Carlo cycles." << endl;
+        TempCount++;
         vec Expectationvalues = zeros<mat>(5);
-        MonteCarloMetropolis( runName, NSpins, MCCycles, Temp, Expectationvalues );
-        cout << "Final energy: " << Expectationvalues(0)/MCCycles << endl;
-//        Expectationvalues /= MCCycles;
-//        fileDump( Filename, Expectationvalues, Expectationvalues.size() );
+        MonteCarloMetropolis(
+                runName,
+                NSpins,
+                MCCycles,
+                Rate,
+                Temp,
+                mode,
+                Expectationvalues,
+                ExpectEnergy,
+                ExpectEnergySquared,
+                ExpectMagnet,
+                ExpectMagnetSquared,
+                AbsMagnet,
+                Accepted,
+                MCTime
+               );
+
+        cout << "Energy expectation value Array: \n"
+             << ExpectEnergy << endl;
+        // printing results to standard out and writing arrays to file:
+        Expectationvalues /= (MCCycles);
+        cout << "Final expexted energy per spin: " << Expectationvalues(0)/(NSpins*NSpins)
+             << " at temperature " << Temp*initialTemp << endl;
+        cout << "Final expectation values, separate: \n"
+             << Expectationvalues
+             << "Energy per spin: " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
+             << "mean abosolute magnetization per spin: " << Expectationvalues(4)/(NSpins*NSpins) << "\n"
+             << "heat capacity Cv*(kT*T) per spin: " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(NSpins*NSpins) << "\n"
+             << "Susceptibility Chi*kT per spin: " << (Expectationvalues(3) - Expectationvalues(2)*Expectationvalues(2))/(NSpins*NSpins) << endl;
+        //setting up strings to reduce errors in writing:
+        string TempString = std::to_string(TempCount);
+        string Filename = "ExpectationValuesTemp"+TempString+runName;
+        string FinalFilename = path+"ExpectationValuesTemp"+TempString+"Final"+runName;
+        // writing to file:
+        fileDump( path+"Energy"+Filename, ExpectEnergy, ExpectEnergy.size() );
+        fileDump( path+"EnergySquared"+Filename, ExpectEnergySquared, ExpectEnergySquared.size() );
+        fileDump( path+"Magnetization"+Filename, ExpectMagnet, ExpectMagnet.size() );
+        fileDump( path+"MagnetizationSquared"+Filename, ExpectMagnetSquared, ExpectMagnetSquared.size() );
+        fileDump( path+"MagnetizationAbsoluteValue"+Filename, AbsMagnet, AbsMagnet.size() );
+        fileDump( path+"AcceptedConfigurationsTemp"+TempString+runName, Accepted, Accepted.size());
+
+        fileDump( FinalFilename, Expectationvalues, Expectationvalues.size() );
     }
     return 0;
 } // end main
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MonteCarloMetropolis(
         string runName,
         int NSpins,
         int MCCycles,
         double Temp,
-        vec & Expectationvalues)
+        double Rate,
+        string mode,
+        vec & Expectationvalues,
+        vec & ExpectEnergy,
+        vec & ExpectEnergySquared,
+        vec & ExpectMagnet,
+        vec & ExpectMagnetSquared,
+        vec & AbsMagnet,
+        vec & Accepted,
+        vec & MCTime
+        )
 {
+    //
     // Seed and Mersenne
     std::random_device rd;
     std::mt19937_64 gen(rd());
+    //
     // Uniform distribution setup 1 >= x >= 0
     std::uniform_real_distribution<double> RNG(0.0, 1.0);
 
     //Lattice initialization
-    mat SpinMatrix = zeros<mat>(NSpins, NSpins);
+    mat Lattice = zeros<mat>(NSpins, NSpins);
     //Energy and magnetization
     double Energy = 0.; double  MagneticMoment = 0.;
+    //
     //Expectationvalues array
-    initializeLattice( NSpins, SpinMatrix, Energy, MagneticMoment);
+    initializeLattice( NSpins, Lattice, Energy, MagneticMoment, mode);
+    //
     //Array for possible changes in energy
     vec EnergyProb = zeros<mat>(17);
     for( int dE = -8; dE <= 8; dE += 4 ) EnergyProb(dE+8) = exp(-dE/Temp);
-    int tenth = MCCycles*0.001;
+    //
+    //Rate of storage
+//    int Rate = (int)((float)MCCycles*(float)Rate);
+    int step = (int)(Rate*(double)MCCycles);
+    cout << "we want to save every " << step << "step" << endl;
 
     //Begin Monte Carlo cycle
-    for( int cycle = 1; cycle <= MCCycles; cycle ++)
+    for( int cycle = 0; cycle < MCCycles; cycle ++)
     {
+        int counter = 0;
         //sweep lattice
-        for( int count = 0; count <= (NSpins*NSpins); count ++ )
+        for( int count = 0; count < (NSpins*NSpins); count ++ )
         {
             int x = (int)( RNG(gen)*(double)NSpins );
             int y = (int)( RNG(gen)*(double)NSpins );
 
-            int DeltaE = 2*SpinMatrix(x, y)*
+            int DeltaE = 2*Lattice(x, y)*
                 (
-                 SpinMatrix( x, PeriodicBoundary( y, NSpins, -1) )
-                 + SpinMatrix( PeriodicBoundary( x, NSpins, -1), y )
-                 + SpinMatrix( x, PeriodicBoundary( y, NSpins, 1) )
-                 + SpinMatrix( PeriodicBoundary( x,  NSpins, 1), y )
+                 Lattice( x, PeriodicBoundary( y, NSpins, -1) )
+                 + Lattice( PeriodicBoundary( x, NSpins, -1), y )
+                 + Lattice( x, PeriodicBoundary( y, NSpins, 1) )
+                 + Lattice( PeriodicBoundary( x,  NSpins, 1), y )
                 );
             if( RNG(gen) <= EnergyProb(DeltaE + 8) )
             {
-                SpinMatrix(x, y) *= -1.; // flip and accept spin
-                MagneticMoment += (double) 2*SpinMatrix(x, y);
+                Lattice(x, y) *= -1.; // flip and accept spin
+                MagneticMoment += (double) 2*Lattice(x, y);
                 Energy += (double)DeltaE;
+                counter += 1;
             }
         }
         //Update expectation values, local node
@@ -90,44 +176,79 @@ void MonteCarloMetropolis(
         Expectationvalues(3) += MagneticMoment*MagneticMoment;
         Expectationvalues(4) += fabs(MagneticMoment);
 
-        if( cycle % tenth == 0)
+//        cout << "we're on cycle: " << cycle << "\n"
+//             << "and we want to check the rmainder of cycle % step with a rate: " << step << ": \n"
+//             << cycle % step << "\n";
+        if( cycle % step == 0 )
         {
-            fileDump( runName+"sweeps"+std::to_string(cycle)+".bin", Expectationvalues/(cycle*NSpins*NSpins), Expectationvalues.size() );
+            cout << "and so we save on cycle "<< cycle << endl;
+            Accepted(cycle) = counter;
+            double denominator = (cycle+1)*NSpins*NSpins;
+
+            ExpectEnergy(cycle) = Expectationvalues(0)/denominator;
+            ExpectEnergySquared(cycle) = Expectationvalues(1)/denominator;
+            ExpectMagnet(cycle) = Expectationvalues(2)/denominator;
+            ExpectMagnetSquared(cycle) = Expectationvalues(3)/denominator;
+            AbsMagnet(cycle) = Expectationvalues(4)/denominator;
         }
+
     }
 
 } // end MonteCarloMetropolis
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-void initializeLattice( int NSpins, mat & SpinMatrix, double & Energy, double & MagneticMoment )
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void initializeLattice( int NSpins, mat & Lattice, double & Energy, double & MagneticMoment, string mode)
 {
     /*
-     *Implement initialization and starting configuration with call to RNG function in future.
+     * Implement initialization and starting configuration with call to RNG function in future.
      */
 
-    // initialize spin matrix and magnetization, ordered
-    for( int x = 0; x < NSpins; x ++ )
-    {
-        for( int y = 0; y < NSpins; y ++ )
+    if (strcmp(mode.c_str(),"Up") == 0)
+    {   // Fill lattice with spin up
+        Lattice.ones();
+        MagneticMoment = Lattice.size();
+    }
+    else if (strcmp(mode.c_str(),"Down") == 0)
+    {   // Fill lattice with spin down
+        Lattice.ones();
+        Lattice = Lattice*-1;
+        MagneticMoment = -1.0*Lattice.size();
+    }
+    else if (strcmp(mode.c_str(),"Random") == 0)
+    {   // Fill lattice with random spin directions
+        mat randomLattice(size(Lattice),fill::randu); randomLattice = sign(randomLattice*2-1);
+        Lattice = randomLattice;
+        MagneticMoment = 0.0;
+        for (int x = 0; x < NSpins; ++x)
         {
-            SpinMatrix(x, y) = 1.; //g.s. spin orientation
-            MagneticMoment += (double)SpinMatrix(x, y);
+            for (int y = 0; y < NSpins; ++y)
+            {
+                MagneticMoment += Lattice(x,y);
+            }
         }
     }
-    // initial energy
-    for( int x = 0; x < NSpins; x ++ )
+    else
     {
-        for( int y = 0; y < NSpins; y ++ )
-        {
-            Energy -= (double)SpinMatrix(x,y)*
-                (
-                 SpinMatrix( PeriodicBoundary( x, NSpins, -1 ), y )
-                 + SpinMatrix( x, PeriodicBoundary( y, NSpins, -1 ) )
-                );
-        }
+        cout << "Did you remember proper capitalization? Either 'Up', 'Down' or 'Random'" << endl;
     }
-    cout << "initial energy is: " << Energy << endl;
-} // end initializeLattice
 
+    Energy = 0;
+    for (int i = 0; i< NSpins; i++)
+    {
+        for (int j = 0; j< NSpins; j++)
+        {
+            Energy -= (double)(Lattice(i,j)*(
+                        Lattice(PeriodicBoundary(i, NSpins, 1), j)
+                      + Lattice(i, PeriodicBoundary(j, NSpins, 1))
+                      ));
+        }
+    }
+    cout << "initial energy per particle is: " << Energy/(NSpins*NSpins) << endl;
+} // end initializeLattice
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void fileDump(
         string Filename,
         mat Array,
@@ -157,9 +278,5 @@ void fileDump(
 
     file.close();
     delete [] tmp_arr;
-
-//    FILE* outfile = fopen(Filename.c_str(), "wb");
-//    fwrite( & Array[0], sizeof(double), ArrayDim*ArrayDim, outfile );
-//    fclose(outfile);
 
 } // end fileDump

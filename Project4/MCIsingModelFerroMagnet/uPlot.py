@@ -1,16 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
+import sys
 
-files = glob.glob("data/*.bin") # list of path+names for relevant files in directory
+assert( len(sys.argv) == 4 ), "Please provide a path, a temperature step and a run name to search for. Omit '.bin'"
 
-eV = np.zeros((len(files),2))
-for i in range(len(files)):
-    expVal = np.fromfile(files[i])
-    eV[i,0], eV[i,1] = expVal[0], expVal[1]
+path = str( sys.argv[1] )
+TempStep = "Temp"+str( sys.argv[2] )
+runName = str( sys.argv[3] )
 
-print(eV)
+files = glob.glob( path + "*"+ TempStep + runName + ".bin" ) # list of path+names for relevant files in directory
 
+print(files)
+print(np.fromfile(files[0]))
+
+cont = "y"
 plt.figure()
-plt.plot(eV[:,1], eV[:,0], 'o')
+while cont == "y":
+    filePos = int(input("what to plot?\n"))
+    cut1 = files[filePos].replace(path, "")
+    cut2 = cut1.replace(TempStep+runName+".bin", "")
+    plt.semilogx(np.fromfile(files[filePos])[1::], label=cut2)
+    cont = input("continue(y/n)? ")
+plt.grid()
+plt.legend()
+plt.xlabel('MC cycles')
 plt.show()

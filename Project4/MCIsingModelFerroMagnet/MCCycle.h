@@ -14,8 +14,23 @@ using namespace arma;
 
 int PeriodicBoundary( int , int , int );
 
-void MonteCarloMetropolis(string , int , int, double , vec & );
-void initializeLattice( int , mat & , double & , double & );
+void MonteCarloMetropolis(
+        string ,
+        int ,
+        int,
+        double ,
+        double ,
+        string,
+        vec & ,
+        vec & ,
+        vec & ,
+        vec & ,
+        vec & ,
+        vec & ,
+        vec & ,
+        vec &
+        );
+void initializeLattice( int , mat & , double & , double & , string );
 void fileDump( string , mat , int );
 
 #endif

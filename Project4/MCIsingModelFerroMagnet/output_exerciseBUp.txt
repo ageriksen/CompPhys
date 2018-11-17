@@ -1,0 +1,18 @@
+please input: 
+read runName, Number-of-Spins, MC-cycles, initial lattice modeinitial-temperature, final-temperature and temperature-step.
+initial lattice config: 
+   1.0000   1.0000
+   1.0000   1.0000
+
+initial energy per particle is: -2
+Final expexted energy per spin: -1.99616 at temperature 1
+Final expectation values, separate: 
+   -7.9846
+   63.8771
+    0.2112
+   15.9745
+    3.9949
+Energy per spin: -1.99616
+mean abosolute magnetization per spin: 0.998734
+heat capacity Cv*(kT*T) per spin: 0.030661
+Susceptibility Chi*kT per spin: 3.98248
