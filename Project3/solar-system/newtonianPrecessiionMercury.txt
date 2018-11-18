@@ -1,9 +1,0 @@
- ./main.exe 
-The position of sun is[0, 0, 0]; with velocity [0, 0, 0];
-The position of mercury is[0.3075, 0, 0]; with velocity [0, 12.44, 0];
-do you want to printi(y/n)?
-y
-name the run: relativisticprecessionmercury
-initial angular momentum [0, 0, -6.31174e-07]; and afterwards [0, 0, -6.31174e-07];
-angular momentum is conserved! with a relative change of 2.31769e-07 over 100 years.
-With relativistic gravity, there is a precession of -1.31397e-05 arcseconds in a century.

@@ -33,6 +33,51 @@ def plotF2D(nr, paths, graphlabels, plottitle, quarter=False):
     plt.show()
     return 0
 
+
+def subplotF3D(nr, path1, path2, path3, path4, labels):
+    fig = plt.figure()
+
+    ax = fig.add_subplot(2, 2, 1, projection='3d')
+    #ax = fig.gca(projection="3d")
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$y$")
+    ax.set_zlabel(r"$z$")  
+    for i in range(nr):
+        ax.plot(*readfile(path1[i], 3), label=labels[i])
+    ax.legend()
+    
+    ax = fig.add_subplot(2, 2, 2, projection='3d')
+    #ax = fig.gca(projection="3d")
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$y$")
+    ax.set_zlabel(r"$z$")  
+    for i in range(nr):
+        ax.plot(*readfile(path2[i], 3), label=labels[i])
+    ax.legend()
+   
+    ax = fig.add_subplot(2, 2, 3, projection='3d')
+    #ax = fig.gca(projection="3d")
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$y$")
+    ax.set_zlabel(r"$z$")  
+    for i in range(nr):
+        x, y, z = readfile(path3[i], 3)
+        ax.plot(x[:(int(len(x)/6))], y[:(int(len(y)/6))], z[:(int(len(z)/6))], label=labels[i])
+    ax.legend()
+    
+    ax = fig.add_subplot(2, 2, 4, projection='3d')
+    #ax = fig.gca(projection="3d")
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$y$")
+    ax.set_zlabel(r"$z$")  
+    for i in range(nr):
+        x, y, z = readfile(path3[i], 3)
+        ax.plot(x[:(int(len(x)/6))], y[:(int(len(y)/6))], z[:(int(len(z)/6))], label=labels[i])
+    ax.legend()
+    #plt.title(plottitle)
+    plt.show()
+    return 0
+
 if __name__ == "__main__":
     import sys
 #    path = ["mobileSun3Bodysun.dat", "mobileSun3Bodyearth.dat", "mobileSun3Bodyjupiter.dat"] 
@@ -59,9 +104,20 @@ if __name__ == "__main__":
 #            "Uranus",
 #            "Neptune"
 #            ]
-    path = ["relativisticPrecessionmercury.dat"]
-    labels = ["Mercury"]
-    nr = int(len(path)) # Department of redundancy department
-    title=r"Sun Earth Jupiter system"
-    plotF2D(nr, path, labels, title)
+#    path = ["relativisticPrecessionmercury.dat"]
+#    labels = ["Mercury"]
+#    nr = int(len(path)) # Department of redundancy department
+#    title=r"Sun Earth Jupiter system"
+#    plotF2D(nr, path, labels, title)
 #    plotF3D(nr, path, labels, title)
+    nr = 2
+    path1 = ["stationarySun3Bodyearth.dat", 
+            "stationarySun3Bodyjupiter.dat"]
+    path2 = ["10xJupiter3Bodyearth.dat", 
+            "10xJupiter3Bodyjupiter.dat"]
+    path3 = ["1kxJupiter3Bodyearth.dat",
+            "1kxJupiter3Bodyjupiter.dat"]
+    path4 = ["1kxJupiter3Bodyearth.dat",
+            "1kxJupiter3Bodyjupiter.dat"]
+    labels = ["earth", "jupiter"]
+    subplotF3D(nr, path1, path2, path3, path4, labels)

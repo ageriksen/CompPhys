@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     string path, runName, mode;
     int NSpins, MCCycles;
-    double initialTemp, finalTemp, TempStep, Rate;
+    double initialTemp, finalTemp, TempStep;//, Rate;
     vec ExpectEnergy, ExpectEnergySquared, ExpectMagnet, ExpectMagnetSquared, AbsMagnet;
     vec Accepted, MCTime;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -25,24 +25,32 @@ int main(int argc, char *argv[]){
     cin >> mode;
     cin >> NSpins;
     cin >> MCCycles;
-    cin >> Rate;
+    //cin >> Rate;
     cin >> initialTemp;
     cin >> finalTemp;
     cin >> TempStep;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cout << "necessary values read." << endl;
 
-    cout << "with a fraction of " << Rate << endl;
-    cout << "and a max number of cycles " << MCCycles << endl;
-    cout << "\n \n The length of our arrays are: " << MCCycles*Rate << "\n" << endl;
-    // Initializing arrays for writing:
-    Accepted = zeros<vec>(MCCycles*Rate);
-    ExpectEnergy = zeros<vec>(MCCycles*Rate);
-    ExpectEnergySquared = zeros<vec>(MCCycles*Rate);
-    ExpectMagnet = zeros<vec>(MCCycles*Rate);
-    ExpectMagnetSquared = zeros<vec>(MCCycles*Rate);
-    AbsMagnet = zeros<vec>(MCCycles*Rate);
-    MCTime = zeros<vec>(MCCycles*Rate);
+    // { Rate of stotrage indefinitely suspended}
+//    cout << "with a fraction of " << Rate << endl;
+//    cout << "and a max number of cycles " << MCCycles << endl;
+//    cout << "\n \n The length of our arrays are: " << MCCycles*Rate << "\n" << endl;
+//    // Initializing arrays for writing:
+//    Accepted = zeros<vec>(MCCycles*Rate);
+//    ExpectEnergy = zeros<vec>(MCCycles*Rate);
+//    ExpectEnergySquared = zeros<vec>(MCCycles*Rate);
+//    ExpectMagnet = zeros<vec>(MCCycles*Rate);
+//    ExpectMagnetSquared = zeros<vec>(MCCycles*Rate);
+//    AbsMagnet = zeros<vec>(MCCycles*Rate);
+//    MCTime = zeros<vec>(MCCycles*Rate);
+    Accepted = zeros<vec>(MCCycles);
+    ExpectEnergy = zeros<vec>(MCCycles);
+    ExpectEnergySquared = zeros<vec>(MCCycles);
+    ExpectMagnet = zeros<vec>(MCCycles);
+    ExpectMagnetSquared = zeros<vec>(MCCycles);
+    AbsMagnet = zeros<vec>(MCCycles);
+    MCTime = zeros<vec>(MCCycles);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cout << "arrays initialized. " << endl;
 
@@ -58,7 +66,7 @@ int main(int argc, char *argv[]){
                 runName,
                 NSpins,
                 MCCycles,
-                Rate,
+               // Rate,
                 Temp,
                 mode,
                 Expectationvalues,
@@ -71,8 +79,8 @@ int main(int argc, char *argv[]){
                 MCTime
                );
 
-        cout << "Energy expectation value Array: \n"
-             << ExpectEnergy << endl;
+        //cout << "Energy expectation value Array: \n"
+        //     << ExpectEnergy << endl;
         // printing results to standard out and writing arrays to file:
         Expectationvalues /= (MCCycles);
         cout << "Final expexted energy per spin: " << Expectationvalues(0)/(NSpins*NSpins)
@@ -107,7 +115,7 @@ void MonteCarloMetropolis(
         int NSpins,
         int MCCycles,
         double Temp,
-        double Rate,
+        //double Rate,
         string mode,
         vec & Expectationvalues,
         vec & ExpectEnergy,
@@ -139,10 +147,9 @@ void MonteCarloMetropolis(
     vec EnergyProb = zeros<mat>(17);
     for( int dE = -8; dE <= 8; dE += 4 ) EnergyProb(dE+8) = exp(-dE/Temp);
     //
-    //Rate of storage
-//    int Rate = (int)((float)MCCycles*(float)Rate);
-    int step = (int)(Rate*(double)MCCycles);
-    cout << "we want to save every " << step << "step" << endl;
+    //
+    ////Rate of storage {INDEFINITE SUSPENTION}
+    //int step = (int)(Rate*(double)MCCycles);
 
     //Begin Monte Carlo cycle
     for( int cycle = 0; cycle < MCCycles; cycle ++)
@@ -176,21 +183,21 @@ void MonteCarloMetropolis(
         Expectationvalues(3) += MagneticMoment*MagneticMoment;
         Expectationvalues(4) += fabs(MagneticMoment);
 
+        // {RATE OF STORAGE INDEFINITELY SUSPENDED}
 //        cout << "we're on cycle: " << cycle << "\n"
 //             << "and we want to check the rmainder of cycle % step with a rate: " << step << ": \n"
 //             << cycle % step << "\n";
-        if( cycle % step == 0 )
-        {
-            cout << "and so we save on cycle "<< cycle << endl;
-            Accepted(cycle) = counter;
-            double denominator = (cycle+1)*NSpins*NSpins;
+        //if( cycle % step == 0 )
+        //{
+        Accepted(cycle) = counter;
+        double denominator = (cycle+1)*NSpins*NSpins;
 
-            ExpectEnergy(cycle) = Expectationvalues(0)/denominator;
-            ExpectEnergySquared(cycle) = Expectationvalues(1)/denominator;
-            ExpectMagnet(cycle) = Expectationvalues(2)/denominator;
-            ExpectMagnetSquared(cycle) = Expectationvalues(3)/denominator;
-            AbsMagnet(cycle) = Expectationvalues(4)/denominator;
-        }
+        ExpectEnergy(cycle) = Expectationvalues(0)/denominator;
+        ExpectEnergySquared(cycle) = Expectationvalues(1)/denominator;
+        ExpectMagnet(cycle) = Expectationvalues(2)/denominator;
+        ExpectMagnetSquared(cycle) = Expectationvalues(3)/denominator;
+        AbsMagnet(cycle) = Expectationvalues(4)/denominator;
+        //}
 
     }
 

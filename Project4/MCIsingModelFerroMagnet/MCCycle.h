@@ -19,7 +19,7 @@ void MonteCarloMetropolis(
         int ,
         int,
         double ,
-        double ,
+        //double ,
         string,
         vec & ,
         vec & ,

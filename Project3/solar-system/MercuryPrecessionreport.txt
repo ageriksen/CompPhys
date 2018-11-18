@@ -1,0 +1,8 @@
+relativistic: initial angular momentum [0, 0, -6.31174e-07]; and afterwards [0, 0, -6.31174e-07];
+angular momentum is conserved! with a relative change of 2.47598e-13 over 100 years.
+With relativistic gravity, there is a precession of 42.762 arcseconds in a century.
+
+
+Newtonian: initial angular momentum [0, 0, -6.31174e-07]; and afterwards [0, 0, -6.31174e-07];
+angular momentum is conserved! with a relative change of 6.20002e-13 over 100 years.
+With newtonian gravity, there is a precession of 0.0211294 arcseconds in a century.

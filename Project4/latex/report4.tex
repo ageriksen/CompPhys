@@ -18,7 +18,7 @@
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{test1.pdf}
-%\caption{Exact and numerial solutions for $n=10$ mesh points.} 
+%\caption{Exact and numerial solutions for $n=10$ mesh points.}
 %\label{fig:n10points}
 %\end{figure}
 
@@ -48,38 +48,109 @@
 \section{Methods and theory}
 
 We want to study a 2 dimensional ferromagnetic system through the Ising model, specifically in phase transitions.
-The system we're studying has an energy 
+The system we're studying has an energy
 \[ E = -J \sum_{<kl>}^N s_k \, s_l \]
-In which the "$<kl>$" signifies summing over neighbouring spots in the lattice only. $s_k = \pm 1$, and N is the total number of spins in 
+In which the "$<kl>$" signifies summing over neighbouring spots in the lattice only. $s_k = \pm 1$, and N is the total number of spins in
 the latice. J is a coupling constant and, as we are currently investigating ferromagnetic elements we have $J > 0$.
 As we will investigate changes in the system, the equation can be solved as
 \[ \Delta E = 2 Js_l^1 \sum_{<k>}^N s_k \].
 
-The numerical issues we focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into 
-%these and discuss here. 
+The numerical issues we focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into
+%these and discuss here.
 
-As with most systems, we begin with a simple iteration. For the ising model of ferromagnets, we start out with a $2\times 2$ lattice to find $\ev{E}$
-as well as the mean average magnetic moment, $\abs{M}$, henceforth "mean magnetism". Additional valuable properties are the specific heat capacity, $C_V$
-as well as succeptability. $\chi$ as functions of T, with periodic boundary conditions. 
+As with most systems, we begin with a simple iteration. For the ising model of ferromagnets, we start out with a $2\times 2$ lattice to find
+as well as the mean average magnetic moment henceforth "mean magnetism". Additional valuable properties are the specific heat capacity,
+as well as succeptability as functions of T, with periodic boundary conditions.
+\[
+    \ev{E(T)}, \qq{} \abs{M(T)}, \qq{} C_V(T), \qq{} \chi(T)
+\] % INCLUD DESCRIPTIONS OF HOW TO FIND MAGNETIZATION, HEAT CAPACITY AND SUCCEPTIBILITY!!!
 
-Having studied simple system, we will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We 
-want to accurately extract the properties found previously, for a scaled temperature $T = 1 \qq{with dimensions} \qty[ T ] = \frac{ J }{ kT }$. Here, 
+Having studied simple system, we will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We
+want to accurately extract the properties found previously, for a scaled temperature $T = 1 \qq{with dimensions} \qty[ T ] = \frac{ J }{ kT }$. Here,
 k is the Boltzman constant. This will allow us to cancel out the k in future calculations. Another important step, is to log the number of Monte Carlo
-(MC) cycles we run. 
+(MC) cycles we run.
+%%%% algorithm begin
+\begin{algorithm}
+    mat<double> $Transfer = [ e^{-\Delta E/ \beta }$ ]\;
+    \For{$n=1$ \KwTo{$L^2$} }{
+        $x_r, y_r = RNG$\;
+        $\Delta{E} = 2\cdot s\qty[x_r, y_r] \sum_{\langle{} k \rangle{} }s_k$\;
+        $r = RNG_{uniform} \in{} \qty[ 0, 1 ] $\;
+        \If{$r \leq Transfer(\Delta{E})$}{
+            $s[x_r, y_r] *= -1.0$\;
+            $M += 2\cdot s[x_r, y_r]$\;
+            $E += \Delta{E}$\;
+        }
+    }
+    \caption{}
+\end{algorithm}
+%%%% algorithm end
 
-Having Benchmarked and controlled our program for a simple system, we up the lattice size $L\times L$ to $L=20$. Because there is little value in studying 
-a system not in equilibrium for our purposes and in order to not waste cpu cycles on usesless info that will at best be thrown out, we need to determine the
-time the system needs to reach equilibrium. The simplest method here, is to just plot the various expectation values as functions of the number of MC cycles.
-and determining by-eye when the system reaches the desired stability. We measure time in sweeps per lattice of MC cycles. An interesting question, is whether
-or not the equilibration time depends on the starting position. Whether this is ordered so all spins point in the same direction or random configuration.
-These first tests will be run with the initial temperature $T=1$. We will also investigate the temperature $T = 2.4$ and whether or not it is possible to 
-estimate equilibration time. Here, we want to plot the total number of accepted MC cycles as a function of the total number of MC cycles run, so as to 
-investigate whether or not we can attest to the accepted configurations depending on T. 
+Having Benchmarked and controlled our program for a simple system, we up the lattice size $L\times L$ to $L=20$. To abvoid wasting cpu cycles on usesless
+info that will at best be thrown out, we need to determine the time the system needs to reach equilibrium. The simplest method here, is to just plot the
+various expectation values as functions of the number of MC cycles. and determining by-eye when the system reaches the desired stability. Time is measured in
+sweeps of MC cycles per lattice. An interesting question, is whether or not the equilibration time depends on the starting position. Whether this is
+ordered so all spins point in the same direction or random configuration. These first tests will be run with the initial temperature $T=1$. We will also
+investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Here, we want to plot the total number of accepted
+MC cycles as a function of the total number of MC cycles run, so as to investigate whether or not we can attest to the accepted configurations depending
+on T.
 
-Additionally we want to 
+Additionally we want to study the probabilities for energies, $\Pr(E)$, in effect counting up the number of times the energy $E$ comes up in the computation.
+We begin our counting after having reached equilibrium to ensure statistically significant readout. We want the energetic variance $\sigma_E^2$.
+%discuss results!
+
+With our system set up, we can now study the properties of the system as we change the temperature. There is a phase shift of the system on the crossing of
+a certain critical temperature $T_C$. Below this, the energy is low enough, so that the bias in energetic preference freezes the system towards the energetic
+minimum. This should result in growing clusters of spins, untill the system eventually inhabits the minimum energy state where all spins point in the same
+direction. With temperatures greater than $T_C$, the energety present lessens the bias towards the energetically preferable state. This means that the clusters
+of similar spins are smaller and more spread, with a more random distribution.
+
+Near $T_C$ we can characterize several properties of the system with a power law behaviour. In the Ising model, the mean magnetisation is given by
+\[ \ev{M(T)} \sim \qty( T - t_C )^{\beta} \qq{with} \beta = \frac{1}{8} \]
+Here, $\beta$ is called the "critical exponent". % what is this?!?
+Similar expressions can be found for heat capacity and susceptibility:
+\begin{align*}
+    C_V(T) &\sim \qty| T_C - T |^{\alpha}, \qq{} \alpha = 0 \\
+    \chi(T) &\sim \qty| T_C - T |^{\gamma}, \qq{} \gamma = \frac{7}{4}
+\end{align*}
+The 0 exponent stems from logarithmic divergence, where the value
+arises from a rewrite into the Taylor series, where $\qty| T_C - T |^{\alpha} \simeq -\ln(\qty| T_C - T | ) + O(\alpha^2)$. This is an exponentially growing
+"spike" around the critical temperature.
+
+
+Another important quantity is correlation length, $\xi$. For temperatures $T \gg T_C$, the correlation between the spins should be so low, that the
+correlation length should be on the order of the distance between each lattice point. As we approach the critical temperature from above, this correlation
+length grows with a divergent behaviour
+\[ \xi(T) \sim \qty| T_C - T |^{-\nu} \]
+
+The $2^{nd}$ order order correction is characterised by a $\xi$ spanning the system. A finite lattice, therefore has a correlation length proportional to
+the lattice size. Using so-called "finite size scaling relations" we can relate the behaviour of $\xi$ to the infinite span. With this, the critical
+temperature scales as
+\[ T _ { C } ( L ) - T _ { C } ( L = \infty ) = a L ^ { - 1 / \nu } \]
+Where $a$ is some constant and $\nu$ is as defined for $\xi$ above. When we set $T = T_C$, the above equations go to:
+\begin{align*}
+    \text{ mean magnetisation: } \\
+    \langle \mathcal { M } ( T ) \rangle &\sim \left( T - T _ { C } \right) ^ { \beta } \rightarrow L ^ { - \beta / \nu }\\
+    \text{ Heat capacity: } \\
+    C _ { V } ( T ) &\sim \left| T _ { C } - T \right| ^ { - \gamma } \rightarrow L ^ { \alpha / \nu }\\
+    \text{ and succeptibility: } \\
+    \chi ( T ) &\sim \left| T _ { C } - T \right| ^ { - \alpha } \rightarrow L ^ { \gamma / \nu }
+\end{align*}
+We want to study these numerically relations in our system when it is near $T_C$. We want to examine the dependence of T and L for the listed characteristics.
+We also want to time these tests, to compare between parallelization of the code. Finally, we want to compare our critical temperature above to the
+closed-form solution found by Onsanger in 1944: $k T _ { C } / J = 2 / \ln ( 1 + \sqrt { 2 } ) \approx 2.269$ \cite{PhysRev.65.117}.
 
 
 \section{Results and discussion}
+
+With these values to control against, we can now benchmark our program. Writing out a few functions, we have one for setting up our lattice, one for running
+through an MCcycle and one for writing the results to file. I store the expectation vales of the energy, the energy squared and the same for the magnetization,
+as well as the absolute value per microstate. These can be used directly, in the case of the energy expectation value and the mean magnetization, or in
+combination such as with the heat capacity and susceptibility, who's scaled values are the variance in either energy or magnetization expectation values. Both
+of these values are important in any MC calculation, because they give a sharp definition of the statistical sharpness of the result.
+%% insert plot of 2x2LatticeOrderUp.png and discuss.
+we see that they approach the analytical values well after 1e6 cycles, with %read from outputExerciseB and reiterate the rough approach seen in the figure
+%above, in order of magnitude.
 
 \section{conclusion}
 

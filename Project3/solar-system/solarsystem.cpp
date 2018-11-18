@@ -24,7 +24,7 @@ void SolarSystem::calculateForcesAndEnergy()
         // Reset forces on all bodies
         body.force.zeros();
     }
-
+    
     for(int i=0; i<numberOfBodies(); i++) 
     {
         vec3 Force;
@@ -36,8 +36,9 @@ void SolarSystem::calculateForcesAndEnergy()
             double dr = deltaRVector.length();
             // Calculate the force and potential energy here
             m_angularMomentum += body1.mass*(body1.velocity.cross(body1.position)) + body2.mass*(body2.velocity.cross(body2.position));
-            Force += (-body1.mass*4*pow(M_PI,2)*body2.mass*deltaRVector/pow(dr, 3))*(1 + (3*pow(m_angularMomentum.length(), 3)/(pow(dr, 2)*pow(m_c,2))));
-            body1.force += Force;
+            Force = (-4*M_PI*M_PI*body1.mass*body2.mass*deltaRVector/(dr*dr*dr));
+                //*(1 + 3*(deltaRVector.cross(body2.velocity)).lengthSquared()/(dr*dr*m_c*m_c));
+            //body1.force += Force;
             body2.force -= Force;
             m_potentialEnergy -= 4*pow(M_PI, 2)*body1.mass*body2.mass/dr;
         }
