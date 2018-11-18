@@ -17,10 +17,12 @@ int PeriodicBoundary( int , int , int );
 void MonteCarloMetropolis(
         string ,
         int ,
-        int,
+        int ,
+        int ,
         double ,
         //double ,
         string,
+        vec & ,
         vec & ,
         vec & ,
         vec & ,

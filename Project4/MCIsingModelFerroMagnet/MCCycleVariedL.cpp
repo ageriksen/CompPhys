@@ -17,9 +17,6 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    cout << "please input: \n"
-            << "path, runName, mode, Nspins, MCCycles, InitialTemp, "
-            << "finalTemp and TempStep." << endl;
     cin >> path;
     cin >> runName;
     cin >> mode;
@@ -31,7 +28,6 @@ int main(int argc, char *argv[]){
     cin >> finalTemp;
     cin >> TempStep;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    cout << "necessary values read." << endl;
 
     // { Rate of stotrage indefinitely suspended}
     EnergyArray = zeros<vec>(MCCycles - Equilibrium);
@@ -43,14 +39,13 @@ int main(int argc, char *argv[]){
     AbsMagnet = zeros<vec>(MCCycles - Equilibrium);
     MCTime = zeros<vec>(MCCycles - Equilibrium);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    cout << "arrays initialized. " << endl;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // run MC cycles over temperature range
     int TempCount = 0;
     for( double Temp = initialTemp; Temp <= finalTemp; Temp += TempStep )
     {
-        cout << "let's run the Monte Carlo cycles." << endl;
+        cout << "T : " << Temp << "\n";
         TempCount++;
         vec Expectationvalues = zeros<mat>(5);
         MonteCarloMetropolis(
@@ -58,7 +53,6 @@ int main(int argc, char *argv[]){
                 NSpins,
                 MCCycles,
                 Equilibrium,
-               // Rate,
                 Temp,
                 mode,
                 EnergyArray,
@@ -72,18 +66,16 @@ int main(int argc, char *argv[]){
                 MCTime
                );
 
-        //cout << "Energy expectation value Array: \n"
-        //     << ExpectEnergy << endl;
         // printing results to standard out and writing arrays to file:
         Expectationvalues /= (MCCycles);
-        cout << "Final expexted energy per spin: " << Expectationvalues(0)/(NSpins*NSpins)
-             << " at temperature " << Temp << endl;
+
+        cout << " <E>/(N^2) : " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
+             << " <|M|>/(N^2) : " << Expectationvalues(4)/(NSpins*NSpins) << "\n"
+             << " Cv*(k*T*T)/(N^2) : " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
+             << " X*(k*T)/(N^2) : " << (Expectationvalues(3) - Expectationvalues(4)*Expectationvalues(4))/(Temp*NSpins*NSpins) << endl;
+
         cout << "Final expectation values, separate: \n"
              << Expectationvalues
-             << "Energy per spin: " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
-             << "mean abosolute magnetization per spin: " << Expectationvalues(4)/(NSpins*NSpins) << "\n"
-             << "heat capacity Cv*(k*T*T) per spin: " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
-             << "Susceptibility Chi*(k*T) per spin: " << (Expectationvalues(3) - Expectationvalues(4)*Expectationvalues(4))/(Temp*NSpins*NSpins) << endl;
         //setting up strings to reduce errors in writing:
         string TempString = std::to_string(TempCount);
         string Filename = "ExpectationValuesTemp"+TempString+runName;
