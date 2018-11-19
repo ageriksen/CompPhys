@@ -9,18 +9,18 @@ inline int PeriodicBoundary(int i, int limit, int add)
 int main(int argc, char *argv[]){
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    string path, runName, mode;
+    string path, mode;
     int MCCycles;
     int Lmin, Lmax, Lstep;
     double initialTemp, finalTemp, TempStep;
     vec EExpect, E2Expect;
     vec M2Expect, MAbsExpect, Temperature;
+    vec Mvariance, Evariance;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // strings:
     cin >> path;
-    cin >> runName;
     cin >> mode;
     // integers:
     cin >> Lmin;
@@ -34,12 +34,14 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    int NTemp = (int)(finalTemp - initialTemp)/TempStep;
+    int NTemp = (int)(((double)finalTemp - (double)initialTemp)/(double)TempStep);
     Temperature = zeros<vec>(NTemp);
     EExpect = zeros<vec>(NTemp);
     E2Expect = zeros<vec>(NTemp);
     M2Expect = zeros<vec>(NTemp);
     MAbsExpect = zeros<vec>(NTemp);
+    Evariance = zeros<vec>(NTemp);
+    Mvariance = zeros<vec>(NTemp);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,29 +82,33 @@ int main(int argc, char *argv[]){
             Expectationvalues /= (MCCycles);
             EExpect(TempCount) = Expectationvalues(0);
             E2Expect(TempCount) = Expectationvalues(1);
-            M2Expect(Temp) = Expectationvalues(2);
-            MAbsExpect(Temp) = Expectationvalues(3);
-            Temperature(Temp) = Temp;
+            M2Expect(TempCount) = Expectationvalues(2);
+            MAbsExpect(TempCount) = Expectationvalues(3);
+            Temperature(TempCount) = Temp;
             //
-            cout << " <E>/(N^2) : " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
-                 << " <|M|>/(N^2) : " << Expectationvalues(3)/(NSpins*NSpins) << "\n"
-                 << " Cv*(k*T*T)/(N^2) : " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
-                 << " X*(k*T)/(N^2) : " << (Expectationvalues(2) - Expectationvalues(3)*Expectationvalues(3))/(Temp*NSpins*NSpins) << endl;
+            //Expectationvalues(0)/(NSpins*NSpins) << "\n"
+            //Expectationvalues(3)/(NSpins*NSpins) << "\n"
+            //(Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
+            //(Expectationvalues(2) - Expectationvalues(3)*Expectationvalues(3))/(Temp*NSpins*NSpins) << endl;
+
+            //
+            cout << "| < E > / (N^2) : " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
+                 << "| <|M|> / (N^2) : " << Expectationvalues(3)/(NSpins*NSpins) << "\n"
+                 << "| Cv*(k)/ (N^2) : " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
+                 << "| X*(k) / (N^2) : " << (Expectationvalues(2) - Expectationvalues(3)*Expectationvalues(3))/(Temp*NSpins*NSpins) << endl;
             //
             //setting up strings to reduce errors in writing:
-            string TempString = std::to_string(TempCount);
-            string Filename = "ExpectationValuesTemp"+TempString+runName;
-            string FinalFilename = path+"ExpectationValuesTemp"+TempString+"Final"+runName;
+            string Fname = "L"+std::to_string(NSpins)+"T"+std::to_string(TempCount)+".bin";
             // writing to file:
-            fileDump( path+"Energy"+Filename, EExpect, EExpect.size() );
+            fileDump( path+"E"+Fname, EExpect, EExpect.size() );
             //
-            fileDump( path+"EnergySquared"+Filename, E2Expect, E2Expect.size() );
+            fileDump( path+"E2"+Fname, E2Expect, E2Expect.size() );
             //
-            fileDump( path+"MagnetizationSquared"+Filename, M2Expect, M2Expect.size() );
+            fileDump( path+"M2"+Fname, M2Expect, M2Expect.size() );
             //
-            fileDump( path+"MagnetizationAbsoluteValue"+Filename, MAbsExpect, MAbsExpect.size() );
+            fileDump( path+"MAbs"+Fname, MAbsExpect, MAbsExpect.size() );
             //
-            fileDump( FinalFilename, Expectationvalues, Expectationvalues.size() );
+            //
             timeFinish = clock();
             timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
             cout << " time, T =  " << Temp << ": " << timeused << endl;
@@ -159,10 +165,9 @@ void MonteCarloMetropolis(
     for( int dE = -8; dE <= 8; dE += 4 ) EnergyProb(dE+8) = exp(-dE/Temp);
 
     //Begin Monte Carlo cycle'
-    int x, y, DeltaE, counter;
+    int x, y, DeltaE;
     for( int cycle = 0; cycle < MCCycles; cycle ++)
     {
-        counter = 0;
         //sweep lattice
         for( int count = 0; count < (NSpins*NSpins); count ++ )
         {
@@ -181,7 +186,6 @@ void MonteCarloMetropolis(
                 Lattice(x, y) *= -1.; // flip and accept spin
                 MagneticMoment += (double) 2*Lattice(x, y);
                 Energy += (double)DeltaE;
-                counter += 1;
             }
         }
         //Update expectation values, local node

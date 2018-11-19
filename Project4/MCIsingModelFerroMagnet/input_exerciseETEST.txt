@@ -1,5 +1,4 @@
-data/
-EEL40_100T21_23.bin
+dataEETest/
 Up
 40
 60
