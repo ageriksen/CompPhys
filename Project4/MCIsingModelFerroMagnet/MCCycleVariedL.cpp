@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    int NTemp = (((double)finalTemp - (double)initialTemp)/(double)TempStep);
+    int NTemp = (int)(((double)finalTemp - (double)initialTemp)/(double)TempStep);
     cout << "number of temperature steps: " << NTemp;
     Temperature = zeros<vec>(NTemp);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
