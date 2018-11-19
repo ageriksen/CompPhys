@@ -36,12 +36,6 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     int NTemp = (int)(((double)finalTemp - (double)initialTemp)/(double)TempStep);
     Temperature = zeros<vec>(NTemp);
-    EExpect = zeros<vec>(NTemp);
-    E2Expect = zeros<vec>(NTemp);
-    M2Expect = zeros<vec>(NTemp);
-    MAbsExpect = zeros<vec>(NTemp);
-    Evariance = zeros<vec>(NTemp);
-    Mvariance = zeros<vec>(NTemp);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,6 +47,14 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for( int NSpins = Lmin; NSpins <= Lmax; NSpins += Lstep )
     {
+        //
+        EExpect = zeros<vec>(NTemp);
+        E2Expect = zeros<vec>(NTemp);
+        M2Expect = zeros<vec>(NTemp);
+        MAbsExpect = zeros<vec>(NTemp);
+        Evariance = zeros<vec>(NTemp);
+        Mvariance = zeros<vec>(NTemp);
+
         //
         cout << "==================================\n"
              << "L : " << NSpins << "\n";
