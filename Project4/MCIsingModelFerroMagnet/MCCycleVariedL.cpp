@@ -10,9 +10,12 @@ int main(int argc, char *argv[]){
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     string path, mode;
+    //
     int MCCycles;
     int Lmin, Lmax, Lstep;
+    //
     double initialTemp, finalTemp, TempStep;
+    //
     vec EExpect, E2Expect;
     vec M2Expect, MAbsExpect, Temperature;
     vec Mvariance, Evariance;
@@ -34,7 +37,8 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    int NTemp = (int)(((double)finalTemp - (double)initialTemp)/(double)TempStep);
+    int NTemp = (((double)finalTemp - (double)initialTemp)/(double)TempStep);
+    cout << "number of temperature steps: " << NTemp;
     Temperature = zeros<vec>(NTemp);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -48,12 +52,13 @@ int main(int argc, char *argv[]){
     for( int NSpins = Lmin; NSpins <= Lmax; NSpins += Lstep )
     {
         //
-        EExpect = zeros<vec>(NTemp);
-        E2Expect = zeros<vec>(NTemp);
-        M2Expect = zeros<vec>(NTemp);
-        MAbsExpect = zeros<vec>(NTemp);
-        Evariance = zeros<vec>(NTemp);
-        Mvariance = zeros<vec>(NTemp);
+        EExpect = zeros<vec>(NTemp+1);
+        E2Expect = zeros<vec>(NTemp+1);
+        M2Expect = zeros<vec>(NTemp+1);
+        MAbsExpect = zeros<vec>(NTemp+1);
+        Evariance = zeros<vec>(NTemp+1);
+        Mvariance = zeros<vec>(NTemp+1);
+        cout << "<E> vector: \n" << EExpect << endl;
 
         //
         cout << "==================================\n"
