@@ -20,22 +20,12 @@ int PeriodicBoundary(
 
 void MonteCarloMetropolis(
         string ,
-        string,
 
-        int ,
         int ,
         int ,
 
         double ,
 
-        vec & ,
-        vec & ,
-        vec & ,
-        vec & ,
-        vec & ,
-        vec & ,
-        vec & ,
-        vec & ,
         vec &
         );
 

@@ -10,10 +10,11 @@ int main(int argc, char *argv[]){
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     string path, runName, mode;
-    int NSpins, MCCycles, Equilibrium;
+    int MCCycles;
+    int Lmin, Lmax, Lstep;
     double initialTemp, finalTemp, TempStep;
-    vec ExpectEnergy, ExpectEnergySquared, ExpectMagnet;
-    vec Accepted, MCTime, EnergyArray, ExpectMagnetSquared, AbsMagnet;
+    vec EExpect, E2Expect;
+    vec M2Expect, MAbsExpect, Temperature;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,9 +23,10 @@ int main(int argc, char *argv[]){
     cin >> runName;
     cin >> mode;
     // integers:
-    cin >> NSpins;
+    cin >> Lmin;
+    cin >> Lmax;
+    cin >> Lstep;
     cin >> MCCycles;
-    cin >> Equilibrium;
     // floats:
     cin >> initialTemp;
     cin >> finalTemp;
@@ -32,68 +34,87 @@ int main(int argc, char *argv[]){
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    EnergyArray = zeros<vec>(MCCycles - Equilibrium);
-    Accepted = zeros<vec>(MCCycles - Equilibrium);
-    ExpectEnergy = zeros<vec>(MCCycles - Equilibrium);
-    ExpectEnergySquared = zeros<vec>(MCCycles - Equilibrium);
-    ExpectMagnet = zeros<vec>(MCCycles - Equilibrium);
-    ExpectMagnetSquared = zeros<vec>(MCCycles - Equilibrium);
-    AbsMagnet = zeros<vec>(MCCycles - Equilibrium);
-    MCTime = zeros<vec>(MCCycles - Equilibrium);
+    int NTemp = (int)(finalTemp - initialTemp)/TempStep;
+    Temperature = zeros<vec>(NTemp);
+    EExpect = zeros<vec>(NTemp);
+    E2Expect = zeros<vec>(NTemp);
+    M2Expect = zeros<vec>(NTemp);
+    MAbsExpect = zeros<vec>(NTemp);
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    clock_t timeStart, timeFinish;
+    double timeused;
+    timeStart = clock();
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // run MC cycles over temperature range
-    int TempCount = 0;
-    for( double Temp = initialTemp; Temp <= finalTemp; Temp += TempStep )
+    for( int NSpins = Lmin; NSpins <= Lmax; NSpins += Lstep )
     {
         //
-        cout << "T : " << Temp << "\n";
+        cout << "==================================\n"
+             << "L : " << NSpins << "\n";
         //
-        TempCount++;
-        //
-        vec Expectationvalues = zeros<mat>(5);
-        //
-        MonteCarloMetropolis(
-                runName,
-                mode,
-                NSpins,
-                MCCycles,
-                Equilibrium,
-                Temp,
-                EnergyArray,
-                Expectationvalues,
-                ExpectEnergy,
-                ExpectEnergySquared,
-                ExpectMagnet,
-                ExpectMagnetSquared,
-                AbsMagnet,
-                Accepted,
-                MCTime
-               );
-        //
-        // printing results to standard out and writing arrays to file:
-        Expectationvalues /= (MCCycles);
-        //
-        cout << " <E>/(N^2) : " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
-             << " <|M|>/(N^2) : " << Expectationvalues(4)/(NSpins*NSpins) << "\n"
-             << " Cv*(k*T*T)/(N^2) : " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
-             << " X*(k*T)/(N^2) : " << (Expectationvalues(3) - Expectationvalues(4)*Expectationvalues(4))/(Temp*NSpins*NSpins) << endl;
-        //
-        //setting up strings to reduce errors in writing:
-        string TempString = std::to_string(TempCount);
-        string Filename = "ExpectationValuesTemp"+TempString+runName;
-        string FinalFilename = path+"ExpectationValuesTemp"+TempString+"Final"+runName;
-        // writing to file:
-        fileDump( path+"Energy"+Filename, ExpectEnergy, ExpectEnergy.size() );
-        fileDump( path+"EnergySquared"+Filename, ExpectEnergySquared, ExpectEnergySquared.size() );
-        fileDump( path+"Magnetization"+Filename, ExpectMagnet, ExpectMagnet.size() );
-        fileDump( path+"MagnetizationSquared"+Filename, ExpectMagnetSquared, ExpectMagnetSquared.size() );
-        fileDump( path+"MagnetizationAbsoluteValue"+Filename, AbsMagnet, AbsMagnet.size() );
-        fileDump( path+"AcceptedConfigurationsTemp"+TempString+runName, Accepted, Accepted.size());
-        //
-        fileDump( FinalFilename, Expectationvalues, Expectationvalues.size() );
-    }
+
+        // run MC cycles over temperature range
+        int TempCount = 0;
+        for( double Temp = initialTemp; Temp <= finalTemp; Temp += TempStep )
+        {
+            //
+            cout << "T : " << Temp << "\n";
+            //
+            vec Expectationvalues = zeros<mat>(4);
+            //
+            MonteCarloMetropolis(
+                    mode,
+                    //
+                    NSpins,
+                    MCCycles,
+                    //
+                    Temp,
+                    //
+                    Expectationvalues
+                   );
+
+            // printing results to standard out and writing arrays to file:
+            Expectationvalues /= (MCCycles);
+            EExpect(TempCount) = Expectationvalues(0);
+            E2Expect(TempCount) = Expectationvalues(1);
+            M2Expect(Temp) = Expectationvalues(2);
+            MAbsExpect(Temp) = Expectationvalues(3);
+            Temperature(Temp) = Temp;
+            //
+            cout << " <E>/(N^2) : " << Expectationvalues(0)/(NSpins*NSpins) << "\n"
+                 << " <|M|>/(N^2) : " << Expectationvalues(3)/(NSpins*NSpins) << "\n"
+                 << " Cv*(k*T*T)/(N^2) : " << (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins) << "\n"
+                 << " X*(k*T)/(N^2) : " << (Expectationvalues(2) - Expectationvalues(3)*Expectationvalues(3))/(Temp*NSpins*NSpins) << endl;
+            //
+            //setting up strings to reduce errors in writing:
+            string TempString = std::to_string(TempCount);
+            string Filename = "ExpectationValuesTemp"+TempString+runName;
+            string FinalFilename = path+"ExpectationValuesTemp"+TempString+"Final"+runName;
+            // writing to file:
+            fileDump( path+"Energy"+Filename, EExpect, EExpect.size() );
+            //
+            fileDump( path+"EnergySquared"+Filename, E2Expect, E2Expect.size() );
+            //
+            fileDump( path+"MagnetizationSquared"+Filename, M2Expect, M2Expect.size() );
+            //
+            fileDump( path+"MagnetizationAbsoluteValue"+Filename, MAbsExpect, MAbsExpect.size() );
+            //
+            fileDump( FinalFilename, Expectationvalues, Expectationvalues.size() );
+            timeFinish = clock();
+            timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
+            cout << " time, T =  " << Temp << ": " << timeused << endl;
+
+            //
+            TempCount++;
+        } // End, temperature
+
+        timeFinish = clock();
+        timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
+        cout << " time, L = " << NSpins << ": " << timeused << endl;
+    }// End, spins states
     return 0;
 } // end main
 
@@ -108,21 +129,13 @@ int main(int argc, char *argv[]){
 //
 
 void MonteCarloMetropolis(
-        string runName,
         string mode,
+        //
         int NSpins,
         int MCCycles,
-        int Equilibrium,
         double Temp,
-        vec & EnergyArray,
-        vec & Expectationvalues,
-        vec & ExpectEnergy,
-        vec & ExpectEnergySquared,
-        vec & ExpectMagnet,
-        vec & ExpectMagnetSquared,
-        vec & AbsMagnet,
-        vec & Accepted,
-        vec & MCTime
+        //
+        vec & Expectationvalues
         )
 {
     //
@@ -174,26 +187,9 @@ void MonteCarloMetropolis(
         //Update expectation values, local node
         Expectationvalues(0) += Energy;
         Expectationvalues(1) += Energy*Energy;
-        Expectationvalues(2) += MagneticMoment;
-        Expectationvalues(3) += MagneticMoment*MagneticMoment;
-        Expectationvalues(4) += fabs(MagneticMoment);
+        Expectationvalues(2) += MagneticMoment*MagneticMoment;
+        Expectationvalues(3) += fabs(MagneticMoment);
 
-        // For post exercise C, find ~equilibration time, then start measuring after.
-        if( cycle >= Equilibrium )
-        {
-            int index = cycle - Equilibrium;
-            // {RATE OF STORAGE INDEFINITELY SUSPENDED}
-
-            EnergyArray(index) = Energy;
-            Accepted(index) = counter;
-            double denominator = (cycle+1)*NSpins*NSpins;
-
-            ExpectEnergy(index) = Expectationvalues(0)/denominator;
-            ExpectEnergySquared(index) = Expectationvalues(1)/denominator;
-            ExpectMagnet(index) = Expectationvalues(2)/denominator;
-            ExpectMagnetSquared(index) = Expectationvalues(3)/denominator;
-            AbsMagnet(index) = Expectationvalues(4)/denominator;
-        }
     }
 
 } // end MonteCarloMetropolis
@@ -208,7 +204,7 @@ void initializeLattice( int NSpins, mat & Lattice, double & Energy, double & Mag
      * Uncertain exactly which folder, but should be in there somewhere:
      * link: https://github.com/Lilleborg/FYS3150-Computational-physics/tree/master/Projects/Project4
      */
-
+//
     if (strcmp(mode.c_str(),"Up") == 0)
     {   // Fill lattice with spin up
         Lattice.ones();
@@ -264,7 +260,7 @@ void initializeLattice( int NSpins, mat & Lattice, double & Energy, double & Mag
             //
         }
     }
-    cout << "initial energy per particle is: " << Energy/(NSpins*NSpins) << endl;
+//    cout << "E0/(N^2) : " << Energy/(NSpins*NSpins) << endl;
 } // end initializeLattice
 //
 //
@@ -283,7 +279,7 @@ void fileDump(
      *
      * First off, dump and make rest as a class
      */
-
+//
     std::ofstream file( Filename, std::ofstream::binary);
     //
     //
@@ -302,5 +298,5 @@ void fileDump(
     //
     file.close();
     delete [] tmp_arr;
-
+//
 } // end fileDump
