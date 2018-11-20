@@ -26,7 +26,8 @@ plt.legend()
 plt.xlabel('MC cycles')
 plt.show()
 
-
-runName =
+path = input("input path, e.g. dataECRandTemp10/")
+runName = input("run name, e.g. 'EL40_100T21_23.bin', or 'ECT10'")
 variableName = input("name of variable to plot: ")
+
 

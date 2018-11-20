@@ -1,0 +1,10 @@
+dataRandSmallLnoEquil/
+Random
+2
+20
+18
+1000000
+0
+1.0
+2.4
+1.4

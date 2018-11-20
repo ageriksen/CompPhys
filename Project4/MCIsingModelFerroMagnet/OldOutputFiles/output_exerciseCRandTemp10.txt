@@ -1,0 +1,17 @@
+please input: 
+path, runName, mode, Nspins, MCCycles, Rate, InitialTemp, finalTemp and TempStep.
+necessary values read.
+arrays initialized. 
+let's run the Monte Carlo cycles.
+initial energy per particle is: -0.03
+Final expexted energy per spin: -1.99716 at temperature 1
+Final expectation values, separate: 
+  -7.9886e+02
+   6.3819e+05
+  -3.9970e+02
+   1.5976e+05
+   3.9970e+02
+Energy per spin: -1.99716
+mean abosolute magnetization per spin: 0.999242
+heat capacity Cv*(kT*T) per spin: 0.0266745
+Susceptibility Chi*kT per spin: 0.0120016
