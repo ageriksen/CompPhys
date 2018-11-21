@@ -84,13 +84,27 @@ int main(int argc, char *argv[]){
             Expectationvalues /= (MCCycles);
 
             //
-            cout << "| < E > / (N^2) : " << ExpectationEnergy.end() << "\n"
-                 << "| <|M|> / (N^2) : " << ExpectationMagnetism.end() << "\n"
-                 << "| Cv*(k)/ (N^2) : " << VarianceE.end() << "\n"
-                 << "| X*(k) / (N^2) : " << VarianceM.end() << endl;
+            cout << "| < E > / (N^2) : " << ExpectationEnergy(MCCycles-Equilibrium-1) << "\n"
+                 << "| <|M|> / (N^2) : " << ExpectationMagnetism(MCCycles-Equilibrium-1) << "\n"
+                 << "| Cv*(k)/ (N^2) : " << VarianceE(MCCycles-Equilibrium-1) << "\n"
+                 << "| X*(k) / (N^2) : " << VarianceM(MCCycles-Equilibrium-1) << endl;
             //
             //setting up strings to reduce errors in writing:
-            string Fname = "L"+std::to_string(NSpins)+"T"+std::to_string(TempCount)+".bin";
+            //
+            //Making temp and L more print friendly:
+            string Lstring;
+            if( NSpins < 10 )
+            {
+                Lstring = "0"+std::to_string(NSpins);
+            }
+            else
+            {
+                Lstring = std::to_string(NSpins);
+            }
+            string TempString = std::to_string(int(round(
+                    TempCount*TempStep + initialTemp
+                    )));
+            string Fname = mode+"L"+Lstring+"T"+TempString+".bin";
             // writing to file:
             fileDump( path+"ExpectationEnergy"+Fname, ExpectationEnergy);
             fileDump( path+"ExpectationMagnetism"+Fname, ExpectationMagnetism);
@@ -100,14 +114,10 @@ int main(int argc, char *argv[]){
             //
             timeFinish = clock();
             timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
-            cout << " time, T =  " << Temp << ": " << timeused << endl;
+            cout << " time: " << timeused << endl;
         }
             //
             TempCount++;
-
-        timeFinish = clock();
-        timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
-        cout << " time, L = " << NSpins << ": " << timeused << endl;
     }// End, spins states
     return 0;
 } // end main
@@ -160,7 +170,31 @@ void MonteCarloMetropolis(
 
     //Begin Monte Carlo cycle'
     int x, y, DeltaE;
-    for( int cycle = 0; cycle < MCCycles; cycle ++)
+    for( int cycle = 0; cycle < Equilibrium; cycle ++)
+    { // Equilibration loop, to loop over the necessary:
+        //sweep lattice
+        for( int count = 0; count < (NSpins*NSpins); count ++ )
+        {
+            x = (int)( RNG(gen)*(double)NSpins );
+            y = (int)( RNG(gen)*(double)NSpins );
+
+            DeltaE = 2*Lattice(x, y)*
+                (
+                   Lattice( x, PeriodicBoundary( y, NSpins, -1) )
+                 + Lattice( PeriodicBoundary( x, NSpins, -1), y )
+                 + Lattice( x, PeriodicBoundary( y, NSpins,  1) )
+                 + Lattice( PeriodicBoundary( x,  NSpins, 1), y )
+                );
+            if( RNG(gen) <= EnergyProb(DeltaE + 8) )
+            {
+                Lattice(x, y) *= -1.; // flip and accept spin
+                MagneticMoment += (double) 2*Lattice(x, y);
+                Energy += (double)DeltaE;
+            }
+        }
+    } // end equilibration loop
+
+    for( int cycle = Equilibrium; cycle < MCCycles; cycle ++)
     {
         //sweep lattice
         for( int count = 0; count < (NSpins*NSpins); count ++ )
@@ -183,18 +217,16 @@ void MonteCarloMetropolis(
             }
         }
         //Update expectation values, local node
-        Expectationvalues(0) += Energy;
-        Expectationvalues(1) += Energy*Energy;
-        Expectationvalues(2) += MagneticMoment*MagneticMoment;
-        Expectationvalues(3) += fabs(MagneticMoment);
+        Expectationvalues.at(0) += Energy;
+        Expectationvalues.at(1) += Energy*Energy;
+        Expectationvalues.at(2) += MagneticMoment*MagneticMoment;
+        Expectationvalues.at(3) += fabs(MagneticMoment);
 
-        if( cycle >= Equilibrium )
-        {
-            ExpectationEnergy(cycle-Equilibrium) = Expectationvalues(0)/(NSpins*NSpins);
-            ExpectationMagnetism(cycle-Equilibrium) = Expectationvalues(3)/(NSpins*NSpins);
-            VarianceE(cycle-Equilibrium) = (Expectationvalues(1) - Expectationvalues(0)*Expectationvalues(0))/(Temp*Temp*NSpins*NSpins);
-            VarianceM(cycle-Equilibrium) = (Expectationvalues(2) - Expectationvalues(3)*Expectationvalues(3))/(Temp*NSpins*NSpins);
-        }
+        ExpectationEnergy(cycle) = Expectationvalues.at(0)/(NSpins*NSpins);
+        ExpectationMagnetism(cycle) = Expectationvalues.at(3)/(NSpins*NSpins);
+        VarianceE(cycle) = (Expectationvalues.at(1) - Expectationvalues.at(0)*Expectationvalues.at(0))/(Temp*Temp*NSpins*NSpins);
+        VarianceM(cycle) = (Expectationvalues.at(2) - Expectationvalues.at(3)*Expectationvalues.at(3))/(Temp*NSpins*NSpins);
+
     }
 
 } // end MonteCarloMetropolis

@@ -109,7 +109,15 @@ int main(int argc, char *argv[]){
                  << "| X*(k) / (N^2) : " << VarianceM(TempCount) << endl;
             //
             //setting up strings to reduce errors in writing:
-            string Fname = "L"+std::to_string(NSpins)+".bin";
+            string Fname;
+            if( NSpins == 100 )
+            {
+                Fname = "L"+std::to_string(NSpins)+".bin";
+            }
+            else
+            {
+                Fname = "L0"+std::to_string(NSpins)+".bin";
+            }
             // writing to file:
             fileDump( path+"ExpectationEnergy"+Fname, ExpectationEnergy);
             fileDump( path+"ExpectationMagnetism"+Fname, ExpectationMagnetism);
@@ -117,17 +125,15 @@ int main(int argc, char *argv[]){
             fileDump( path+"VarianceM"+Fname, VarianceM);
             //
             //
-            timeFinish = clock();
-            timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
-            cout << " time, T =  " << Temp << ": " << timeused << endl;
+            TempCount++;
 
             //
-            TempCount++;
+            timeFinish = clock();
+            timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
+            cout << " time: " << timeused << endl;
+
         } // End, temperature
 
-        timeFinish = clock();
-        timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
-        cout << " time, L = " << NSpins << ": " << timeused << endl;
     }// End, spins states
     return 0;
 } // end main
@@ -227,7 +233,6 @@ void MonteCarloMetropolis(
         Expectationvalues.at(1) += Energy*Energy;
         Expectationvalues.at(2) += MagneticMoment*MagneticMoment;
         Expectationvalues.at(3) += fabs(MagneticMoment);
-
     } // end expectationvalue loop
 
 } // end MonteCarloMetropolis
