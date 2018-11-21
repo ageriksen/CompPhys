@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
     double initialTemp, finalTemp, TempStep;
     //
     vec ExpectationEnergy, ExpectationMagnetism,
-        VarianceE, VarianceM;
+        HeatCapacity, Susceptibility, AcceptedConfigurations;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,8 +48,9 @@ int main(int argc, char *argv[]){
         //
         ExpectationEnergy = zeros<vec>(MCCycles - Equilibrium);
         ExpectationMagnetism = zeros<vec>(MCCycles - Equilibrium);
-        VarianceE = zeros<vec>(MCCycles - Equilibrium);
-        VarianceM = zeros<vec>(MCCycles - Equilibrium);
+        HeatCapacity = zeros<vec>(MCCycles - Equilibrium);
+        Susceptibility = zeros<vec>(MCCycles - Equilibrium);
+        AcceptedConfigurations = zeros<vec>(MCCycles - Equilibrium);
 
         //
         cout << "==================================\n"
@@ -77,8 +78,9 @@ int main(int argc, char *argv[]){
                     Expectationvalues,
                     ExpectationEnergy,
                     ExpectationMagnetism,
-                    VarianceE,
-                    VarianceM
+                    HeatCapacity,
+                    Susceptibility,
+                    AcceptedConfigurations
                    );
             // printing results to standard out and writing arrays to file:
             Expectationvalues /= (MCCycles);
@@ -86,12 +88,13 @@ int main(int argc, char *argv[]){
             //
             cout << "| < E > / (N^2) : " << ExpectationEnergy(MCCycles-Equilibrium-1) << "\n"
                  << "| <|M|> / (N^2) : " << ExpectationMagnetism(MCCycles-Equilibrium-1) << "\n"
-                 << "| Cv*(k)/ (N^2) : " << VarianceE(MCCycles-Equilibrium-1) << "\n"
-                 << "| X*(k) / (N^2) : " << VarianceM(MCCycles-Equilibrium-1) << endl;
+                 << "| Cv*(k)/ (N^2) : " << HeatCapacity(MCCycles-Equilibrium-1) << "\n"
+                 << "| X*(k) / (N^2) : " << Susceptibility(MCCycles-Equilibrium-1) << endl;
             //
             //setting up strings to reduce errors in writing:
             //
             //Making temp and L more print friendly:
+            //
             string Lstring;
             if( NSpins < 10 )
             {
@@ -101,15 +104,18 @@ int main(int argc, char *argv[]){
             {
                 Lstring = std::to_string(NSpins);
             }
-            string TempString = std::to_string(int(round(
-                    TempCount*TempStep + initialTemp
-                    )));
+            //
+            //string TempString = std::to_string(int(round(
+            //        TempCount*TempStep + initialTemp
+            //        )));
+            string TempString = std::to_string( int(round( Temp*10 )) );
             string Fname = mode+"L"+Lstring+"T"+TempString+".bin";
             // writing to file:
             fileDump( path+"ExpectationEnergy"+Fname, ExpectationEnergy);
             fileDump( path+"ExpectationMagnetism"+Fname, ExpectationMagnetism);
-            fileDump( path+"VarianceE"+Fname, VarianceE);
-            fileDump( path+"VarianceM"+Fname, VarianceM);
+            fileDump( path+"HeatCapacity"+Fname, HeatCapacity);
+            fileDump( path+"Susceptibility"+Fname, Susceptibility);
+            fileDump( path+"AcceptedConfigurations"+Fname, AcceptedConfigurations);
             //
             //
             timeFinish = clock();
@@ -144,8 +150,9 @@ void MonteCarloMetropolis(
         vec & Expectationvalues,
         vec & ExpectationEnergy,
         vec & ExpectationMagnetism,
-        vec & VarianceE,
-        vec & VarianceM
+        vec & HeatCapacity,
+        vec & Susceptibility,
+        vec & AcceptedConfigurations
         )
 {
     //
@@ -170,6 +177,7 @@ void MonteCarloMetropolis(
 
     //Begin Monte Carlo cycle'
     int x, y, DeltaE;
+    int Accepted = 0;
     for( int cycle = 0; cycle < Equilibrium; cycle ++)
     { // Equilibration loop, to loop over the necessary:
         //sweep lattice
@@ -214,6 +222,7 @@ void MonteCarloMetropolis(
                 Lattice(x, y) *= -1.; // flip and accept spin
                 MagneticMoment += (double) 2*Lattice(x, y);
                 Energy += (double)DeltaE;
+                Accepted ++;
             }
         }
         //Update expectation values, local node
@@ -222,10 +231,22 @@ void MonteCarloMetropolis(
         Expectationvalues.at(2) += MagneticMoment*MagneticMoment;
         Expectationvalues.at(3) += fabs(MagneticMoment);
 
-        ExpectationEnergy(cycle) = Expectationvalues.at(0)/(NSpins*NSpins);
-        ExpectationMagnetism(cycle) = Expectationvalues.at(3)/(NSpins*NSpins);
-        VarianceE(cycle) = (Expectationvalues.at(1) - Expectationvalues.at(0)*Expectationvalues.at(0))/(Temp*Temp*NSpins*NSpins);
-        VarianceM(cycle) = (Expectationvalues.at(2) - Expectationvalues.at(3)*Expectationvalues.at(3))/(Temp*NSpins*NSpins);
+        int EquilibratedCycle = cycle-Equilibrium;
+
+        AcceptedConfigurations(EquilibratedCycle) = Accepted;
+        ExpectationEnergy(EquilibratedCycle) = Expectationvalues.at(0)/(EquilibratedCycle*NSpins*NSpins);
+        ExpectationMagnetism(EquilibratedCycle) = Expectationvalues.at(3)/(EquilibratedCycle*NSpins*NSpins);
+        HeatCapacity(EquilibratedCycle) = (
+                  ( Expectationvalues.at(1) - ( Expectationvalues.at(0)*Expectationvalues.at(0)/EquilibratedCycle ) )
+                / ( EquilibratedCycle*Temp*Temp*NSpins*NSpins )
+                );
+        Susceptibility(EquilibratedCycle) = (
+                  ( Expectationvalues.at(2) - ( Expectationvalues.at(3)*Expectationvalues.at(3)/EquilibratedCycle ) )
+                / ( EquilibratedCycle*Temp*Temp*NSpins*NSpins )
+                );
+
+//                Expectationvalues.at(2) - Expectationvalues.at(3)*Expectationvalues.at(3))/(EquilibratedCycle*Temp*NSpins*NSpins
+//                );
 
     }
 

@@ -19,10 +19,11 @@ Plotting is either matplotlib's plot() or semilogx() as appropriate to task.
 MAKE SURE THE FOLDER IN THE FIRST LINE OF THE INPUT FILE EXISTS ALREADY.
 
 =================================
+Ideas for improvement:
+
 PARALLELLIZATION
 
 
-Ideas for improvement:
 making class objects for
     lattice
         initialize
@@ -41,6 +42,10 @@ making class objects for
         Could be in lattice
     Metropolis sampling rule
         Finding rate of probabilities and comparing to variable preference
+
+For Benchmarks, no real need to store plots, so maybe store a selection along the cycles to
+plot as dots against a line of the closed form analytical solution.
+
 
 =================================
 

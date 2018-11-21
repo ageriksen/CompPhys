@@ -1,4 +1,4 @@
-#include "MCCycleLarge.h"
+#include "MCCycleEnergies.h"
 #include <iostream>
 
 inline int PeriodicBoundary(int i, int limit, int add)
@@ -16,8 +16,7 @@ int main(int argc, char *argv[]){
     //
     double initialTemp, finalTemp, TempStep;
     //
-    vec ExpectationEnergy, ExpectationMagnetism,
-        HeatCapacity, Susceptibility, Temperature;
+    vec Energies;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,34 +35,17 @@ int main(int argc, char *argv[]){
     cin >> TempStep;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    int NTemp = int(round( (
-                 ( (double)finalTemp - (double)initialTemp )
-                     / (double)TempStep
-                 ) )
-                );
-    Temperature = linspace<vec>(initialTemp, finalTemp, NTemp+1);
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     clock_t timeStart, timeFinish;
     double timeused;
     timeStart = clock();
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    int Equilibration = MCCycles - Equilibrium;
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for( int NSpins = Lmin; NSpins <= Lmax; NSpins += Lstep )
     {
         //
-        ExpectationEnergy = zeros<vec>(NTemp+1);
-        ExpectationMagnetism = zeros<vec>(NTemp+1);
-        HeatCapacity = zeros<vec>(NTemp+1);
-        Susceptibility = zeros<vec>(NTemp+1);
-
+        Energies = zeros<vec>(MCCycles - Equilibrium);
         //
         cout << "==================================\n"
              << "L : " << NSpins << "\n";
@@ -87,53 +69,47 @@ int main(int argc, char *argv[]){
                     //
                     Temp,
                     //
-                    Expectationvalues
+                    Expectationvalues,
+                    Energies
                    );
             // printing results to standard out and writing arrays to file:
-            Expectationvalues /= (Equilibration);
-            ExpectationEnergy(TempCount) = Expectationvalues.at(0)
-                                            /(NSpins*NSpins);
-            ExpectationMagnetism(TempCount) = Expectationvalues.at(3)
-                                            /(NSpins*NSpins);
-            HeatCapacity(TempCount) =
-                ( Expectationvalues.at(1) - Expectationvalues.at(0)*Expectationvalues.at(0) )
-                    /(Temp*Temp*NSpins*NSpins);
-            Susceptibility(TempCount) =
-                ( Expectationvalues.at(2) - Expectationvalues.at(3)*Expectationvalues.at(3) )
-                    /(Temp*NSpins*NSpins);
-
+            Expectationvalues /= (MCCycles);
+            double VarianceE = (
+                      Expectationvalues(1)
+                    - (  Expectationvalues(0)*Expectationvalues(0) )
+                    );
             //
-            cout << "| < E > / (N^2) : " << ExpectationEnergy(TempCount) << "\n"
-                 << "| <|M|> / (N^2) : " << ExpectationMagnetism(TempCount) << "\n"
-                 << "| Cv*(k)/ (N^2) : " << HeatCapacity(TempCount) << "\n"
-                 << "| X*(k) / (N^2) : " << Susceptibility(TempCount) << endl;
+            cout << "| Variance, Energy : " << VarianceE << "\n";
             //
             //setting up strings to reduce errors in writing:
-            string Fname;
-            if( NSpins == 100 )
+            //
+            //Making temp and L more print friendly:
+            //
+            string Lstring;
+            if( NSpins < 10 )
             {
-                Fname = "L"+std::to_string(NSpins)+".bin";
+                Lstring = "0"+std::to_string(NSpins);
             }
             else
             {
-                Fname = "L0"+std::to_string(NSpins)+".bin";
+                Lstring = std::to_string(NSpins);
             }
+            //
+            //string TempString = std::to_string(int(round(
+            //        TempCount*TempStep + initialTemp
+            //        )));
+            string TempString = std::to_string( int(round( Temp*10 )) );
+            string Fname = mode+"L"+Lstring+"T"+TempString+".bin";
             // writing to file:
-            fileDump( path+"ExpectationEnergy"+Fname, ExpectationEnergy);
-            fileDump( path+"ExpectationMagnetism"+Fname, ExpectationMagnetism);
-            fileDump( path+"HeatCapacity"+Fname, HeatCapacity);
-            fileDump( path+"Susceptibility"+Fname, Susceptibility);
+            fileDump( path+"Energies"+Fname, Energies );
             //
-            //
-            TempCount++;
-
             //
             timeFinish = clock();
             timeused = (double)( timeFinish - timeStart )/CLOCKS_PER_SEC;
             cout << " time: " << timeused << endl;
-
-        } // End, temperature
-
+        }
+            //
+            TempCount++;
     }// End, spins states
     return 0;
 } // end main
@@ -154,9 +130,11 @@ void MonteCarloMetropolis(
         int NSpins,
         int MCCycles,
         int Equilibrium,
+        //
         double Temp,
         //
-        vec & Expectationvalues
+        vec & Expectationvalues,
+        vec & Energies
         )
 {
     //
@@ -181,7 +159,7 @@ void MonteCarloMetropolis(
 
     //Begin Monte Carlo cycle'
     int x, y, DeltaE;
-
+    int Accepted = 0;
     for( int cycle = 0; cycle < Equilibrium; cycle ++)
     { // Equilibration loop, to loop over the necessary:
         //sweep lattice
@@ -200,14 +178,13 @@ void MonteCarloMetropolis(
             if( RNG(gen) <= EnergyProb(DeltaE + 8) )
             {
                 Lattice(x, y) *= -1.; // flip and accept spin
-                MagneticMoment += (double) 2*Lattice(x, y);
                 Energy += (double)DeltaE;
             }
-        } // end equilibration loop
+        }
+    } // end equilibration loop
 
-    }
     for( int cycle = Equilibrium; cycle < MCCycles; cycle ++)
-    { // Loop to update and adjust energies et al.
+    {
         //sweep lattice
         for( int count = 0; count < (NSpins*NSpins); count ++ )
         {
@@ -226,6 +203,7 @@ void MonteCarloMetropolis(
                 Lattice(x, y) *= -1.; // flip and accept spin
                 MagneticMoment += (double) 2*Lattice(x, y);
                 Energy += (double)DeltaE;
+                Accepted ++;
             }
         }
         //Update expectation values, local node
@@ -233,7 +211,11 @@ void MonteCarloMetropolis(
         Expectationvalues.at(1) += Energy*Energy;
         Expectationvalues.at(2) += MagneticMoment*MagneticMoment;
         Expectationvalues.at(3) += fabs(MagneticMoment);
-    } // end expectationvalue loop
+
+        int EquilibratedCycle = cycle-Equilibrium;
+        Energies(EquilibratedCycle) = Energy;
+
+    }
 
 } // end MonteCarloMetropolis
 //
@@ -311,7 +293,7 @@ void initializeLattice( int NSpins, mat & Lattice, double & Energy, double & Mag
 
 void fileDump(
         string Filename,
-        vec Array
+        mat Array
         )
 {
     /*
@@ -323,7 +305,6 @@ void fileDump(
      */
 //
     std::ofstream file( Filename, std::ofstream::binary);
-    //
     //
     int ArrayDim = Array.size();
     double *tmp_arr = new double[ArrayDim];

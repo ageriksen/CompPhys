@@ -1,5 +1,5 @@
-#ifndef MCCYCLESMALL_H
-#define MCCYCLESMALL_H
+#ifndef MCCYCLEENERGIES_H
+#define MCCYCLEENERGIES_H
 
 #include <cmath>
 #include <fstream>
@@ -27,10 +27,6 @@ void MonteCarloMetropolis(
 
         double ,
 
-        vec &,
-        vec &,
-        vec &,
-        vec &,
         vec &,
         vec &
         );

@@ -1,0 +1,11 @@
+dataEnergyProbability/
+Up
+20
+20
+18
+1000000
+10000
+1.0
+2.4
+1.4
+
