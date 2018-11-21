@@ -74,9 +74,10 @@ int main(int argc, char *argv[]){
                    );
             // printing results to standard out and writing arrays to file:
             Expectationvalues /= (MCCycles);
-            double VarianceE = (
+            double VarianceE = ((
                       Expectationvalues(1)
-                    - (  Expectationvalues(0)*Expectationvalues(0) )
+                    - (  Expectationvalues(0)*Expectationvalues(0) ))
+                    /(NSpins*NSpins)
                     );
             //
             cout << "| Variance, Energy : " << VarianceE << "\n";
