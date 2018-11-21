@@ -16,6 +16,8 @@ Files are read in python with glob("filenames") and fed into
 Numpy's "fromfile()" function.
 Plotting is either matplotlib's plot() or semilogx() as appropriate to task.
 
+MAKE SURE THE FOLDER IN THE FIRST LINE OF THE INPUT FILE EXISTS ALREADY.
+
 =================================
 PARALLELLIZATION
 
