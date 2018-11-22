@@ -43,6 +43,7 @@ int main(int argc, char *argv[]){
                  ) )
                 );
     Temperature = linspace<vec>(initialTemp, finalTemp, NTemp+1);
+    fileDump( path+"Temperature.bin", Temperature);
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
