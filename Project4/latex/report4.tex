@@ -55,27 +55,27 @@ with most things, I started from the bottom with a 2 by 2 lattice and acode mean
 \section{Methods and theory}
 
 We want to study a 2 dimensional ferromagnetic system through the Ising model, specifically in phase transitions.
-The system we're studying has an energy
+The system has an energy
 \[ E = -J \sum_{<kl>}^N s_k \, s_l \]
 In which the "$<kl>$" signifies summing over neighbouring spots in the lattice only. $s_k = \pm 1$, and N is the total number of spins in
-the latice. J is a coupling constant and, as we are currently investigating ferromagnetic elements we have $J > 0$.
-As we will investigate changes in the system, the equation can be solved as
+the latice. J is a coupling constant and, as I am currently investigating ferromagnetic elements I have $J > 0$.
+As I will investigate changes in the system, the equation can be solved as
 \[ \Delta E = 2 Js_l^1 \sum_{<k>}^N s_k \].
 
-The numerical issues we focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into
+The numerical issues I focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into
 %these and discuss here.
 
-As with most systems, we begin with a simple iteration. For the ising model of ferromagnets, we start out with a $2\times 2$ lattice to find
+As with most systems, I begin with a simple iteration. For the ising model of ferromagnets, I start out with a $2\times 2$ lattice to find
 as well as the mean average magnetic moment henceforth "mean magnetism". Additional valuable properties are the specific heat capacity,
 as well as succeptability as functions of T, with periodic boundary conditions.
 \[
     \ev{E(T)}, \qq{} \abs{M(T)}, \qq{} C_V(T), \qq{} \chi(T)
-\] % INCLUD DESCRIPTIONS OF HOW TO FIND MAGNETIZATION, HEAT CAPACITY AND SUCCEPTIBILITY!!!
+\] % include DESCRIPTIONS OF HOW TO FIND MAGNETIZATION, HEAT CAPACITY AND SUCCEPTIBILITY!!!
 
-Having studied simple system, we will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We
+Having studied simple system, I will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We
 want to accurately extract the properties found previously, for a scaled temperature $T = 1 \qq{with dimensions} \qty[ T ] = \frac{ J }{ kT }$. Here,
 k is the Boltzman constant. This will allow us to cancel out the k in future calculations. Another important step, is to log the number of Monte Carlo
-(MC) cycles we run.
+(MC) cycles I run.
 %%%% algorithm begin
 \begin{algorithm}
     mat<double> $Transfer = [ e^{-\Delta E/ \beta }$ ]\;
@@ -93,26 +93,26 @@ k is the Boltzman constant. This will allow us to cancel out the k in future cal
 \end{algorithm}
 %%%% algorithm end
 
-Having Benchmarked and controlled our program for a simple system, we up the lattice size $L\times L$ to $L=20$. To abvoid wasting cpu cycles on usesless
-info that will at best be thrown out, we need to determine the time the system needs to reach equilibrium. The simplest method here, is to just plot the
+Having Benchmarked and controlled our program for a simple system, I up the lattice size $L\times L$ to $L=20$. To abvoid wasting cpu cycles on usesless
+info that will at best be thrown out, I need to determine the time the system needs to reach equilibrium. The simplest method here, is to just plot the
 various expectation values as functions of the number of MC cycles. and determining by-eye when the system reaches the desired stability. Time is measured in
 sweeps of MC cycles per lattice. An interesting question, is whether or not the equilibration time depends on the starting position. Whether this is
 ordered so all spins point in the same direction or random configuration. These first tests will be run with the initial temperature $T=1$. We will also
-investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Here, we want to plot the total number of accepted
-MC cycles as a function of the total number of MC cycles run, so as to investigate whether or not we can attest to the accepted configurations depending
+investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Here, I want to plot the total number of accepted
+MC cycles as a function of the total number of MC cycles run, so as to investigate whether or not I can attest to the accepted configurations depending
 on T.
 
-Additionally we want to study the probabilities for energies, $\Pr(E)$, in effect counting up the number of times the energy $E$ comes up in the computation.
+Additionally I want to study the probabilities for energies, $\Pr(E)$, in effect counting up the number of times the energy $E$ comes up in the computation.
 We begin our counting after having reached equilibrium to ensure statistically significant readout. We want the energetic variance $\sigma_E^2$.
 %discuss results!
 
-With our system set up, we can now study the properties of the system as we change the temperature. There is a phase shift of the system on the crossing of
+With our system set up, I can now study the properties of the system as I change the temperature. There is a phase shift of the system on the crossing of
 a certain critical temperature $T_C$. Below this, the energy is low enough, so that the bias in energetic preference freezes the system towards the energetic
 minimum. This should result in growing clusters of spins, untill the system eventually inhabits the minimum energy state where all spins point in the same
 direction. With temperatures greater than $T_C$, the energety present lessens the bias towards the energetically preferable state. This means that the clusters
 of similar spins are smaller and more spread, with a more random distribution.
 
-Near $T_C$ we can characterize several properties of the system with a power law behaviour. In the Ising model, the mean magnetisation is given by
+Near $T_C$ I can characterize several properties of the system with a power law behaviour. In the Ising model, the mean magnetisation is given by
 \[ \ev{M(T)} \sim \qty( T - t_C )^{\beta} \qq{with} \beta = \frac{1}{8} \]
 Here, $\beta$ is called the "critical exponent". % what is this?!?
 Similar expressions can be found for heat capacity and susceptibility:
@@ -126,15 +126,15 @@ arises from a rewrite into the Taylor series, where $\qty| T_C - T |^{\alpha} \s
 
 
 Another important quantity is correlation length, $\xi$. For temperatures $T \gg T_C$, the correlation between the spins should be so low, that the
-correlation length should be on the order of the distance between each lattice point. As we approach the critical temperature from above, this correlation
+correlation length should be on the order of the distance between each lattice point. As I approach the critical temperature from above, this correlation
 length grows with a divergent behaviour
 \[ \xi(T) \sim \qty| T_C - T |^{-\nu} \]
 
 The $2^{nd}$ order order correction is characterised by a $\xi$ spanning the system. A finite lattice, therefore has a correlation length proportional to
-the lattice size. Using so-called "finite size scaling relations" we can relate the behaviour of $\xi$ to the infinite span. With this, the critical
+the lattice size. Using so-called "finite size scaling relations" I can relate the behaviour of $\xi$ to the infinite span. With this, the critical
 temperature scales as
 \[ T _ { C } ( L ) - T _ { C } ( L = \infty ) = a L ^ { - 1 / \nu } \]
-Where $a$ is some constant and $\nu$ is as defined for $\xi$ above. When we set $T = T_C$, the above equations go to:
+Where $a$ is some constant and $\nu$ is as defined for $\xi$ above. When I set $T = T_C$, the above equations go to:
 \begin{align*}
     \text{ mean magnetisation: } \\
     \langle \mathcal { M } ( T ) \rangle &\sim \left( T - T _ { C } \right) ^ { \beta } \rightarrow L ^ { - \beta / \nu }\\
@@ -144,13 +144,13 @@ Where $a$ is some constant and $\nu$ is as defined for $\xi$ above. When we set 
     \chi ( T ) &\sim \left| T _ { C } - T \right| ^ { - \alpha } \rightarrow L ^ { \gamma / \nu }
 \end{align*}
 We want to study these numerically relations in our system when it is near $T_C$. We want to examine the dependence of T and L for the listed characteristics.
-We also want to time these tests, to compare between parallelization of the code. Finally, we want to compare our critical temperature above to the
+We also want to time these tests, to compare between parallelization of the code. Finally, I want to compare our critical temperature above to the
 closed-form solution found by Onsanger in 1944: $k T _ { C } / J = 2 / \ln ( 1 + \sqrt { 2 } ) \approx 2.269$ \cite{PhysRev.65.117}.
 
 
 \section{Results and discussion}
 
-With these values to control against, we can now benchmark our program. Writing out a few functions, we have one for setting up our lattice, one for running
+With these values to control against, I can now benchmark our program. Writing out a few functions, I have one for setting up our lattice, one for running
 through an MCcycle and one for writing the results to file. I store the expectation vales of the energy, the energy squared and the same for the magnetization,
 as well as the absolute value per microstate. These can be used directly, in the case of the energy expectation value and the mean magnetization, or in
 combination such as with the heat capacity and susceptibility, who's scaled values are the variance in either energy or magnetization expectation values. Both
@@ -159,52 +159,64 @@ of these values are important in any MC calculation, because they give a sharp d
 we see that they approach the analytical values well after 1e6 cycles, with %read from outputExerciseB and reiterate the rough approach seen in the figure
 %above, in order of magnitude.
 
-The Monte Carlo method is, by nature a stochastic representation, where we simulate the system as it evolves with time. Therefore, We have no guarantee that
-the state is in it's most likely form. As our statistical models are based on an equilibrium assumption, they do not give accurate results unless we are in
-a stable position. As a test for this, we run the now benchmarked program over a lattice of $L=20$ spin states in 2 directions and store the expectation
+The Monte Carlo method is, by nature a stochastic representation, where I simulate the system as it evolves with time. Therefore, We have no guarantee that
+the state is in it's most likely form. As our statistical models are based on an equilibrium assumption, they do not give accurate results unless I am in
+a stable position. As a test for this, I run the now benchmarked program over a lattice of $L=20$ spin states in 2 directions and store the expectation
 energy and mean magnetization $\langle E \rangle$ and $\langle |M| \rangle$.
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../Graphics/ExpectationEnergyL20.pdf}
     \caption{Plot of $\langle E \rangle$ for a lattice of size $L=20$ for temperatures $T = \qty{ 1.0, 2.4 }$. We can see that there clearly is
         a difference in the convergence of the different temperatures, with the higher temperatures having a higher average energy. This
-        is as we would expect. We can see, that both graphs seem to have settled towards a stable value somewhere in between $10^2$ and $10^3$
+        is as I would expect. We can see, that both graphs seem to have settled towards a stable value somewhere in between $10^2$ and $10^3$
         cycles through the lattice. What is not obvious, is that the numbers displayed are only $\frac{1}{100}$ of the actual values, as I failed
         to specify an x-axis, yet plotted every 100th element. this brings the Equilibration time closer to $10^4$, which is what I've used for the
         remainder of the project.}
 \label{fig:ExpectEL20}
 \end{figure}
 We can see that for the low temperature, the expectation energy lies at about $-2J$ per sping, $J$ is here the coupling constant between the spin, not
-Joule. Looking back at the Ising model, we can see that this means more or less every spin points in the same direction. As we increase the temperature,
-we notice that the resting energy is higher. This makes sense if we consider that there are more energy within the system which allows for some spins to be
+Joule. Looking back at the Ising model, I can see that this means more or less every spin points in the same direction. As I increase the temperature,
+we notice that the resting energy is higher. This makes sense if I consider that there are more energy within the system which allows for some spins to be
 in less energetically preferential positions.
 \begin{figure}[hbtp]
     \includegraphics[scale=0.4]{../Graphics/ExpectationMagnetismL20Log.pdf}
     \caption{we can see that the magnetization approaches 1 for the lower temperature. as it is scaled in our model, this means that efectively all spins
-    point in the same direction. as we increase the temperature, and the spins can change a bit more freely, we get a lower magnetization. there is increased
-    turbulence for the higher temperature, but i would say we have reached a mostly stable state at around $10^2$ or slightly above, as with the energy.
+    point in the same direction. as I increase the temperature, and the spins can change a bit more freely, I get a lower magnetization. there is increased
+    turbulence for the higher temperature, but i would say I have reached a mostly stable state at around $10^2$ or slightly above, as with the energy.
     this is in agreement with fig \ref{fig:expectel20}.}
 \label{fig:expectml20}
 \end{figure}
 
+furthermore, The rate of change as I evolve the system over time should stabilize as I reach equilibrium. To capture this, I recorded each accepted change
+to the lattice, while I stored each cycle into an array. The accumulating sum was then scaled with the number of Monte Carlo cycles for each step and plotted,
+see fig \ref{fig:Accepted}
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{../Graphics/AcceptedConfigurationsVsTime.pdf}
+    \caption{Figure of the number of accepted configurations during my run. Noticeably, the lower temperature tends towards an equilibrium with greater
+    numbers of accepted changes, while the higher temperature seems to settle down slightly with time. One should note the order of magnitude difference
+    between the lower and higher temperature acceptance rates. A difference on the order of $10^3$ shows how much more active the system is with the
+    additinal temperature.}
+\label{fig:Accepted}
+\end{figure}
 
-Another interesting facet, is the probability of each energy for the system durign these states. As we measure statistical values, probability would merely
-be a scaled frequency of energies. Storing these, we can make a normalized histogram to ilustrate, see fig\ref{fig:PrEhist}
+
+Another interesting facet, is the probability of each energy for the system durign these states. As I measure statistical values, probability would merely
+be a scaled frequency of energies. Storing these, I can make a normalized histogram to ilustrate, see fig\ref{fig:PrEhist}
 \begin{figure}[hbtp]
     \includegraphics[scale=0.4]{../Graphics/energyHistogram.pdf}
     \caption{A scaled histogram of the occurences of various energies of the lattice over time. The upmost one is of a temperature $T=1.0$ and the lower
     has $T=2.4$. As one would expect, without energy in the system, there is very little the particles in the lattice can do to not follow the energetically
     advantageous configuration. We can also notice, that between the 2 largest columns, there is a gap of $8J$, which is the energy from 4 ordered to 1
     disordered spin state, which follows our model. There is another slight bump with $8J$ less energy as well. The lower of the 2 is for the more energetic
-    $T=2.4$ state. Here we see a far greater spread of energies, this time there are fewer configurations where all spins point in the same direciton, but the
+    $T=2.4$ state. Here I see a far greater spread of energies, this time there are fewer configurations where all spins point in the same direciton, but the
     vast majority of the states are in above the $-400$ energy state, which would be half of the low-energy state. The shape is somewhat reminiscent of the
     Boltzmann distribution of states.}
 \label{fig:PrEhist}
 \end{figure}
-If we look at the histogram in figure \ref{fig:PrEhist}, I would place the peak probability in $799$ and $450$ or $475$ respectively, based on the height
-difference observed. According to my computed variance, $\sigma_E^2=$, we can check the validity of our measurements.
+If I look at the histogram in figure \ref{fig:PrEhist}, I would place the peak probability in $799$ and $450$ or $475$ respectively, based on the height
+difference observed. According to my computed variance, $\sigma_E^2=$, I can check the validity of our measurements.
 
 
-Having observed these changes in the state over the different temperatures, we now want to study the system to see if there is a gradual change, or a more
+Having observed these changes in the state over the different temperatures, I now want to study the system to see if there is a gradual change, or a more
 distinct one, akin to the shift from ice to water with temperature. As my model was not object oriented, The changes required were somewhat extensive. The
 result was a second, eventually third, iteration of my Monte Carlo simulation, "MCCycleLarge". With the setup, I attempted to remove as much as possible from
 the various loops. The result was discarding the previously stored values in favour of an "ExpectationValues" array accumulating data through the sweeps. I
@@ -219,16 +231,16 @@ sacrifice. After leaving the program to slow cook overnight, I could finally sta
     \caption{The figure above is the mean energy, $\ev{E}$, the mean magnetization, $\ev{|M|}$, the heat capacity a constant volume,
     $C_V$ scaled by $k_B\cdot T^2$ for simplicity during calculation, effectively the energetic variance per spin, and the susceptibility
     $\chi$ scaled by $k_B\cdot T$ to the effect of taking the variance of the absolute magnetization of the system. Following Onsanger's
-    prediction, we should expect to see a critical temperature at around the temperature 2.27. The mean energy per particle seems to increase
+    prediction, I should expect to see a critical temperature at around the temperature 2.27. The mean energy per particle seems to increase
     fairly linearly with temperature, but the magnetization drops of towards 0, in what seems to be an exponential trend, with the full decent
     beginning in between 2.26 and 2.28. I can also see the beginning of an extremum in the range 2.26 to 2.30 for the heat capacity of the system,
     seeming to suggest that this is the range where the greatest amount of energy is required to change the temperature. This too is to be expected
-    in a phase shift. There could possibly be a spike in the susceptibility in this range as well, but the different lattice sizes produce so widely
+    in a phase shift There could possibly be a spike in the susceptibility in this range as well, but the different lattice sizes produce so widely
     differing results here, that I am loathe to give a definitive suggestion.}
 \label{fig:VarVsTime}
 \end{figure}
 
-Ideally, following the idea of a phase shift, we should see some sort of extrema in this range. The $\ev{E}$ is mostly linear throughout the range,
+Ideally, following the idea of a phase shift, I should see some sort of extrema in this range. The $\ev{E}$ is mostly linear throughout the range,
 and the susceptibility spreads out far toom much for me to give any indications as to the magnetic change of state. For the latter 2, there is some change,
 however. The range around $2.27$ seems to be the temperatures at which the mean magnetization begins to plummet, indicating a far less cohesive spin direction
 after this rough value, where there would likely be little coherence in spin direction across the lattice. The heat capacity too, has a peak in this rough
@@ -238,12 +250,17 @@ area.
 
 \section{conclusion}
 
-There seems to be indications of a phase shift in this area, as we can see the system behaviour differing over the temperatures, but the "peak" in heat
-capacity is not very pronounced, and is not a reliable proof here. If there was indeed a phase shift, then I would expect to see a fairly high difference
-in the energies of some particles with regards to others. I take ice melting as an example here. During the process of melting, som molecules would be frosen
-while others would be free to move about. After having melted, all particles are equally as free to move. Similarly, if before the phase shift, the molecules
-were kept in place by the energy needed to supplant the energetically prefreable configuration, then around the area where they could "break free", I would
-expect to see a more sporadic shift in areas, leading to a far greater spred from the mean. This should lead to quite a spike in the heat capacity, which I
+There seems to be indications of a phase shift in the area of $2.27, 2.30$, as I can see the system behaviour differing over the temperatures, but the "peak"
+in heat capacity is not very pronounced, and is not a reliable proof here. If there was indeed a phase shift, then I would expect to see a fairly high
+difference in the energies of some particles with regards to others. I take ice melting as an example here. During the process of melting, som molecules
+would be frosen while others would be free to move about. After having melted, all particles are equally as free to move. Similarly, if before the phase
+shift, the molecules were kept in place by the energy needed to supplant the energetically prefreable configuration, then around the area where they could
+"break free", I would expect to see a more sporadic shift in areas, leading to a far greater spred from the mean.
+
+We can also see that after reaching a temperature of $2.4$, the rate of change is orders of magnitude above the lower temperature, suggesting a far more
+dynamic system at these later stages.
+
+This should lead to quite a spike in the heat capacity, which I
 simply don't see. I expect this fact comes from a lack of data. The stochastic nature of the Monte Carlo methods demand a great deal of points. Points which I
 was unable to provide. If I had been able to scrounge up the time to parallellize the code I believe I could have reproduced a far stronger peak, as well less
 drift between the lattice sizes.
