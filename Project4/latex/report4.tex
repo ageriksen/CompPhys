@@ -47,9 +47,12 @@
 \maketitle
 
 \section{Introduction}
-The aim here, is to get used to the Monte Carlo simulation of a system and see how it challenges the intuition of the user. With the Ising method to
-simulate the system, run a comparative test of energies and control these to a probabilistic rule which allows for some dynamicism in the system. As
-with most things, I started from the bottom with a 2 by 2 lattice and acode meant specifially for this. \cite{MortenIsingmodel}
+The aim here, is to get used to the Monte Carlo simulation of a system and see how it challenges the intuition of the user. %%%%%%%%%
+%%%%%%%%%%retouch!!
+With the Ising method to simulate the system, run a comparative test of energies and control these to a probabilistic rule which
+allows for some dynamicism in the system. %%%%%%%%
+%%%%%%%%%%%%%%%%%%% end retouch
+As with most things, I started from the bottom with a 2 by 2 lattice and acode meant specifially for this. \cite{MortenIsingmodel}
 
 
 \section{Methods and theory}
@@ -58,60 +61,106 @@ We want to study a 2 dimensional ferromagnetic system through the Ising model, s
 The system has an energy
 \[ E = -J \sum_{<kl>}^N s_k \, s_l \]
 In which the "$<kl>$" signifies summing over neighbouring spots in the lattice only. $s_k = \pm 1$, and N is the total number of spins in
-the latice. J is a coupling constant and, as I am currently investigating ferromagnetic elements I have $J > 0$.
-As I will investigate changes in the system, the equation can be solved as
+the latice. J is a coupling constant and for a ferromagnetic system is $J > 0$.
+Changing 1 spin state will cause a change in energy of:
 \[ \Delta E = 2 Js_l^1 \sum_{<k>}^N s_k \].
 
-The numerical issues I focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into
+the relevant variables here, assuming there is no exchange of particles with the surroundings, but that the system is in a thermal bath starts with
+the partition function $Z$ from the Helmholtz free energy, which in turn is a scaling factor for the probability.
+\begin{align*}
+    P _ { i } ( \beta ) = \frac { 1 } { Z }e ^ { - \beta E _ { i } }
+    Z = \sum _ { i = 1 } ^ { M } e ^ { - \beta E _ { i } }
+\end{align*}
+From the probabilities, we can derive the average energy, $\ev{E}$ as
+\begin{align*}
+    \langle E \rangle = \sum _ { i = 1 } ^ { M } E _ { i } P _ { i } ( \beta ) = \frac { 1 } { Z } \sum _ { i = 1 } ^ { M } E _ { i } e ^ { - \beta E _ { i } }
+\end{align*}
+and the mean magnetization $\ev{|M|}$ as
+\begin{align*}
+    \ev{|M|} = \sum_i^M \Pr{\beta}_i = \frac{1}{Z} \sum_i^M |M_i| e^{-\beta E_i }.
+\end{align*}
+as well as a connected set of variances
+\begin{align*}
+    \sigma _ { E } ^ { 2 } = \left\langle E ^ { 2 } \right\rangle - \langle E \rangle ^ { 2 } \\
+\sigma_{M }^{ 2 } = \left\langle M^{ 2 } \right\rangle - \langle M \rangle^{ 2 }
+\end{align*}
+leading to 2 further variables, heat capacity, $C_V$,  and susceptibility, $\chi$
+\begin{align*}
+    C _ { V } = \frac { 1 } { k _ { B } T ^ { 2 } } \sigma_E
+    \chi = \frac { 1 } { k _ { B } T } \sigma
+\end{align*}
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+%The numerical issues I focus on through the project, is periodic boundary conditions as well as the metropolis algorithm. % Look further into
 %these and discuss here.
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+We will use the Metropolis sampling rule, whose algorithm compares a uniformly chosen stochastic number between 0 and 1 with the probability ratio
+of the new state with the current state. Looking at the probability function, this ratio would ultimately become $e^{e_i - E_{i+1}}= e^{\Delta E }$.
+Looking at the sum, we assume also, that each lattice point is connected to 4 others, at all times. This means we are working with periodic boundary
+conditions. An ilustration of such could be a toroid structure. with $n$ elements in a direction, going to $n+1$ means returning to place number $1$.
 
-As with most systems, I begin with a simple iteration. For the ising model of ferromagnets, I start out with a $2\times 2$ lattice to find
-as well as the mean average magnetic moment henceforth "mean magnetism". Additional valuable properties are the specific heat capacity,
-as well as succeptability as functions of T, with periodic boundary conditions.
+
+Starting small with a $2\times 2$ lattice to find as well as the mean average magnetic moment henceforth "mean magnetism". Additional valuable
+properties are the specific heat capacity, as well as succeptability as functions of T, with periodic boundary conditions.
 \[
     \ev{E(T)}, \qq{} \abs{M(T)}, \qq{} C_V(T), \qq{} \chi(T)
 \] % include DESCRIPTIONS OF HOW TO FIND MAGNETIZATION, HEAT CAPACITY AND SUCCEPTIBILITY!!!
+In the 2 dimensional case, we can write out the variables as
+\begin{align*}
+    Z &= 2\qty( e^{-8\beta} + e^{8\beta} )
+    &= 2\cdot 2\cosh{8\beta} \\
+    \ev{E} &= \frac{1}{Z} 8\cdot \qty( 2(e^{-8\beta} - e^{8\beta}) )
+    &= -8\tanh{8\beta} \\
+    \ev{|M|} &= \frac{1}{Z} \qty( 8 e^{-8\beta} + 16 )
+\end{align*}
+The equations for $\ev{E^2}$ and it's magnetic equivalent is the same, exept for the number multiplied with the probability now is squared. The
+variance are calculated as in the expression above, and can be found as\cite{Anna}
+\[ \frac{\ev{E}}{L^2} = -1.99 \qq{} \frac{\ev{|M|}}{L^2} = 0.9886 \]
+And with a similar relation to the variance
+\[\frac{C_V}{L^2} = 0.032 \qq{} \frac{\chi}{L^2} = 3.993 \]
+Where the exact values are found by setting $\beta=1$ and the severely restricted lattice size.
 
-Having studied simple system, I will write a code of the Ising model to analyse it and use our previous results as benchmarks for further expansion. We
-want to accurately extract the properties found previously, for a scaled temperature $T = 1 \qq{with dimensions} \qty[ T ] = \frac{ J }{ kT }$. Here,
-k is the Boltzman constant. This will allow us to cancel out the k in future calculations. Another important step, is to log the number of Monte Carlo
-(MC) cycles I run.
+These values will form the basis of the benchmarking for numerical computations on the model. These benchmarks are found using a scaled temperature
+$T=1 \frac{J}{k_B T}$, where here J is Joule and not the coupling constant J referred to in the rest of this project. the main purpose of this definition
+is to scale the equations so that we avoid finicky floating point opperations and reduce numerical round off errors.
 %%%% algorithm begin
 \begin{algorithm}
-    mat<double> $Transfer = [ e^{-\Delta E/ \beta }$ ]\;
-    \For{$n=1$ \KwTo{$L^2$} }{
-        $x_r, y_r = RNG$\;
-        $\Delta{E} = 2\cdot s\qty[x_r, y_r] \sum_{\langle{} k \rangle{} }s_k$\;
-        $r = RNG_{uniform} \in{} \qty[ 0, 1 ] $\;
-        \If{$r \leq Transfer(\Delta{E})$}{
-            $s[x_r, y_r] *= -1.0$\;
-            $M += 2\cdot s[x_r, y_r]$\;
-            $E += \Delta{E}$\;
-        }
+    initialize a probability ratio array for all 4 posibilities of the\\
+    switch in spinstate. \\
+    \For{ the range of spin states }{
+        1: Chose a random spinstate in the lattice\\
+        2: check the energetic gain in changing a configuration.\\
+        3: compare corresponding probability ratio to a stochastic number $ a \in {0.0, 1.0}$\\
+        \If{ $a <= \Pr{\Delta E}$ }{
+            apply change\\
+            Update magnetism for lattice\\
+            update energy level for lattice\\
+            }
     }
-    \caption{}
+    \caption{The algorithm for 1 MC cycle. }
 \end{algorithm}
 %%%% algorithm end
 
 Having Benchmarked and controlled our program for a simple system, I up the lattice size $L\times L$ to $L=20$. To abvoid wasting cpu cycles on usesless
-info that will at best be thrown out, I need to determine the time the system needs to reach equilibrium. The simplest method here, is to just plot the
-various expectation values as functions of the number of MC cycles. and determining by-eye when the system reaches the desired stability. Time is measured in
+info that will at best be thrown out, an estimation of the equilibration time of the system is made. The simplest method here, is to just plot the
+various expectation values as functions of the number of MC cycles. and determining by eye when the system reaches the desired stability. Time is measured in
 sweeps of MC cycles per lattice. An interesting question, is whether or not the equilibration time depends on the starting position. Whether this is
 ordered so all spins point in the same direction or random configuration. These first tests will be run with the initial temperature $T=1$. We will also
-investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Here, I want to plot the total number of accepted
-MC cycles as a function of the total number of MC cycles run, so as to investigate whether or not I can attest to the accepted configurations depending
-on T.
-
+investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Explored as functions over time.
+%%%%%%%%%%%%%%%
 Additionally I want to study the probabilities for energies, $\Pr(E)$, in effect counting up the number of times the energy $E$ comes up in the computation.
 We begin our counting after having reached equilibrium to ensure statistically significant readout. We want the energetic variance $\sigma_E^2$.
 %discuss results!
+%%%%%%%%%%%%%%%%%%%%5
 
-With our system set up, I can now study the properties of the system as I change the temperature. There is a phase shift of the system on the crossing of
+Having set up the system, I can now study it's evolution with regards to temperature. There is a phase shift of the system on the crossing of
 a certain critical temperature $T_C$. Below this, the energy is low enough, so that the bias in energetic preference freezes the system towards the energetic
 minimum. This should result in growing clusters of spins, untill the system eventually inhabits the minimum energy state where all spins point in the same
 direction. With temperatures greater than $T_C$, the energety present lessens the bias towards the energetically preferable state. This means that the clusters
 of similar spins are smaller and more spread, with a more random distribution.
 
+%%%%%%%%%%%%%%%%
 Near $T_C$ I can characterize several properties of the system with a power law behaviour. In the Ising model, the mean magnetisation is given by
 \[ \ev{M(T)} \sim \qty( T - t_C )^{\beta} \qq{with} \beta = \frac{1}{8} \]
 Here, $\beta$ is called the "critical exponent". % what is this?!?
@@ -124,12 +173,12 @@ The 0 exponent stems from logarithmic divergence, where the value
 arises from a rewrite into the Taylor series, where $\qty| T_C - T |^{\alpha} \simeq -\ln(\qty| T_C - T | ) + O(\alpha^2)$. This is an exponentially growing
 "spike" around the critical temperature.
 
-
-Another important quantity is correlation length, $\xi$. For temperatures $T \gg T_C$, the correlation between the spins should be so low, that the
-correlation length should be on the order of the distance between each lattice point. As I approach the critical temperature from above, this correlation
-length grows with a divergent behaviour
+Another important quantity is correlation length, $\xi$. For temperatures $T \gg T_C$, the correlation between the spins should be on the order of the
+distance between each lattice point. Aproaching the critical temperature from above gives an exponential
+growth in the correlation length.
 \[ \xi(T) \sim \qty| T_C - T |^{-\nu} \]
-
+%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%
 The $2^{nd}$ order order correction is characterised by a $\xi$ spanning the system. A finite lattice, therefore has a correlation length proportional to
 the lattice size. Using so-called "finite size scaling relations" I can relate the behaviour of $\xi$ to the infinite span. With this, the critical
 temperature scales as
@@ -143,12 +192,15 @@ Where $a$ is some constant and $\nu$ is as defined for $\xi$ above. When I set $
     \text{ and succeptibility: } \\
     \chi ( T ) &\sim \left| T _ { C } - T \right| ^ { - \alpha } \rightarrow L ^ { \gamma / \nu }
 \end{align*}
-We want to study these numerically relations in our system when it is near $T_C$. We want to examine the dependence of T and L for the listed characteristics.
-We also want to time these tests, to compare between parallelization of the code. Finally, I want to compare our critical temperature above to the
-closed-form solution found by Onsanger in 1944: $k T _ { C } / J = 2 / \ln ( 1 + \sqrt { 2 } ) \approx 2.269$ \cite{PhysRev.65.117}.
+%%%%%%%%%%%%%%%%%%%
+The final point of inquiry is near the critical temperature $T_C$, examining the dependence of T and L for the listed characteristics.
+We also want to time the tests, to compare between parallelization of the code. and finally compare the numerical critical temperature from a Monte Carlo
+simulation to the closed-form solution found by Onsanger in 1944: $k T _ { C } / J = 2 / \ln ( 1 + \sqrt { 2 } ) \approx 2.269$ \cite{PhysRev.65.117}.
+
 
 
 \section{Results and discussion}
+
 
 With these values to control against, I can now benchmark our program. Writing out a few functions, I have one for setting up our lattice, one for running
 through an MCcycle and one for writing the results to file. I store the expectation vales of the energy, the energy squared and the same for the magnetization,
@@ -246,6 +298,28 @@ however. The range around $2.27$ seems to be the temperatures at which the mean 
 after this rough value, where there would likely be little coherence in spin direction across the lattice. The heat capacity too, has a peak in this rough
 area.
 
+Looking at the graphs, there seems to be a top around 2.28 and 2.3, with regards to the heat capacity $C_V$. Equation number 3, \cite{Project4}, in the
+project description gives a neat linear depence between the critical temperature for a given lattice size at a sett exponent $\nu = 1$, as:
+\[ T_C( L ) = T_C ( L = \inf ) + aL^{-1} \]
+Comparing the maximal values for the heat capacity, we can get a measure of the seeming linearity here. A linear fit, gives the critical temperature
+at $L = \inf$ as $\approx 2.3$.
+\begin{figure}[hbtp]
+    \includegraphics[scale=0.4]{../Graphics/LinearRegressionCV.pdf}
+    \caption{Linear regression fit of the maximal values of $C_v$ found in the range $2.1$ to $2.3$, Why the graph is displaced to such a degree is
+    uncertain, but likely has to do with inacuracies in provided data proving difficult to make a fit of.}
+\label{fig:expectml20}
+\end{figure}
+
+Another way to approximate, is to take the mean and standard error of the critical temperatures for the Heat capacity and susceptibility, and taking the mean
+over different lattice sizes. Yielding the results:
+\begin{table}[h]
+    \begin{tabular}{ |l|l|l| }
+    \hline
+        $T_{c,C_v}$ & $2.287 \pm 0.004$ \\
+        $T_{c,\chi}$ & $2.29 \pm  0.007$ \\
+    \end{tabular}
+\end{table}
+
 
 
 \section{conclusion}
@@ -258,7 +332,8 @@ shift, the molecules were kept in place by the energy needed to supplant the ene
 "break free", I would expect to see a more sporadic shift in areas, leading to a far greater spred from the mean.
 
 We can also see that after reaching a temperature of $2.4$, the rate of change is orders of magnitude above the lower temperature, suggesting a far more
-dynamic system at these later stages.
+dynamic system at these later stages. Furthermore, the linear fit of the heat capacity maxima gave an intercept of $2.304$, which means a relative error to
+Onsanger's result of $\frac{(2.304 - 2.269)}{ 2.269 } = 0.015$.
 
 This should lead to quite a spike in the heat capacity, which I
 simply don't see. I expect this fact comes from a lack of data. The stochastic nature of the Monte Carlo methods demand a great deal of points. Points which I
