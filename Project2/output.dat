@@ -1,0 +1,25 @@
+>./functions.exe 200
+relative error for orbital states 1 2 and 3:
+-0.896138         -0.902665         -0.888984
+run of HO potential omega1 = 0.01for
+A rotation of a matrix with dimensions n: 200 diagonalizes in 70160rotations.
+ These rotations are completed over a period of 5.97444 seconds
+armadillo's eigenvalues found
+relative error for orbital states 1 2 and 3:
+14.3936           22.5244           31.7509
+run of HO potential omega2 = 0.5for
+A rotation of a matrix with dimensions n: 200 diagonalizes in 145791rotations.
+ These rotations are completed over a period of 6.30822 seconds
+armadillo's eigenvalues found
+relative error for orbital states 1 2 and 3:
+5219.87           8936.95           12791.6
+run of HO potential omega3 = 1for
+A rotation of a matrix with dimensions n: 200 diagonalizes in 226000rotations.
+ These rotations are completed over a period of 6.64672 seconds
+armadillo's eigenvalues found
+relative error for orbital states 1 2 and 3:
+2.08481e+06       3.57345e+06       5.11592e+06
+run of HO potential omega4 = 5for
+A rotation of a matrix with dimensions n: 200 diagonalizes in 309823rotations.
+ These rotations are completed over a period of 7.7885 seconds
+armadillo's eigenvalues found

@@ -4,19 +4,19 @@ int main(int argc, char *argv[])
 {
     if ( argc < 2 )
     {
-        cout    << "please supply a dimension for matrix size and integration step length."
+        cout    << "please supply a dimension for matrix size."
                 << "as well as the name of file written, as 'n'DimEigval.txt"
-                << endl; 
+                << endl;
         return 1;
     }
 
     // initializing variables
-    int maxdistance, iterations, dim; 
+    int maxdistance, iterations, dim;
     double diagonal, semidiagonal, tolerance, step, time, sum_off, eps_rel1, eps_rel2, eps_rel3;
     mat eigvalmatrix, eigvecmatrix;
-    vec outvalues, eigenvalues, eigenstate1, eigenstate2, eigenstate3, omega; 
-    uvec eigval_index; 
-    
+    vec outvalues, eigenvalues, eigenstate1, eigenstate2, eigenstate3, omega;
+    uvec eigval_index;
+
     // establishing necessary elements
     maxdistance = 10; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix, omega(i));
         wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
         sum_offdiag(eigvalmatrix, dim, sum_off);
-        
+
         // finding the lowest eigenstates of the HO system.
         eigenvalues = zeros(dim);
         for ( unsigned i = 0; i < eigenvalues.size(); i++)
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
         eigenstate3 = eigvecmatrix.col(eigval_index(2));
 
         // investigating whether or not the lowest 3 eigenvalues are correct to within
-        // 4 leading digits. 
+        // 4 leading digits.
         eps_rel1 = ( eigenvalues(eigval_index(0)) - 3.0 )/3.0;
         eps_rel2 = ( eigenvalues(eigval_index(1)) - 7.0 )/7.0;
         eps_rel3 = ( eigenvalues(eigval_index(2)) - 11.0 )/11.0;
@@ -65,15 +65,15 @@ int main(int argc, char *argv[])
         myfile << "eigenstate1" << setw(20)
                << "eigenstate2" << setw(20)
                << "eigenstate3" << setw(20)
-               << "rotations" << setw(20) 
-               << "time" << setw(20) 
+               << "rotations" << setw(20)
+               << "time" << setw(20)
                << "ofdiagonal sum" << setw(20)
                << "number of steps" << endl;
         myfile << eigenstate1(0) << setw(20)
                << eigenstate2(0) << setw(20)
                << eigenstate3(0) << setw(20)
-               << iterations << setw(20) 
-               << time << setw(20) 
+               << iterations << setw(20)
+               << time << setw(20)
                << sum_off << setw(20)
                << dim << endl;
         for ( unsigned i = 1; i < eigenstate1.size(); i++)
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         mat armadilloeigenvalues(dim, dim, fill::zeros);
         mat armaeigvecmat(dim,dim, fill::zeros);
         vec armaeigval(dim, fill::zeros);
-        Toeplitztridiag( armadilloeigenvalues, dim, step, diagonal, semidiagonal, omega(i)); 
+        Toeplitztridiag( armadilloeigenvalues, dim, step, diagonal, semidiagonal, omega(i));
 //        cout << armadilloeigenvalues << endl;
         auto start = chrono::system_clock::now();
         eig_sym(armaeigval, armaeigvecmat, armadilloeigenvalues);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         uvec indices = sort_index(armaeigval);
         cout << "armadillo's eigenvalues found" << endl;
 
-        //write 
+        //write
         string writefile= "EigvectorsEigvaluesArmadilloOmega"+to_string(i)+".txt";
         ofstream thisfile;
         thisfile.open(writefile, ios::out);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 void setup(int dim, int maxdistance, double & step, double & diagonal, double & semidiagonal, mat & eigvalmatrix, mat & eigvecmatrix, double omega)
 {
     //setting diagonal and semidiagonal element values
-    double diag, semidiag; 
+    double diag, semidiag;
     diag = diagonal; semidiag = semidiagonal;
     step = ((double)maxdistance/dim); // step size
     diagonal = diag/(step*step);  // diagonal constant from taylor expand of diff-eq.
@@ -164,9 +164,9 @@ void setup(int dim, int maxdistance, double & step, double & diagonal, double & 
 //Wrapper function to loop over iterations of rotations
 void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatrix, mat & eigvecmatrix, int dim )
 {
-    double maxnondiagonal = 1; 
+    double maxnondiagonal = 1;
     auto start = chrono::system_clock::now();
-    int p, q; 
+    int p, q;
     while ( maxnondiagonal > tolerance )
     {
         offdiag(eigvalmatrix, p, q, dim);
@@ -180,26 +180,26 @@ void wrapper(double tolerance,int & iterations, double & time,  mat & eigvalmatr
 }
 
 //#############################################################
-//function to set a tridiagonal Toeplitx matrix given diagonal 
+//function to set a tridiagonal Toeplitx matrix given diagonal
 //and "neighbouring" elements values d and a
 void Toeplitztridiag(mat & Matrix, int dim, double step, double diagonal, double semidiagonal, double omega)
 {
     double rho;
     for( int i = 1; i < (dim-1); i++)
     {
-        // filling Toeplitz matrix((i+1)*step)*((i+1)*step); 
+        // filling Toeplitz matrix((i+1)*step)*((i+1)*step);
         rho = (double)i*step;
-        Matrix(i,i) = diagonal + omega*(rho*rho) + 1.0/rho;
-        Matrix(i, i+1) = semidiagonal; 
+        Matrix(i,i) = diagonal + omega*omega*(rho*rho) + 1.0/rho;
+        Matrix(i, i+1) = semidiagonal;
         Matrix(i, i-1) = semidiagonal;
     }
 
     // supplying the ends with appropriate appropriate  elements
     rho = step;
-    Matrix(0,0) = diagonal + omega*(rho*rho) + 1.0/rho;  
-    Matrix(0,1) = semidiagonal; 
+    Matrix(0,0) = diagonal + omega*omega*(rho*rho) + 1.0/rho;
+    Matrix(0,1) = semidiagonal;
     rho = (double)(dim-1)*step;
-    Matrix(dim-1,dim-1) = diagonal + omega*(rho*rho) + 1.0/rho; 
+    Matrix(dim-1,dim-1) = diagonal + omega*omega*(rho*rho) + 1.0/rho;
     Matrix(dim-1,dim-2) = semidiagonal;
 } // end of Toeplitztridiag
 
@@ -210,17 +210,17 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
 {
     //declarations of sin and cos
     double s, c;
-    
+
     if ( A(k,l) != 0.0 )
     {
-        double t, tau; 
+        double t, tau;
         tau = ( A(l,l) - A(k,k) )/( 2*A(k,l) );
         // avoiding loss of precision from difference between similar,
-        // large numbers. 
+        // large numbers.
         if ( tau >= 0 )
         {
             t = 1.0/( tau + sqrt( 1.0 + (tau*tau) ) );
-        } 
+        }
         else
         {
             t = -1.0/( -tau + sqrt( 1.0 + (tau*tau) ) );
@@ -228,7 +228,7 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
         c = 1/sqrt( 1 + (t*t) );
         s = c*t;
     }
-    else 
+    else
     {
         c = 1.0;
         s = 0.0;
@@ -237,8 +237,8 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
     double a_kk, a_ll, a_ik, a_il, r_ik, r_il;
     a_kk = A(k,k);
     a_ll = A(l,l);
-    A(k,k) = (c*c)*a_kk - 2.0*(c*s)*A(k,l) + (s*s)*a_ll; 
-    A(l,l) = (s*s)*a_kk + 2.0*(c*s)*A(k,l) + (c*c)*a_ll; 
+    A(k,k) = (c*c)*a_kk - 2.0*(c*s)*A(k,l) + (s*s)*a_ll;
+    A(l,l) = (s*s)*a_kk + 2.0*(c*s)*A(k,l) + (c*c)*a_ll;
     // setting all nondiagonal elements manually
     A(k,l) = 0.0;
     A(l,k) = 0.0;
@@ -263,12 +263,12 @@ void jacobi_rotate( mat & A, mat & R, int & k, int & l, int n )
 } //end of jacobi_rotate
 
 //####################################################
-// function using armadillo to find largest 
+// function using armadillo to find largest
 // offdiagonal element
 void offdiag( mat A, int & p, int & q, int n )
 {
     double max = 0.0;
-    double aij; 
+    double aij;
     for ( int i = 0; i < n; i++)
     {
         for ( int j = i+1; j < n; j++)
@@ -303,10 +303,10 @@ void sum_offdiag( mat eigenvalues, int dim, double & sum_off)
 void test_maxoffdiag()
 {
    /*
-    *Function to test that the "offdiag" function actually picks 
-    out the maximum value of the matrix sent in. To do this, I 
+    *Function to test that the "offdiag" function actually picks
+    out the maximum value of the matrix sent in. To do this, I
     send in a known 5x5 matrix and ensure that the maximum value
-    picked is the correct one. 
+    picked is the correct one.
     */
     int test_p, test_q, dim, maxvalue;
     dim = 5;
@@ -317,33 +317,33 @@ void test_maxoffdiag()
     offdiag( testmatrix, test_p, test_q, dim);
     cout << "test of 'offdiag' function using "<<
        "simple matrix of dim " << dim << endl;
-    cout << "I chose a maxvalue of "<< maxvalue << 
+    cout << "I chose a maxvalue of "<< maxvalue <<
         " and assigned it to testmatrix("<< dim -3 << ","<< dim -2 << ")" << endl;
     cout << "offdiag returns values of p, q as " << test_p << ", " << test_q << endl;
     cout << "which corresponds to a maxvalue of " << testmatrix(test_p, test_q) << endl;
 } // end of test_maxoffdiag
 
 // ##################################
-// test that correct eigenvalues extracted. 
+// test that correct eigenvalues extracted.
 void test_eigvalues()
 {
     /*
-     * This test takes a jacobi rotated matrix and compares the 
-     * eigenvalues along the diagonal and compares it with the 
-     * analytical eigenvalues from the fomula bellow eq (2) in 
-     * the project 2 pdf. 
+     * This test takes a jacobi rotated matrix and compares the
+     * eigenvalues along the diagonal and compares it with the
+     * analytical eigenvalues from the fomula bellow eq (2) in
+     * the project 2 pdf.
      */
     int dim, maxdistance, iterations;
     double diagonal, semidiagonal, tolerance, epsilon, step, time;
     mat testeigvalmatrix, testeigvecmatrix;
     vec lambda, testeigvalvector;
-    dim = 5; maxdistance = 1;  diagonal = 2.0; semidiagonal = -1.0; 
+    dim = 5; maxdistance = 1;  diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-15; iterations = 0;
-    
+
     setup(dim, maxdistance, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix, 1);
 
     wrapper( tolerance, iterations, time,  testeigvalmatrix, testeigvecmatrix, dim);
-    
+
     lambda = zeros<vec>(dim);
     testeigvalvector = zeros<vec>(dim);
     for ( int i = 0; i < dim; i++)
@@ -354,7 +354,7 @@ void test_eigvalues()
     cout << lambda << endl;
     epsilon = (mean(testeigvalvector)-mean(lambda))/mean(lambda); // relative difference between means
                                                                   // of analyrical and numerical eigvals.
-    
+
     cout << "test eigenvalue matrix" << endl;
     cout << testeigvalmatrix << endl;
     cout << "analytical eigenvalue vector lambda: " << endl;
@@ -369,14 +369,14 @@ void test_orthogonality()
 {
     /*
      * The test aims to ensure that each column in the transformed matrix maintains
-     * orthogonality under rotations. The test takes a small matrix and ensures that 
+     * orthogonality under rotations. The test takes a small matrix and ensures that
      * columns are orthogonal before and after rotation.
      */
     int dim, maxdistance, iterations;
     double diagonal, semidiagonal, tolerance, testinnerproduct, step, time;
     mat testeigvalmatrix, testeigvecmatrix;
     vec testeigveccollumn_i, testeigveccollumn_j;
-    dim = 5; maxdistance = 1; diagonal = 2.0; semidiagonal = -1.0; 
+    dim = 5; maxdistance = 1; diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-15; iterations = 0;
 
     setup( dim, maxdistance, step, diagonal, semidiagonal, testeigvalmatrix, testeigvecmatrix, 1);
@@ -404,14 +404,14 @@ void test_2dimrotation()
 {
     int iterations, dim;
     double diagonal, semidiagonal, tolerance, step, time;
-    mat eigvalmatrix, eigvecmatrix; 
+    mat eigvalmatrix, eigvecmatrix;
     diagonal = 2.0; semidiagonal = -1.0;
     tolerance = 1.0e-16; dim = 2; iterations = 0;
     setup(dim, 1, step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix, 1);
     wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
-    cout << "test of 2 dim rotation reveals " << iterations 
+    cout << "test of 2 dim rotation reveals " << iterations
          << " rotations before we have the eigenvalues" << endl;
-} // end of test_2dimrotation()    
+} // end of test_2dimrotation()
 
 void test_jacobiiterations()
 {
@@ -422,7 +422,7 @@ void test_jacobiiterations()
 
     maxdistance = 0; // maxdistance rho = r/alpha
     diagonal = 2.0; semidiagonal = -1.0;
-    tolerance = 1.0e-5; 
+    tolerance = 1.0e-5;
 
     vec repeatarray = linspace(2, 100, 99);
     vec rotations = zeros(repeatarray.size());
@@ -430,7 +430,7 @@ void test_jacobiiterations()
     for (unsigned i = 0; i < (repeatarray.size() - 1); i++ )
     {
         dim = repeatarray(i);
-        iterations = 0; 
+        iterations = 0;
         setup(dim, maxdistance,  step, diagonal, semidiagonal, eigvalmatrix, eigvecmatrix, 1);
         wrapper( tolerance, iterations, time, eigvalmatrix, eigvecmatrix, dim);
         rotations(i) = iterations;
@@ -438,7 +438,7 @@ void test_jacobiiterations()
     }
     ofstream myfile;
     myfile.open("DimRotationTime.txt");
-    myfile << "dimensions" << setw(20) 
+    myfile << "dimensions" << setw(20)
            << "rotations" << setw(20)
            << "time spent" << endl;
     for ( unsigned i = 0; i < rotations.size(); i++ )

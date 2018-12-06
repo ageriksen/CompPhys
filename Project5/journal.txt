@@ -1,0 +1,8 @@
+thurs 6/12-18:
+    first entry. anxious about project. Not finished with theoretical part, but will suspend
+developement in favour of cranking out workable code. Ideal is to hammer out a minimum skeleton
+today and look to parallellization tonight and tomorrow. Once able to set simulations to cook, will
+work on updating theory.
+    14:45: random header and store class mostly up and running. Next priority is to put up a system class containing
+the necessary wave functions as well as the hamiltonian/energy for a given state. After that, comes the MC sweep and cycle
+class. Parallellization would be considered after this.

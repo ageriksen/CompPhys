@@ -1,0 +1,141 @@
+\documentclass[10pt]{revtex4-1}
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{color}
+\usepackage{physics}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable, booktabs, mathpazo}
+\usepackage{natbib}
+
+\pgfplotsset{compat=1.15}
+
+\pgfplotstableset{
+    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+    every last row/.style={after row=\hline \bottomrule},
+    every first column/.style={
+        column type/.add={|}{}
+        },
+    every last column/.style={
+        column type/.add={}{|}
+        },
+}
+
+%\begin{figure}[hbtp]
+%\includegraphics[scale=0.4]{.pdf}
+%\caption{}
+%\label{fig:}
+%\end{figure}
+
+%\begin{tikzpicture}
+%    \begin{axis}[
+%            title= Earth-Sun system, Forward Euler integration,
+%            xlabel={$x$},
+%            ylabel={$y$},
+%        ]
+%        \addplot table {../runresults/earthEuler2body.dat}
+%    \end{axis}
+%\end{tikzpicture}
+
+\begin{document}
+\title{%
+    Project 5\\
+    \large
+    Quantum Monte Carlo of Confined Electrons}
+\author{Anders Eriksen}
+\begin{abstract}
+\end{abstract}
+\maketitle
+
+\section{Introduction}
+Aim: VMC to evaluate gs.\  energy, relative distance between 2 electrons as well as expectationvalues of kinetic and potenial energy of quantum dots
+with $N=2$ electrons in 3 dimensions.
+
+A stochastic approach to problem in project 2. Though most studies are done in the 2 dimensional case, this will be kept in 3D to more easiliy
+compare with the project mentioned.
+
+In section i, I go through ... and ... and finally .... And in section ii, I provide and discuss my findings. Finally, in section iii, I concretize
+the results and discuss possible future paths as well as points at which this project could have been made better.
+
+\section{Theory and Methods}
+Quantum dots are a lively research area for condensed matter physics and material science with wide reaching applications from quantum computing
+to solar cells.
+
+Main aim is to study these systems with a focus on understanding the repulsive forces between the electrons. The advantage of the VMC approach is the
+ability to use cartesian coordinates over polar. %% Relevant background material e.g. chapter 14 of the lecture notes.
+
+Our system is of electrons confined in a pure 3D isotropic harmonic oscillator potential with an idealized total Hamiltonian
+\begin{align}
+    \hat{H} = \sum_{i = 1}^{N} \qty( - \frac{1}{2} \nabla_{i}^{2} + \frac{1}{2} \omega^{2} r_{i}^{2} ) + \sum_{i < j} \frac{1}{r_{i j}}\label{eq:full}
+\end{align}
+having set the natural units $\hbar = c = e = m_{e} = 1$, as well as all put all energies in atomic units $a.u$.
+
+Thus all results will be scaled. The first sum
+is the standard harmonic oscillator, whilst the latter part of the Hamiltonian is the repulsive forces between the electrons.
+\begin{align}
+    \hat{H}^0 &= \sum_{i = 1}^{N} \qty( - \frac{1}{2} \nabla_{i}^{2} + \frac{1}{2} \omega^{2} r_{i}^{2} )\label{eq:unperturbed} \\
+    \hat{H}'  &= \sum_{i < j} \frac{1}{r_{i j}} \label{eq:perturbed}
+\end{align}
+The distance
+$r_{ij} = \sqrt{\vec{r_1} - \vec{r_2}}$ is between the 2 particles, each position given as $r_i = \sqrt{ x_i^2 + y_i^2 + z_i^2 }$.
+
+The first step will be the unperturbed harmonic oscillator Hamiltonian mentioned above (\ref{eq:unperturbed}). Setting $\hbar \omega = 1$ gives the energy
+$3 a.u$. This will serve as a benchmark during developement of the code.
+
+In 3 dimensions, the wave equation is
+\begin{align}
+    \psi_{\vec{n}} \qty(\vec{r}) = A H_{n_x}(\sqrt{\omega} \, x )\, H_{n_y}(\sqrt{\omega} \, y )\, H_{n_z}(\sqrt{\omega} \, z )
+    e^{-\omega \, r^2 / 2}
+\end{align}
+The $H_{n_i}(\omega\, i )$ are the Hermite polynomials and A is a normalization constant.\ for the ground state, and assuming opposing spins, the
+energy becomes $\epsilon_{\vec{n}} = \frac{3}{2}$ per electron. This brings the total energy up to $3 a.u$ as stated previuosly.
+The unperturbed ground state eigenfunction for the 2 electron system then becomes
+\begin{align}
+    \vec{\Psi}(\vec{r_1}, \vec{r_2} ) = C e^{-\omega \, ( r_1^2 r_2^2 ) /2}
+\end{align}
+With C as a normalization constant.
+
+Since the electrons are fermions, they obey the Pauli exclusion principle. This means that the ground state is
+non-degenerate with each having opposing spin. This could also be likened to the singlet state in the nlm style Dirac notation. The total spin of this
+system must therefore be 0.
+
+Our first two trial wave functions will be
+\begin{align}
+    \Psi_{T_1} \qty( \vec{r}_{1}, \vec{r}_{2} ) &= C e^{-\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})}\label{eq:trial1}\\
+    \Psi_{T_2} \qty( \vec{r}_{1}, \vec{r}_{2} ) &= C e^{-\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} e^{\frac{r_{12}}{2\qty(1 + \beta r_{12})}}
+    \label{eq:trial2}
+\end{align}
+With $\alpha$ and $\beta$ as variational parameters.
+
+The energy at a given distance, $r_1$, $r1_2$ is our local energy
+\begin{align}
+    E_L &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\\
+        &= C^{-1} e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\nabla_1^2 -\nabla_2^2 + \omega^2(r_1^2 + r_2^2))
+          C e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \\
+        &= e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\alpha^2 \omega^2 (r_1^2 + r_2^2) + \omega^2 (r_1^2 + r_2^2))
+          e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \\
+        &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 )
+\end{align}
+
+
+\section{Results}
+
+
+\begin{table}[h!tb]
+    \centering
+    \caption{Test table of electron values}
+    \pgfplotstabletypeset[sci]{../data/testvalues2electrons.dat}
+\end{table}
+
+\section{Conclusion}
+
+\section{Appendix}
+
+\end{document}

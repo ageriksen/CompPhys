@@ -33,7 +33,6 @@
 %\end{tikzpicture}
 
 \begin{document}
-
 \title{%
     Project 4\\
     \large Studies of phase transition in magnetic systems}
@@ -142,9 +141,9 @@ is to scale the equations so that we avoid finicky floating point opperations an
 \end{algorithm}
 %%%% algorithm end
 
-Having Benchmarked and controlled our program for a simple system, I up the lattice size $L\times L$ to $L=20$. To abvoid wasting cpu cycles on usesless
+Having Benchmarked and controlled our program for a simple system, I up the lattice size $L\times L$ to $L=20$. To avoid wasting cpu cycles on usesless
 info that will at best be thrown out, an estimation of the equilibration time of the system is made. The simplest method here, is to just plot the
-various expectation values as functions of the number of MC cycles. and determining by eye when the system reaches the desired stability. Time is measured in
+various expectation values as functions of the number of MC cycles. And determining by eye when the system reaches the desired stability. Time is measured in
 sweeps of MC cycles per lattice. An interesting question, is whether or not the equilibration time depends on the starting position. Whether this is
 ordered so all spins point in the same direction or random configuration. These first tests will be run with the initial temperature $T=1$. We will also
 investigate the temperature $T = 2.4$ and whether or not it is possible to estimate equilibration time. Explored as functions over time.
@@ -157,7 +156,7 @@ We begin our counting after having reached equilibrium to ensure statistically s
 Having set up the system, I can now study it's evolution with regards to temperature. There is a phase shift of the system on the crossing of
 a certain critical temperature $T_C$. Below this, the energy is low enough, so that the bias in energetic preference freezes the system towards the energetic
 minimum. This should result in growing clusters of spins, untill the system eventually inhabits the minimum energy state where all spins point in the same
-direction. With temperatures greater than $T_C$, the energety present lessens the bias towards the energetically preferable state. This means that the clusters
+direction. With temperatures greater than $T_C$, the energy present lessens the bias towards the energetically preferable state. This means that the clusters
 of similar spins are smaller and more spread, with a more random distribution.
 
 %%%%%%%%%%%%%%%%
@@ -201,20 +200,34 @@ simulation to the closed-form solution found by Onsanger in 1944: $k T _ { C } /
 
 \section{Results and discussion}
 
+With the analytical results above, the first point of order is to make a minimal code that allows for benchmarking and later add complexity. Borrowing
+heavily from the "Isingmodel.cpp"\cite{MortenIsingmodel}, and modifying to fit the specifications. Controlling it against the analytical values, showed a fit
+near the
 
-With these values to control against, I can now benchmark our program. Writing out a few functions, I have one for setting up our lattice, one for running
-through an MCcycle and one for writing the results to file. I store the expectation vales of the energy, the energy squared and the same for the magnetization,
-as well as the absolute value per microstate. These can be used directly, in the case of the energy expectation value and the mean magnetization, or in
-combination such as with the heat capacity and susceptibility, who's scaled values are the variance in either energy or magnetization expectation values. Both
-of these values are important in any MC calculation, because they give a sharp definition of the statistical sharpness of the result.
-%% insert plot of 2x2LatticeOrderUp.png and discuss.
-we see that they approach the analytical values well after 1e6 cycles, with %read from outputExerciseB and reiterate the rough approach seen in the figure
-%above, in order of magnitude.
+\begin{table}[h]
+    \begin{tabular}{ |l|l|l| }
+        \hline
+          $T = 1.0$ & $t 2.66646s$\\
+        \hline
+          $\ev{ E } / (N^2)$ & $-1.99599$\\
+          $\ev{|M|} / (N^2)$ & $0.998645$\\
+          $C_v\cdot k_B / (N^2)$ & $-1.59358e+07$\\
+          $\chi \cdot k_B / (N^2)$ & $-3.98916e+06$\\
+          \hline
+        $T = 2.4$ & $t=5.31488s$\\
+        \hline
+          $\ev{ E } / (N^2)$ & $-1.64245$\\
+          $\ev{|M|} / (N^2)$ & $0.881098$\\
+          $C_v\cdot k_B / (N^2)$ & $-1.87336e+06$\\
+          $\chi \cdot k_B / (N^2)$ & $-1.29389e+06$\\
+          \hline
+    \end{tabular}
+\end{table}
 
 The Monte Carlo method is, by nature a stochastic representation, where I simulate the system as it evolves with time. Therefore, We have no guarantee that
 the state is in it's most likely form. As our statistical models are based on an equilibrium assumption, they do not give accurate results unless I am in
 a stable position. As a test for this, I run the now benchmarked program over a lattice of $L=20$ spin states in 2 directions and store the expectation
-energy and mean magnetization $\langle E \rangle$ and $\langle |M| \rangle$.
+energy and mean magnetization $\langle E \rangle$ and $\langle |M| \rangle$.\cite{Project4git}
 \begin{figure}[hbtp]
 \includegraphics[scale=0.4]{../Graphics/ExpectationEnergyL20.pdf}
     \caption{Plot of $\langle E \rangle$ for a lattice of size $L=20$ for temperatures $T = \qty{ 1.0, 2.4 }$. We can see that there clearly is
@@ -227,7 +240,7 @@ energy and mean magnetization $\langle E \rangle$ and $\langle |M| \rangle$.
 \end{figure}
 We can see that for the low temperature, the expectation energy lies at about $-2J$ per sping, $J$ is here the coupling constant between the spin, not
 Joule. Looking back at the Ising model, I can see that this means more or less every spin points in the same direction. As I increase the temperature,
-we notice that the resting energy is higher. This makes sense if I consider that there are more energy within the system which allows for some spins to be
+we notice that the resting energy is higher. This makes sense if I consider that there is more energy within the system which allows for some spins to be
 in less energetically preferential positions.
 \begin{figure}[hbtp]
     \includegraphics[scale=0.4]{../Graphics/ExpectationMagnetismL20Log.pdf}
@@ -238,7 +251,7 @@ in less energetically preferential positions.
 \label{fig:expectml20}
 \end{figure}
 
-furthermore, The rate of change as I evolve the system over time should stabilize as I reach equilibrium. To capture this, I recorded each accepted change
+furthermore, the rate of change as I evolve the system over time should stabilize as I reach equilibrium. To capture this, I recorded each accepted change
 to the lattice, while I stored each cycle into an array. The accumulating sum was then scaled with the number of Monte Carlo cycles for each step and plotted,
 see fig \ref{fig:Accepted}
 \begin{figure}[hbtp]
@@ -293,7 +306,7 @@ sacrifice. After leaving the program to slow cook overnight, I could finally sta
 \end{figure}
 
 Ideally, following the idea of a phase shift, I should see some sort of extrema in this range. The $\ev{E}$ is mostly linear throughout the range,
-and the susceptibility spreads out far toom much for me to give any indications as to the magnetic change of state. For the latter 2, there is some change,
+and the susceptibility spreads out far too much for me to give any indications as to the magnetic change of state. For the latter 2, there is some change,
 however. The range around $2.27$ seems to be the temperatures at which the mean magnetization begins to plummet, indicating a far less cohesive spin direction
 after this rough value, where there would likely be little coherence in spin direction across the lattice. The heat capacity too, has a peak in this rough
 area.
@@ -302,7 +315,7 @@ Looking at the graphs, there seems to be a top around 2.28 and 2.3, with regards
 project description gives a neat linear depence between the critical temperature for a given lattice size at a sett exponent $\nu = 1$, as:
 \[ T_C( L ) = T_C ( L = \inf ) + aL^{-1} \]
 Comparing the maximal values for the heat capacity, we can get a measure of the seeming linearity here. A linear fit, gives the critical temperature
-at $L = \inf$ as $\approx 2.3$.
+at $L = \inf$ as $\approx 2.304$.
 \begin{figure}[hbtp]
     \includegraphics[scale=0.4]{../Graphics/LinearRegressionCV.pdf}
     \caption{Linear regression fit of the maximal values of $C_v$ found in the range $2.1$ to $2.3$, Why the graph is displaced to such a degree is
@@ -327,8 +340,8 @@ over different lattice sizes. Yielding the results:
 There seems to be indications of a phase shift in the area of $2.27, 2.30$, as I can see the system behaviour differing over the temperatures, but the "peak"
 in heat capacity is not very pronounced, and is not a reliable proof here. If there was indeed a phase shift, then I would expect to see a fairly high
 difference in the energies of some particles with regards to others. I take ice melting as an example here. During the process of melting, som molecules
-would be frosen while others would be free to move about. After having melted, all particles are equally as free to move. Similarly, if before the phase
-shift, the molecules were kept in place by the energy needed to supplant the energetically prefreable configuration, then around the area where they could
+would be frozen while others would be free to move about. After having melted, all particles are equally as free to move. Similarly, if before the phase
+shift, the molecules were kept in place by the energy needed to supplant the energetically preferable configuration, then around the area where they could
 "break free", I would expect to see a more sporadic shift in areas, leading to a far greater spred from the mean.
 
 We can also see that after reaching a temperature of $2.4$, the rate of change is orders of magnitude above the lower temperature, suggesting a far more
