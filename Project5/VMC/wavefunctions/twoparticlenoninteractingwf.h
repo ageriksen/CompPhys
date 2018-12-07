@@ -16,7 +16,7 @@ class TwoParticleNonInteractingWF : public Wavefunction
 
         double sumSquares( const arma::Mat<double> & positions );
 
-        double calculate( const arma::Mat<double> & positions );
+        double powers( const arma::Mat<double> & positions );
         double localEnergy( const arma::Mat<double> & positions );
 
     private:
@@ -24,16 +24,12 @@ class TwoParticleNonInteractingWF : public Wavefunction
         double m_alpha = 0;
 }; //
 
-inline double TwoParticleNonInteractingWF::calculate
+inline double TwoParticleNonInteractingWF::powers
 (
  const arma::Mat<double> & positions
 )
-{ // calculate state wavefunction. PLACEHOLDER VERSION!!
-    return std::exp
-            (
-            -0.5*m_alpha*m_omega
-            *sumSquares(positions)
-            );
+{ // powers of state wavefunction.
+    return -0.5*m_alpha*m_omega*sumSquares(positions);
 }
 
 inline double TwoParticleNonInteractingWF::localEnergy

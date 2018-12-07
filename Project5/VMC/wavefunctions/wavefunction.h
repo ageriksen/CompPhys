@@ -12,14 +12,14 @@ class Wavefunction
         {}
         virtual ~Wavefunction() {}
 
-        virtual double calculate( const arma::Mat<double> & positions);
+        virtual double powers( const arma::Mat<double> & positions);
         virtual double localEnergy( const arma::Mat<double> & positions);
 
     protected:
         int m_NParticles, m_NDimensions;
 };
 
-inline double Wavefunction::calculate( const arma::Mat<double> & positions)
+inline double Wavefunction::powers( const arma::Mat<double> & positions)
 { // non-interacting wavefunction
     exit(0);
     return 0.0;
