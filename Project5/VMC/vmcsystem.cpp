@@ -12,6 +12,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     double ratio = 0;
 
     //ensure energies to be stored are nulled out before the start.
+    double localEnergy = 0;
     m_energy = 0;
     m_energySquared = 0;
     //reset acceptance as well
@@ -62,8 +63,50 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
             exponent = 2.0*m_newWaveFunction - 2.0*m_oldWaveFunction;
             ratio = std::exp(exponent);
 
+            if( acceptanceDistribution( engine ) <= ratio )
+            {// accepting suggestion
+                m_oldWaveFunction = m_newWaveFunction;
+                for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
+                {
+                    m_positionsOld(particle, dimension) = m_positionsNew(particle, dimension);
+                }
+                // Update acceptance:
+                m_acceptanceCounter ++;
+            }
+            else
+            {//reset parameters
+                m_newWaveFunction = m_oldWaveFunction;
+                for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
+                {
+                    m_positionsNew(particle, dimension) = m_positionsOld(particle, dimension);
+                }
+            }
         } // end of metropolis per particle
+
+        // New local energy
+        localEnergy = m_WF -> localEnergy(m_positionsNew);
+        m_energy += localEnergy;
+        m_energySquared += localEnergy*localEnergy;
+
+
     } // end of MCCycles
+
+    // Gathering data from processors
+    double tmpEnergy = 0;
+    double tmpEnergySquared = 0;
+
+    MPI_Reduce( &m_energy, &tmpEnergy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_energySquared, &tmpEnergySquared, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    // printout
+    if( m_rank == 0 )
+    {
+        std::cout
+            << std::setprecision(16) << "Energy:            " << m_energy << "\n";
+            << std::setprecision(16) << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n";
+            << std::setprecision(16) << "Acceptance ratio:  " << m_acceptanceCounter / double(m_NParticles*m_MCCycles)
+            << endl;
+    }
 
 
 } // end runVMC
