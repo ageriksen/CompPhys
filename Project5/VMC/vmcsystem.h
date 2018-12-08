@@ -2,7 +2,7 @@
 #define VMCSYSTEM_H
 
 #include <armadillo>
-#include "wavefunctions/wavefunction.h"
+#include "wavefunctions/twoparticlenoninteractingwf.h"
 
 class VMCSystem
 {
@@ -17,7 +17,7 @@ class VMCSystem
             m_positionsOld.zeros();
         }
         //
-        void setWaveFunction( Wavefunction * WF )
+        void setWaveFunction( TwoParticleNonInteractingWF *WF )
         {
             m_WF = WF;
         }
@@ -29,7 +29,7 @@ class VMCSystem
         int m_NParticles, m_NDimensions;
         arma::Mat<double> m_positionsOld, m_positionsNew;
         // Wavefunction
-        Wavefunction * m_WF = nullptr;
+        TwoParticleNonInteractingWF *m_WF = nullptr;
         double m_oldWaveFunction = 0;
         double m_newWaveFunction = 0;
         // Parallellization variables

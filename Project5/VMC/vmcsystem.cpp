@@ -105,7 +105,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
             << std::setprecision(16) << "Energy:            " << m_energy << "\n";
             << std::setprecision(16) << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n";
             << std::setprecision(16) << "Acceptance ratio:  " << m_acceptanceCounter / double(m_NParticles*m_MCCycles)
-            << endl;
+            << std::endl;
     }
 
 
