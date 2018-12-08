@@ -5,8 +5,7 @@ TwoParticleNonInteractingWF::TwoParticleNonInteractingWF
 (
     int NParticles,
     int NDimensions
-):
-    Wavefunction( NParticles, NDimensions )
+): Wavefunction( NParticles, NDimensions )
 {
     if( NParticles != 2 )
     {

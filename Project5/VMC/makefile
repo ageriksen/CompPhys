@@ -2,4 +2,4 @@ CXX = mpic++
 CXXFLAGS = -Wall
 LDLIBS = -larmadillo
 
-all: main
+main: vmcsystem.o wavefunctions/twoparticlenoninteractingwf.o

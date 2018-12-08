@@ -1,4 +1,12 @@
 #include "vmcsystem.h"
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <mpi.h>
+
+using std::cout;
+using std::endl;
+using std::setprecision;
 
 void VMCSystem::runVMC( int MCCycles, double steplength )
 {
@@ -101,11 +109,11 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     // printout
     if( m_rank == 0 )
     {
-        std::cout
-            << std::setprecision(16) << "Energy:            " << m_energy << "\n";
-            << std::setprecision(16) << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n";
-            << std::setprecision(16) << "Acceptance ratio:  " << m_acceptanceCounter / double(m_NParticles*m_MCCycles)
-            << std::endl;
+        cout
+            << setprecision(16) << "Energy:            " << m_energy << "\n"
+                                     << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n"
+                                     << "Acceptance ratio:  " << m_acceptanceCounter / double(m_NParticles*m_MCCycles)
+            << endl;
     }
 
 
