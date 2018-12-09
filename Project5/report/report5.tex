@@ -98,7 +98,7 @@ The $H_{n_i}(\omega\, i )$ are the Hermite polynomials and A is a normalization 
 energy becomes $\epsilon_{\vec{n}} = \frac{3}{2}$ per electron. This brings the total energy up to $3 a.u$ as stated previuosly.
 The unperturbed ground state eigenfunction for the 2 electron system then becomes
 \begin{align}
-    \vec{\Psi}(\vec{r_1}, \vec{r_2} ) = C e^{-\omega \, ( r_1^2 r_2^2 ) /2}
+    \vec{\Psi}(\vec{r_1}, \vec{r_2} ) = C e^{-\frac{1}{2}\omega \, ( r_1^2 + r_2^2 ) }
 \end{align}
 With C as a normalization constant.
 
@@ -116,22 +116,31 @@ With $\alpha$ and $\beta$ as variational parameters.
 
 The energy at a given distance, $r_1$, $r1_2$ is our local energy
 \begin{align}
-    E_L &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\\
+    E_{L_1} &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\nonumber \\
         &= C^{-1} e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\nabla_1^2 -\nabla_2^2 + \omega^2(r_1^2 + r_2^2))
-          C e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \\
+          C e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
         &= e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\alpha^2 \omega^2 (r_1^2 + r_2^2) + \omega^2 (r_1^2 + r_2^2))
-          e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \\
-        &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 )
+          e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
+        &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:naiveLocalEnergy}
 \end{align}
-
+Where we use $\nabla_i^2 = \pdv{x_i}^2 + \pdv{y_i}^2 + \pdv{z_i}^2$ and, as an example,
+\begin{align}
+    \pdv[2]{x_1} \Psi{T_1} &= \pdv{x_1}\qty( -\alpha \omega x_1 e^{-\frac{1}{2}(r_1^2 + r_2^2)} )\nonumber\\
+                                &= -\alpha\omega + (\alpha\omega x_1^2)e^{-\frac{1}{2}(r_1^2 + r_2^2)}
+\end{align}
+Summing upp all 3 dimensions, gives us the answer in (\ref{eq:naiveLocalEnergy}). As the repulsive Coloumb interaction is purely dependent on positions
+and works between particles, adding it to our simple 2-particle state results in
+\begin{align}
+    E_{L_} = \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:firstLocalEnergy}
+\end{align}
 
 \section{Results}
 
 
 \begin{table}[h!tb]
     \centering
-    \caption{Test table of electron values}
-    \pgfplotstabletypeset[sci]{../data/testvalues2electrons.dat}
+    \caption{Table of first run}
+    \pgfplotstabletypeset[sci]{../data/TwoParticlesNonInteractiveWF.dat}
 \end{table}
 
 \section{Conclusion}

@@ -24,7 +24,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     m_energy = 0;
     m_energySquared = 0;
     //reset acceptance as well
-    m_acceptanceCounter = 0;
+    m_acceptRatio = 0;
 
     // RNG setup
     std::random_device rd;
@@ -51,9 +51,9 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     //----------------------------------------
     //  MC simulation over total cycles
     //----------------------------------------
+    unsigned long long acceptance = 0;
     for( int cycle = 0; cycle < m_MCCycles; cycle ++ )
     {
-
         // runs each particle through the metropolis sampling rule
         for( int particle = 0; particle < m_NParticles; particle ++ )
         {
@@ -79,7 +79,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
                     m_positionsOld(particle, dimension) = m_positionsNew(particle, dimension);
                 }
                 // Update acceptance:
-                m_acceptanceCounter ++;
+                acceptance++;
             }
             else
             {//reset parameters
@@ -98,22 +98,25 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
 
 
     } // end of MCCycles
+    m_acceptRatio = double(acceptance)/double(m_NParticles*m_MCCycles);
+
 
     // Gathering data from processors
     double tmpEnergy = 0;
     double tmpEnergySquared = 0;
+    double tmpAcceptRatio = 0;
 
-    MPI_Reduce( &m_energy, &tmpEnergy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce( &m_energySquared, &tmpEnergySquared, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_energy,          &tmpEnergy,         1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_energySquared,   &tmpEnergySquared,  1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_acceptRatio,     &tmpAcceptRatio,    1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
     // printout
     if( m_rank == 0 )
     {
-        cout
-            << setprecision(16) << "Energy:            " << m_energy << "\n"
-                                     << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n"
-                                     << "Acceptance ratio:  " << m_acceptanceCounter / double(m_NParticles*m_MCCycles)
-            << endl;
+        cout << setprecision(16) << "Energy:            " << m_energy << "\n"
+             << setprecision(16) << "Variance(Energy):  " << (m_energySquared - m_energy) / double(MCCycles) << "\n"
+             << setprecision(16) << "Acceptance ratio:  " << m_acceptRatio
+             << endl;
     }
 
 

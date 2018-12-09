@@ -1,7 +1,7 @@
 #include "store.h"
 #include "vmcsystem.h"
-#include <mpi.h>
 #include "wavefunctions/twoparticlenoninteractingwf.h"
+#include <mpi.h>
 #include <iostream>
 
 using namespace std;
@@ -33,6 +33,17 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     TwoParticleNonInteractingWF WF( NParticles, NDimensions );
     VMC.setWaveFunction( &WF );
 
+    // Store object
+    string fileName;
+    cout << "please provide a filename for storage" << endl;
+    cin >> fileName;
+    store alphaFile( fileName );
+    alphaFile.open();
+
+    string headline = "alpha E Variance {Acceptance ratio}";
+    alphaFile.dat(headline);
+
+
     // Varying wavefunction parameters
     double alphaMin = 0.8;
     double alphaMax = 1.2;
@@ -43,8 +54,20 @@ int main( int numberOfArguments, char *cmdLineArguments[])
         {
             cout << "\n alpha = " << alpha << "\n";
         }
+        //running variational MC
         WF.setParameters( omega, alpha );
         VMC.runVMC( MCCycles, steplength );
+
+        // storing run
+        if( processRank == 0 )
+        {
+            alphaFile.lineAdd( to_string(alpha) );
+            alphaFile.lineAdd( to_string(VMC.energy()/double(MCCycles)) );
+            alphaFile.lineAdd( to_string( ( VMC.energySquared() - VMC.energy() )/double(MCCycles) ) );
+            alphaFile.lineAdd( to_string( VMC.ratio() ) );
+            alphaFile.dat();
+            alphaFile.lineClean();
+        }
     }
 
     // printing runtime
@@ -55,6 +78,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
         cout << "runtime complete. time used: \n"
              << double(programTime.count())/3600.0 << " hrs ("
              << programTime.count() << ")" << endl;
+        alphaFile.close();
     }
 
     // MPI namespace cancel:

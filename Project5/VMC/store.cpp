@@ -11,7 +11,7 @@ void store::bin(vec Array)
     }
     std::ofstream file
         (
-            m_filename, std::ofstream::binary
+            m_fileName, std::ofstream::binary
         );
     file.write
         (

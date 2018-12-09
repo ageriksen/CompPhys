@@ -6,7 +6,10 @@
 #!/*.*
 
 # folders
-build
+build*
+#data*
+Old*
+Exclude*
 
 #compiled files
 *.o
@@ -21,15 +24,19 @@ build
 #images
 *.png
 *.jpg
+*.pdf
 
 #latex
 *.aux
-*.bib
 *.pdf
 *.log
 *.out
 *.gz
 *.dvi
+*.xml
+*.blg
+*.bcf
+#*.bib
 
 #pycache
 *.pyc

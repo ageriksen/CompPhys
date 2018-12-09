@@ -6,3 +6,76 @@ work on updating theory.
     14:45: random header and store class mostly up and running. Next priority is to put up a system class containing
 the necessary wave functions as well as the hamiltonian/energy for a given state. After that, comes the MC sweep and cycle
 class. Parallellization would be considered after this.
+    18:50: General setup discussed with Mathias. overarching goals, are to have smaller entities containing necessary information
+and a general structure containing the entities and governing their interactions. This then can be fed into the appropriate tests.
+The plan is to have different wavefuntions going from a base wavefunction, so that the difference between them is in their content,
+not in their handling. This can be fed into a system which governs the number of particles, their forces and e.g. also the selection rule,
+seing as this will not change. Then the MC sweep would call the system during each sweep.
+    Also worth noting, that the missing factor in front of the alpha omega in EL1 came from the 3 dimensional nabla.
+    00:47: this is really the next day, but I'm only stopping now. The overal strategy of object orientation and the plan of interchangable
+entities managed by a structure handing and receiving from the simulations are both well behaved so far. The current tactic is to scrutinize
+and personalize Mathias' template wavefunction inheritances and build the system from those. further, I need to look into the "ratio" function
+so that I can simplify the exponent. This should be found either in the notes from the initial presentation or with the metropolis sampling rule.
+Some strange error messages for "overloading virtual functions" whose whole point is to be overloaded... Most likely issue with ALE. Further plans
+after setting up hierarchy, is to settle parallellization. Then benchmarks, I think. Then I can focus on benchmarking and theory over the weekend
+as well as begin to run simulations. Have pictures of names for computers in computer lab with 8 cores, to speed up simulations. ssh in and leave
+cooking over night.
+
+fri 7/12-18:
+    Getting back into it, it seems like I had one instance of inline definitions and another for...not inline...yeah.
+    12:11: I think I figured out a solution. The inlines are fine as inlines, most likely. They only really return numbers, so we can easily
+add eventual missing functionality to be called in the inlines. e.g. sumSquares, which now is a nested for loop that takes the position matrix
+and exrtacts the sum of it's squares and returns it. This then is called in the ratio and localEnergy inlines. The syntax seems to check out.
+    13:55: 2 particle wavefunction setup, Moving on to system class to have the structure to be fed into the MC analysis.
+    14:55: I think I prefer Mathias' naming of "function to get wave equation" as calculate rather than my "ratio". Will convert.
+    15:07: Having gone through shell implementation of parallellized VMC system class, I think perhaps separating the system and MC is not necessarily
+Overly necessary. Will currently try to make a simple system, then send into MC.
+    15:29: After working throug, the system alone does very little. Will convert to VMCsystem, as this will simulate system developement over time
+as well as just hold it. The wave equations are the structures and they inherit the base class for ease of adjustment later on.
+    19:20: Had a long conversation with Anna about the project further. Current path seems fine, though there was some uncertainty in whether variations
+of inheritances of the wavefunction classes were the best way to go. The way forward will likely be leaving a few tests to run for a while to determine
+"steplength". I believe that this steplength would be what added to whichever value, alpha, beta or omega we're currently optimizing for. A tip here, is
+"good enough" before perfect. I think the step length needs to be dynamic over the MC cycles, to catch the minima, rather than just skipping past it.
+Uncertainties here, consist of whether or not the step size should be optimized first somehow, or if it should just be averaged. I think it was supposed to
+be found through adjusting the acceptance ration to be as close to 50% as possible. Refer once more to "good enough" here, so I don't waste the entire weekend
+++ on this. There is a meeting with Andrei tomorrow, saturday, at 13:00 to look into class structure.
+    21:00: going well so far. Currently keeping the unfortunate "acceptanceCounter". Need to convert to precentage somehow.
+
+sat 8/12-18:
+    Slow start today, due to various domestic issues. Meeting at 13:00 with Andrei about program structure. Current goal is to compile setup to object files.
+    13:50: The compilation seems to work, so long as I compile with mpic++ rather than plain c++. Currently, mostly copied down Mathias' main file. This has
+a static steplength, and only deals with the initial finding of alpha. Expansion would be to adjust steplenght either before, or during to optimize and to implement correct choice of alpha and beta.
+    14:01: Had a strange error message when I filled in more info abt. main, and switched from "Wavefunction" to "TwoParticleNonInteractingWF". Seems to be
+"undefined reference". Feeling slightly fatigued, so will take slight break. Next check is for correct imports.
+    15:57: The errors came from missing includes in vmcsystem.h, but this has been rectified. Program now compiles properly. Runtests remain.
+    18:36: First runtest with cores=2, found from lscpu command from commandline. Method used was for the naive hamiltonian, whose lowest total energy per
+particle is 3a.u. This is, as expected, found as alpha=1. Considering this is the benchmark point of the code, I see no current need to run heavier
+examinations. Possible solution if errors pop up later, to rerun with the noninteracting case and ensure that a detailed study produces correct results.
+    19:10: currently implementing storage to file, using my store class. Note for further work, rename variables to differentiate parts, e.g. lineadd to
+lineAdd.
+    21:10: Considering implemtations of writes to file, should I implement...
+    22:22: Gaia demanded attention. Uncertain exactly how to store info. Maybe implement getters for vmcsystem, so that, e.g. energy and eventually kinetic
+and potential energy is a part of the class object, and can be extracted to store when needed.
+    00:33: The program now writes the results to file in a format readable by pgfplots with latex.
+
+sun 9/12-18:
+    11:32: Having successfully written to file, uncertain specifically what to do next, so currently working on report to move forward untill something
+more specific pops up.
+
+
+
+---------------------------------------
+            TO DO
+---------------------------------------
+
+Priority A
+    x write in calls to "store" class and formulate output to file I can load into report.
+    o Settle at, or decide on stepLength, alphaLength and betaLength for optimal precision
+    o Run through steps up untill alpha and beta have been chosen well enough.
+    o implement storing Ek and Ep, not just E and E^2
+
+Priority C
+    x Rename store class function names to capitalize beginnings of words not at beginning of name, e.g. lineadd to lineAdd.
+
+Priority D
+    o Implement random.h in vmcsystem, rather than explicit calls.

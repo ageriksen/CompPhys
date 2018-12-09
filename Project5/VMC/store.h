@@ -13,24 +13,24 @@ class store
 {
     public:
         store();  // construtor
-        ~store(); // destructor
 
-        store(string filename)
-        { // constructor w/ filename
-            m_filename = filename;
+        store(string fileName)
+        { // constructor w/ fileName
+            m_fileName = fileName;
         }
 
        // setters and getters?
-       void setFILE(string filename)
+       void setFile(string fileName)
        {
-           m_filename = filename;
+           m_fileName = fileName;
        }
+       string getLine() { return m_line; }
 
         // open file
         void open()
         {
             m_file.open(
-                    m_filename, std::ofstream::out
+                    m_fileName, std::ofstream::out
                 );
         }
 
@@ -39,14 +39,19 @@ class store
         {
             m_file << m_line << "\n";
         }
+        void dat(string line)
+        {
+            m_file << line << "\n";
+        }
 
         void bin(vec Array);
 
         // Lines
-        void lineadd(string element)
+        void lineAdd(string element)
         {
-            m_line += element;
+            m_line += element+" ";
         }
+        void lineClean() { m_line = ""; }
 
         // close file
         void close()
@@ -56,7 +61,8 @@ class store
 //
     private:
         std::ofstream m_file;
-        string m_filename, m_line;
+        string m_fileName;
+        string m_line;
 };
 
 #endif // end of store header
