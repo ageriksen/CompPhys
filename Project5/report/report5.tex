@@ -117,22 +117,20 @@ With $\alpha$ and $\beta$ as variational parameters.
 The energy at a given distance, $r_1$, $r1_2$ is our local energy
 \begin{align}
     E_{L_1} &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\nonumber \\
-        &= C^{-1} e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\nabla_1^2 -\nabla_2^2 + \omega^2(r_1^2 + r_2^2))
-          C e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
-        &= e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\alpha^2 \omega^2 (r_1^2 + r_2^2) + \omega^2 (r_1^2 + r_2^2))
-          e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
         &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:naiveLocalEnergy}
 \end{align}
-Where we use $\nabla_i^2 = \pdv{x_i}^2 + \pdv{y_i}^2 + \pdv{z_i}^2$ and, as an example,
-\begin{align}
-    \pdv[2]{x_1} \Psi{T_1} &= \pdv{x_1}\qty( -\alpha \omega x_1 e^{-\frac{1}{2}(r_1^2 + r_2^2)} )\nonumber\\
-                                &= -\alpha\omega + (\alpha\omega x_1^2)e^{-\frac{1}{2}(r_1^2 + r_2^2)}
-\end{align}
-Summing upp all 3 dimensions, gives us the answer in (\ref{eq:naiveLocalEnergy}). As the repulsive Coloumb interaction is purely dependent on positions
+The road there is found in (\ref{eq:naiveLocalEnergyExpanded}). As the repulsive Coloumb interaction is purely dependent on positions
 and works between particles, adding it to our simple 2-particle state results in
 \begin{align}
-    E_{L_} = \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:firstLocalEnergy}
+    E_{L_1} = \frac{1}{2} \omega^2 \qty(r_1^2 + r_2^2) \qty( 1 -\alpha^2 ) + 3\alpha \omega + \frac{1}{ r_{12} } \label{eq:firstLocalEnergy}
 \end{align}
+
+The second trial wavefunction, (\ref{eq:trial2}) gives a few extra products, but thanks to the product rule, they separate into
+\[
+    E_{L_2} = E_{L_1} + \frac{1}{ 2 \qty( 1 + \beta r_{12} )^{2} }
+    \qty[ \alpha \omega r_{12} - \frac{ 1 }{ 2 \qty( 1 + \beta r_{2} )^{2} } - \frac{ 2 }{ r_{12} } + \frac{ 2 \beta }{ 1 + \beta r_{12} } ]
+\]
+
 
 \section{Results}
 
@@ -146,5 +144,49 @@ and works between particles, adding it to our simple 2-particle state results in
 \section{Conclusion}
 
 \section{Appendix}
+
+\subsection{First trial wavefunction local energy}
+
+using $\nabla_i^2 = \pdv{x_i}^2 + \pdv{y_i}^2 + \pdv{z_i}^2$ and that
+\begin{align}
+    \pdv[2]{x_1} \Psi{T_1} &= \pdv{x_1}\qty( -\alpha \omega x_1 e^{-\frac{1}{2}(r_1^2 + r_2^2)} )\nonumber\\
+                                &= -\alpha\omega + (\alpha\omega x_1^2)e^{-\frac{1}{2}(r_1^2 + r_2^2)}
+\end{align}
+Which is the same for $y$ and $z$. Summing up each contribution and halving from the fraction in the hamiltonian and for each particle leads to
+\begin{align}
+    \pdv[2]{x_1} \Psi{T_1} = -3\alpha\omega + \alpha\omega (r_1^2 - r_2^2)e^{-\frac{1}{2}(r_1^2 + r_2^2)}
+\end{align}
+and the last $\omega^2 ( r_1^2 + r_2^2 )$ is from the positional potential element of the Hamiltonian.
+\begin{align}
+    E_{L_1} &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\nonumber \\
+        &= C^{-1} e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})} \frac{1}{2}\qty(-\nabla_1^2 -\nabla_2^2 + \omega^2(r_1^2 + r_2^2))
+          C e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
+        &= e^{\frac{1}{2}\alpha \omega \qty(r_{1}^{2} + r_{2}^{2})}
+            \frac{1}{2}\qty(-\alpha^2 \omega^2 (r_1^2 + r_2^2) + 6\alpha \omega + \omega^2 (r_1^2 + r_2^2))
+            e^{-\frac{1}{2} \alpha \omega \qty(r_1^2 + r_2^2)} \nonumber \\
+        &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:naiveLocalEnergyExpanded}
+\end{align}
+
+\subsection{second trial wavefunction local energy}
+This is a more complicated differentiation. It is eased somewhat by the fact that
+\[ \nabla_i^2 = \pdv[2]{x_i} + \pdv[2]{y_i} + \pdv[2]{z_i} \]
+gives the same result per particle, from $r_{12} = \qty| \va{r_1} - \va{r_2} | = \sqrt{ (x_1 - x_2)^2 + (y_1 - y_2) + (z_1 - z_2)^2 }$ due to the
+double derivative negating negatives. We also see a close symmetry between $x, y, z$ in that the only difference is in the direct differentiation of
+$r_{12}$. $\pdv{r_{12i}}{q} = \frac{1}{2r_{12}}(q_1 - q_2)$. Further, we have the product rule which makes the wave equation differentiation separable into
+the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2]{x_1}$, the rest can be extrapolated.
+\begin{align}
+    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
+        &= \pdv{x_1} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \frac{1}{2}\pdv{x_1}\qty( \frac{r_{12}}{1 + \beta r_{12}} ) )\nonumber \\
+    \text{using the equality } \frac{r_{12}}{1 + \beta r_{12} } = \frac{1}{\frac{1}{r_{12}} + \beta } \label{eq:equivalence} \\
+    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
+        &= -\qty( \frac{1}{r_{12}} + \beta )^{-2} \vdot \pdv{x_1} \qty( \frac{1}{r_{12}} ) \nonumber\\
+    \pdv{x_1}\qty( \frac{1}{r_{12}} ) &= -\frac{1}{r_{12}^2}(x_1 - x_2)\nonumber \\
+    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
+        &= - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} \qq{writing back into \ref{eq:equivalence}} \nonumber \\
+    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
+        &= \frac{1}{2} \pdv{x} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \qty( - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} ) ) \nonumber\\
+        &= \frac{1}{2} \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2})^2
+\end{align}
+
 
 \end{document}

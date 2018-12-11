@@ -62,6 +62,12 @@ sun 9/12-18:
     11:32: Having successfully written to file, uncertain specifically what to do next, so currently working on report to move forward untill something
 more specific pops up.
 
+mon 10/12-18:
+    11:42: The issue that showed up regarding impossible variance seems to be solved. The problem lay in the fact that I squared the summed energies,
+but did not scale the variable by the square of the cycles run. adding this returned the variance to within acceptable values, and as expected threw it
+to 0 at the exact value.
+    16:54: Slow day again. Need to step up. Currently work on theoretical part.
+
 
 
 ---------------------------------------
@@ -73,6 +79,7 @@ Priority A
     o Settle at, or decide on stepLength, alphaLength and betaLength for optimal precision
     o Run through steps up untill alpha and beta have been chosen well enough.
     o implement storing Ek and Ep, not just E and E^2
+    o change table of results to plot of energy vs. alpha or something.
 
 Priority C
     x Rename store class function names to capitalize beginnings of words not at beginning of name, e.g. lineadd to lineAdd.
