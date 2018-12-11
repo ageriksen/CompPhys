@@ -18,7 +18,9 @@ vec3::vec3(double x, double y, double z)
 void vec3::print()
 {
     // Will print matlab syntax vector. Output will be like: [2.09, 5.3, 9.1];
-    cout << "[" << components[0] << ", " << components[1] << ", " << components[2] << "]" << endl;
+    cout << "[" << components[0] << ", "
+        << components[1] << ", "
+        << components[2] << "]" << endl;
 }
 
 void vec3::print(string name)
@@ -30,7 +32,11 @@ void vec3::print(string name)
 
 vec3 vec3::cross(vec3 otherVector)
 {
-    return vec3(y()*otherVector.z()-z()*otherVector.y(), z()*otherVector.x()-x()*otherVector.z(), x()*otherVector.y()-y()*otherVector.x());
+    return vec3(
+            y()*otherVector.z()-z()*otherVector.y(),
+            z()*otherVector.x()-x()*otherVector.z(),
+            x()*otherVector.y()-y()*otherVector.x()
+            );
 }
 
 double vec3::dot(vec3 otherVector)
