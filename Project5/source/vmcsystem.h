@@ -23,6 +23,7 @@ class VMCSystem
         }
         //
         void runVMC( int MCCycles, double steplength );
+        //double stepFinder( double omega );
 
         // getters
         double energy() { return m_energy; }
@@ -30,7 +31,9 @@ class VMCSystem
         double ratio() { return m_acceptRatio; }
 
     private:
+        //----------------------------------------
         // System variables
+        //----------------------------------------
         int m_NParticles, m_NDimensions;
         arma::Mat<double> m_positionsOld, m_positionsNew;
         // Wavefunction

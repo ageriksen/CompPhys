@@ -68,6 +68,14 @@ but did not scale the variable by the square of the cycles run. adding this retu
 to 0 at the exact value.
     16:54: Slow day again. Need to step up. Currently work on theoretical part.
 
+tues 11/12-18:
+    18:17: difficult day due to operation. Went through a core part of base and progeny classes. Currently working through implementing proper inheritance.
+
+wed 12/12-18:
+    11:33: I think I've verified the implementation of the base and inherited class. strange error about cstdlib in armadillo? will try to reboot.
+    17:57: Mostly up and running. Needed to add another rule to makefile "CC = mpic++" and not include any headers in rule "all".
+Need to make a "stepFinder" function for finding correct steplength based on oscillator frequency. and need to rewrite setParameters so it takes
+vector<double> rather than individual doubles, so I can send in varying amounts of variables.
 
 
 ---------------------------------------
@@ -80,6 +88,8 @@ Priority A
     o Run through steps up untill alpha and beta have been chosen well enough.
     o implement storing Ek and Ep, not just E and E^2
     o change table of results to plot of energy vs. alpha or something.
+    o rewrite virtual void setParameters(double, double) to ( vector<double> )
+    o add stepFinder function for varyin steplength according to omega
 
 Priority C
     x Rename store class function names to capitalize beginnings of words not at beginning of name, e.g. lineadd to lineAdd.

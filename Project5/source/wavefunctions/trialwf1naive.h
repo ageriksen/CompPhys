@@ -5,13 +5,14 @@
 
 class trialWF1Naive: public Wavefunction
 {
+//------------------------------------------------------
     public:
         trialWF1Naive( int NParticles, int NDimensions );
 
-        void setParameters( double omega, double alpha )
+        void setParameters( arma::Col<double> parameters )
         {
-            m_omega = omega;
-            m_alpha = alpha;
+            m_omega = parameters(0);
+            m_alpha = parameters(0);
         }
 
         double sumSquares( const arma::Mat<double> & positions );
@@ -19,11 +20,17 @@ class trialWF1Naive: public Wavefunction
         double powers( const arma::Mat<double> & positions );
         double localEnergy( const arma::Mat<double> & positions );
 
+        //getters and setters
+        double omega()  { return m_omega; }
+        double alpha()  { return m_alpha; }
+
+//------------------------------------------------------
     private:
-        double m_omega = 0;
         double m_alpha = 0;
+        double m_omega = 0;
 }; //
 
+//------------------------------------------------------
 inline double trialWF1Naive::powers
 (
  const arma::Mat<double> & positions
@@ -32,6 +39,7 @@ inline double trialWF1Naive::powers
     return -0.5*m_alpha*m_omega*sumSquares(positions);
 }
 
+//------------------------------------------------------
 inline double trialWF1Naive::localEnergy
 (
  const arma::Mat<double> & positions

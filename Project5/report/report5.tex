@@ -126,10 +126,10 @@ and works between particles, adding it to our simple 2-particle state results in
 \end{align}
 
 The second trial wavefunction, (\ref{eq:trial2}) gives a few extra products, but thanks to the product rule, they separate into
-\[
+\begin{align}
     E_{L_2} = E_{L_1} + \frac{1}{ 2 \qty( 1 + \beta r_{12} )^{2} }
     \qty[ \alpha \omega r_{12} - \frac{ 1 }{ 2 \qty( 1 + \beta r_{2} )^{2} } - \frac{ 2 }{ r_{12} } + \frac{ 2 \beta }{ 1 + \beta r_{12} } ]
-\]
+\end{align}
 
 
 \section{Results}
@@ -185,7 +185,7 @@ the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2
         &= - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} \qq{writing back into \ref{eq:equivalence}} \nonumber \\
     \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
         &= \frac{1}{2} \pdv{x} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \qty( - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} ) ) \nonumber\\
-        &= \frac{1}{2} \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2})^2
+        &= \frac{1}{2} \qty( \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2}))^2 - \pdv{x_1} \qty( \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} )
 \end{align}
 
 
