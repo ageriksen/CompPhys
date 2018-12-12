@@ -2,4 +2,4 @@ CXX = mpic++
 CXXFLAGS = -Wall
 LDLIBS = -larmadillo
 
-main: vmcsystem.o wavefunctions/wavefunction.o
+main: main.o vmcsystem.o wavefunctions/wavefunction.h wavefunctions/trialwf1naive.o

@@ -1,6 +1,7 @@
 #include "store.h"
 #include "vmcsystem.h"
 #include "wavefunctions/wavefunction.h"
+#include "wavefunctions/trialwf1naive.h"
 #include <mpi.h>
 #include <iostream>
 
@@ -31,9 +32,11 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     //
     VMCSystem VMC( NParticles, NDimensions, processors, processRank );
     //WAVEFUNCTION
-    wavefuntion *WF;
+    Wavefunction *WF;
+
     WF = new trialWF1Naive( NParticles, NDimensions );
-    VMC.setWaveFunction( &WF );
+
+    VMC.setWaveFunction( WF );
 
     // Store object
     string fileName;
@@ -57,7 +60,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
             cout << "\n alpha = " << alpha << "\n";
         }
         //running variational MC
-        WF.setParameters( omega, alpha );
+        WF -> setParameters( omega, alpha );
         VMC.runVMC( MCCycles, steplength );
 
         // storing run

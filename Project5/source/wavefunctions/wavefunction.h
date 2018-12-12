@@ -10,8 +10,8 @@ class Wavefunction
         Wavefunction(int NParticles, int NDimensions):
             m_NParticles(NParticles), m_NDimensions(NDimensions)
         {}
-        virtual ~Wavefunction() {}
 
+        virtual void setParameters( double, double ) = 0;
         virtual double powers( const arma::Mat<double> & positions) = 0;
         virtual double localEnergy( const arma::Mat<double> & positions) = 0;
 

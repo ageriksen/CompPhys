@@ -16,8 +16,8 @@ class trialWF1Naive: public Wavefunction
 
         double sumSquares( const arma::Mat<double> & positions );
 
-        virtual double powers( const arma::Mat<double> & positions );
-        virtual double localEnergy( const arma::Mat<double> & positions );
+        double powers( const arma::Mat<double> & positions );
+        double localEnergy( const arma::Mat<double> & positions );
 
     private:
         double m_omega = 0;
