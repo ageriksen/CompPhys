@@ -23,7 +23,7 @@ class VMCSystem
         }
         //
         void runVMC( int MCCycles, double steplength );
-        //double stepFinder( double omega );
+        double stepFinder( double omega, double alpha);
 
         // getters
         double energy() { return m_energy; }

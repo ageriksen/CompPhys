@@ -5,13 +5,6 @@
 #include <mpi.h>
 
 //------------------------------------------------------
-//  NAMESPACES
-//------------------------------------------------------
-using std::cout;
-using std::endl;
-using std::setprecision;
-
-//------------------------------------------------------
 //  VRUN MC
 //------------------------------------------------------
 void VMCSystem::runVMC( int MCCycles, double steplength )
@@ -132,17 +125,6 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     MPI_Reduce( &m_energySquared,   &tmpEnergySquared,  1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce( &m_acceptRatio,     &tmpAcceptRatio,    1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    //------------------------------------------------------
-    // printout
-    //------------------------------------------------------
-    if( m_rank == 0 )
-    {
-        cout << setprecision(16) << "Mean energy:       " << m_energy/double(MCCycles) << "\n"
-                                 << "Variance(Energy):  " << (m_energySquared - (m_energy*m_energy/MCCycles)) / double(MCCycles) << "\n"
-                                 << "Acceptance ratio:  " << m_acceptRatio
-             << endl;
-    }
-
 
 } // end runVMC
 
@@ -150,41 +132,39 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
 //------------------------------------------------------
 //  STEP FINDER
 //------------------------------------------------------
-//double VMCSystem::stepFinder( double omega )
-//{
-//    // variable setup
-//    double trialStep;
-//    int quickMC = 1e5;
-//    double acceptanceCutoff = 0.6;
-//    double acceptanceMin = acceptanceCutoff;
-//    arma::Col<double> param = arma::zeros(2);
-//    param(0) = omega;
-//    param(1) = 1.0;
-//
-//    //testing steplengths
-//    for( double delta = 0.1; delta < 10; delta += 0.05 )
-//    {
-//        this -> m_WF -> setParameters( param );
-//        this -> runVMC( quickMC, delta );
-//
-//        if( m_rank == 0 )
-//        {
-//            if( m_acceptRatio < acceptanceMin )
-//            {
-//                acceptanceMin = m_acceptRatio;
-//                trialStep = delta;
-//            }
-//        }
-//    }
-//    // ensuring change found in steplength
-//    if( m_rank == 0 )
-//    {
-//        if( acceptanceMin == acceptanceCutoff )
-//        {
-//            std::cout << "could not find a good steplength" << std::endl;
-//            exit(1);
-//        }
-//    }
-//    std::cout << "steplength: " << trialStep << std::endl;
-//    return trialStep;
-//}// end stepFinder
+double VMCSystem::stepFinder( double omega, double alpha)
+{
+    // variable setup
+    double trialStep;
+    int quickMC = 1e5;
+    double acceptanceMin = 0.45;
+    double acceptanceMax = 0.59;
+    double currentAccept;
+    arma::Col<double> param = arma::zeros(2);
+    param(0) = omega;
+    param(1) = alpha;
+
+    //testing steplengths
+    for( double delta = 0.5; delta < 2; delta += 0.1 )
+    {
+        this -> m_WF -> setParameters( param );
+        this -> runVMC( quickMC, delta );
+
+        std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
+
+        if(  m_acceptRatio > acceptanceMin && m_acceptRatio < acceptanceMax)
+        {
+            currentAccept = m_acceptRatio;
+            trialStep = delta;
+            std::cout << "steplength: " << trialStep << "\n"
+                      << "acceptRatio: " << currentAccept << std::endl;
+            return trialStep;
+        }
+    }
+    if( m_rank == 0 )
+    {
+        std::cout << "could not find a good steplength" << std::endl;
+        exit(0);
+    }
+    return 5;
+}// end stepFinder
