@@ -12,6 +12,9 @@
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 using std::chrono::duration;
+using std::cout;
+using std::cin;
+using std::endl;
 
 //------------------------------------------------------
 //  MAIN
@@ -40,7 +43,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     //double omega = 1.0;
     // VMC variables
     int MCCycles = 1e6;
-    double stepLength; //= 1.0; // should give ~50% acceptance
+    //double stepLength; //= 1.0; // should give ~50% acceptance
     //
     VMCSystem VMC( NParticles, NDimensions, processors, processRank );
     //------------------------------------------------------
@@ -53,7 +56,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     VMC.setWaveFunction( WF );
 
     //------------------------------------------------------
-    // Storage object
+    //      STORAGE INITIATE
     //------------------------------------------------------
     string fileName;
     std::cout << "please provide a filename for storage" << std::endl;
@@ -65,18 +68,45 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     alphaFile.dat(headline);
 
     //------------------------------------------------------
-    //  RUNNINGN VMC
+    //  RUNNING VMC
     //------------------------------------------------------
-    // Varying wavefunction parameters
+    // wavefunction parameters
+    int paramSize;
+    cout << "\nparam.Size:\n";
+    cin >> paramSize;
+    arma::Col<double> parameters = arma::zeros(paramSize);
+    //------------------------------------------------------
+    //      INPUT VALUES
+    //------------------------------------------------------
+    int omegaSize;
+    cout << "\nomegaSize: \n";
+    cin >> omegaSize;
+    arma::Col<double> omega = arma::zeros(omegaSize);
+    arma::Col<double> stepLength = arma::zeros(omega.size());
+    for( int index = 0; index < omegaSize; index++ )
+    {
+        cout << "\nomega("<<index<<"): ";
+        cin >>  omega(index);
+    }
+
+
+    for( int index= 0; index < omegaSize; index++ )
+    {
+        std::cout
+            << "\n------------------------------------------------------\n"
+            << "\n omega = " << omega(index) << "\n";
+        parameters(0) = omega(index);
+        parameters(1) = 1;
+        stepLength(index) = VMC.stepFinder( parameters );
+    }
+    std::cout
+        << "\n------------------------------------------------------\n";
+
+
     double alphaMin = 0.8;
     double alphaMax = 1.2;
     double alphaStep = 0.05;
-    arma::Col<double> parameters = arma::zeros(2);
-    arma::Col<double> omega = arma::zeros(3);
-    omega(0) = 0.01;
-    omega(1) = 0.5;
-    omega(2) = 1.0;
-    for( int index= 0; index < 3; index++ )
+    for( int index= 0; index < omegaSize; index++ )
     {
         for( double alpha = alphaMin; alpha < alphaMax; alpha += alphaStep )
         {
@@ -84,16 +114,13 @@ int main( int numberOfArguments, char *cmdLineArguments[])
             {
                 std::cout
                     << "\n------------------------------------------------------\n"
-                    << "\n omega = " << omega(index)
-                    << "\n alpha = " << alpha << "\n";
+                    << " alpha = " << alpha << "\n";
             }
             //running variational MC
             parameters(0) = omega(index);
             parameters(1) = alpha;
-            stepLength = VMC.stepFinder( parameters(0), parameters(1));
-            //stepLength = 1.0;
             WF -> setParameters( parameters );
-            VMC.runVMC( MCCycles, stepLength );
+            VMC.runVMC( MCCycles, stepLength(index) );
 
             // storing run
             if( processRank == 0 )

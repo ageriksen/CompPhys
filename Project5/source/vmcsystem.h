@@ -23,7 +23,14 @@ class VMCSystem
         }
         //
         void runVMC( int MCCycles, double steplength );
-        double stepFinder( double omega, double alpha);
+        double stepFinder( arma::Col<double> param );
+        void clean()
+        {
+        m_energy = 0;
+        m_energySquared = 0;
+        m_oldWaveFunction = 0;
+        m_newWaveFunction = 0;
+        }
 
         // getters
         double energy() { return m_energy; }

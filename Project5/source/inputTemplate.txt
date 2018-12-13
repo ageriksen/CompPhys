@@ -1,0 +1,6 @@
+../data/filename.dat
+paramSize//number of parameters impacting wavefunction and energy.
+omegaSize
+omega(i)
+... for omegaSize
+

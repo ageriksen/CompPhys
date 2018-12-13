@@ -1,0 +1,4 @@
+../data/trialwf1naive.dat
+2
+1
+1.0

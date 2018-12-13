@@ -132,25 +132,25 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
 //------------------------------------------------------
 //  STEP FINDER
 //------------------------------------------------------
-double VMCSystem::stepFinder( double omega, double alpha)
+double VMCSystem::stepFinder( arma::Col<double> param )
 {
     // variable setup
     double trialStep;
-    int quickMC = 1e5;
-    double acceptanceMin = 0.45;
-    double acceptanceMax = 0.59;
+    int quickMC = 1e5; // only need acceptance ratio, not exact results
+    double acceptanceMin = 0.45; // lower bound on acceptance ratio
+    double acceptanceMax = 0.55; // upper bound on acceptance ratio
     double currentAccept;
-    arma::Col<double> param = arma::zeros(2);
-    param(0) = omega;
-    param(1) = alpha;
+    double deltaMin = 0.1/double(param(0)); // min delta value tested and step
+    double deltaMax = 10/double(param(0));  // max delta value tested
+    std::cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  std::endl;
 
     //testing steplengths
-    for( double delta = 0.5; delta < 2; delta += 0.1 )
+    for( double delta = deltaMin; delta < deltaMax; delta += deltaMin )
     {
         this -> m_WF -> setParameters( param );
         this -> runVMC( quickMC, delta );
 
-        std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
+        //std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
 
         if(  m_acceptRatio > acceptanceMin && m_acceptRatio < acceptanceMax)
         {
@@ -158,13 +158,15 @@ double VMCSystem::stepFinder( double omega, double alpha)
             trialStep = delta;
             std::cout << "steplength: " << trialStep << "\n"
                       << "acceptRatio: " << currentAccept << std::endl;
+            clean();
             return trialStep;
         }
     }
     if( m_rank == 0 )
     {
         std::cout << "could not find a good steplength" << std::endl;
-        exit(0);
+//        exit(0);
     }
+    clean();
     return 5;
 }// end stepFinder
