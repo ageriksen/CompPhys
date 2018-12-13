@@ -68,7 +68,6 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
         // runs each particle through the metropolis sampling rule
         for( int particle = 0; particle < m_NParticles; particle ++ )
         {
-
             //Suggest update
             for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
             {
@@ -140,7 +139,7 @@ double VMCSystem::stepFinder( arma::Col<double> param )
     double acceptanceMin = 0.45; // lower bound on acceptance ratio
     double acceptanceMax = 0.55; // upper bound on acceptance ratio
     double currentAccept;
-    double deltaMin = 0.1/double(param(0)); // min delta value tested and step
+    double deltaMin = 0.01/double(param(0)); // min delta value tested and step
     double deltaMax = 10/double(param(0));  // max delta value tested
     std::cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  std::endl;
 

@@ -59,13 +59,15 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     //      STORAGE INITIATE
     //------------------------------------------------------
     string fileName;
-    std::cout << "please provide a filename for storage" << std::endl;
+    //std::cout << "please provide a filename for storage" << std::endl;
     std::cin >> fileName;
     store alphaFile( fileName );
     alphaFile.open();
     //
-    string headline = "alpha E Variance {Acceptance ratio}";
+    string headline; //= "alpha E Variance {Acceptance ratio}";
+    cin >> headline;
     alphaFile.dat(headline);
+    cout << headline;
 
     //------------------------------------------------------
     //  RUNNING VMC
@@ -81,14 +83,14 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     int omegaSize;
     cout << "\nomegaSize: \n";
     cin >> omegaSize;
+    cout << "omegaSize: " << omegaSize << endl;
     arma::Col<double> omega = arma::zeros(omegaSize);
     arma::Col<double> stepLength = arma::zeros(omega.size());
     for( int index = 0; index < omegaSize; index++ )
     {
-        cout << "\nomega("<<index<<"): ";
+        //cout << "\nomega("<<index<<"): ";
         cin >>  omega(index);
     }
-
 
     for( int index= 0; index < omegaSize; index++ )
     {
@@ -99,23 +101,25 @@ int main( int numberOfArguments, char *cmdLineArguments[])
         parameters(1) = 1;
         stepLength(index) = VMC.stepFinder( parameters );
     }
-    std::cout
-        << "\n------------------------------------------------------\n";
+ //   std::cout
+ //       << "\n------------------------------------------------------\n";
 
 
     double alphaMin = 0.8;
     double alphaMax = 1.2;
     double alphaStep = 0.05;
+    cout << headline << endl;
     for( int index= 0; index < omegaSize; index++ )
     {
+        cout << "\n----------------------------------------------------\n";
         for( double alpha = alphaMin; alpha < alphaMax; alpha += alphaStep )
         {
-            if( processRank == 0 )
-            {
-                std::cout
-                    << "\n------------------------------------------------------\n"
-                    << " alpha = " << alpha << "\n";
-            }
+//            if( processRank == 0 )
+//            {
+//                std::cout
+//                    << "\n------------------------------------------------------\n"
+//                    << " alpha = " << alpha << "\n";
+//            }
             //running variational MC
             parameters(0) = omega(index);
             parameters(1) = alpha;
@@ -129,14 +133,15 @@ int main( int numberOfArguments, char *cmdLineArguments[])
                 alphaFile.lineAdd( std::to_string(VMC.energy()/double(MCCycles)) );
                 alphaFile.lineAdd( std::to_string( ( VMC.energySquared() - (VMC.energy()*VMC.energy()/MCCycles) )/double(MCCycles) ) );
                 alphaFile.lineAdd( std::to_string( VMC.ratio() ) );
+                cout << alphaFile.getLine() << endl;
                 alphaFile.dat();
                 alphaFile.lineClean();
             // printout
-                std::cout << std::setprecision(16)
-                    << "Mean energy:       " << VMC.energy()/double(MCCycles) << "\n"
-                    << "Variance(Energy):  " << (VMC.energySquared() - (VMC.energy()*VMC.energy()/double(MCCycles))) / double(MCCycles) << "\n"
-                    << "Acceptance ratio:  " << VMC.ratio()
-                    << std::endl;
+               // std::cout << std::setprecision(16)
+               //     << "Mean energy:       " << VMC.energy()/double(MCCycles) << "\n"
+               //     << "Variance(Energy):  " << (VMC.energySquared() - (VMC.energy()*VMC.energy()/double(MCCycles))) / double(MCCycles) << "\n"
+               //     << "Acceptance ratio:  " << VMC.ratio()
+               //     << std::endl;
             }
 
         } // end for alpha

@@ -1,4 +1,5 @@
 ../data/trialwf1naive.dat
+alpha <E> Variance {Acceptance Ratio}
 2
 1
 1.0

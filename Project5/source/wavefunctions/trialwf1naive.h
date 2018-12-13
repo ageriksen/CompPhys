@@ -2,6 +2,7 @@
 #define TRIALWF1NAIVE_H
 
 #include "wavefunction.h"
+#include <iostream>
 
 class trialWF1Naive: public Wavefunction
 {
@@ -12,7 +13,7 @@ class trialWF1Naive: public Wavefunction
         void setParameters( arma::Col<double> parameters )
         {
             m_omega = parameters(0);
-            m_alpha = parameters(0);
+            m_alpha = parameters(1);
         }
 
         double sumSquares( const arma::Mat<double> & positions );
