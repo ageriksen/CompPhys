@@ -70,10 +70,6 @@ class storage
        {
            m_oFile.close();
        }
-       void iClose()
-       {
-           m_iFile.close();
-       }
 //
     private:
         std::ofstream m_oFile;

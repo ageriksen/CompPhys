@@ -36,12 +36,12 @@ int main( int numberOfArguments, char *argumentList[])
     //------------------------------------------------------
     // Imported Variables
     //------------------------------------------------------
-    storage storageFile;
-    vector<double> parameters; // setting up parameter vector to have apropriate size
-    vector<string> parameterNames;
-    vector<double> omegaVec;
-    vector<double> alphaVec;
-    vector<double> betaVec;
+    storage storageFile("../data/testrun.dat");
+    vector<double> parameters(2); // setting up parameter vector to have apropriate size
+    vector<string> parameterNames(2);
+    vector<double> omegaVec(3);
+    vector<double> alphaVec(3);
+    vector<double> betaVec(3);
     //if 2nd argument provided, it's the name of the file to store values
     if( numberOfArguments > 2 )
     {
@@ -52,6 +52,8 @@ int main( int numberOfArguments, char *argumentList[])
     //if 3rd argument provided, it's the name of the file with the omega array
     if( numberOfArguments > 3 )
     {
+        omegaVec.resize(0);
+        parameters.resize(0);
         std::string omegaFilename = argumentList[3];
         storage omegaStore(omegaFilename);
         omegaStore.in(omegaVec);
@@ -61,6 +63,7 @@ int main( int numberOfArguments, char *argumentList[])
     // if 4th argument provided, set alpha start, stop and step from provided file
     if( numberOfArguments > 4 )
     {
+        alphaVec.resize(0);
         std::string alphaFilename = argumentList[4];
         storage alphaStore(alphaFilename);
         alphaStore.in(alphaVec);
@@ -70,6 +73,7 @@ int main( int numberOfArguments, char *argumentList[])
     // if 5th argument provided, set beta start, stop and step from provided file
     if( numberOfArguments > 5 )
     {
+        betaVec.resize(0);
         std::string betaFilename = argumentList[5];
         storage betaStore(betaFilename);
         betaStore.in(betaVec);
