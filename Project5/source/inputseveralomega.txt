@@ -1,5 +1,10 @@
 ../data/severalomega.dat
-omega alpha <E> variance {Acceptance Ratio}
+5
+omega
+alpha
+E
+variance
+Ratio
 2
 3
 0.01

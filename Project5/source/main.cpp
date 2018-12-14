@@ -1,10 +1,11 @@
-#include "store.h"
+#include "storage.h"
 #include "vmcsystem.h"
 #include "wavefunctions/wavefunction.h"
 #include "wavefunctions/trialwf1naive.h"
 #include <mpi.h>
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 //------------------------------------------------------
 //  NAMESPACES
@@ -15,20 +16,67 @@ using std::chrono::duration;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::string;
+using std::vector;
 
 //------------------------------------------------------
 //  MAIN
 //------------------------------------------------------
-int main( int numberOfArguments, char *cmdLineArguments[])
+int main( int numberOfArguments, char *argumentList[])
 {
 
     //------------------------------------------------------
     //MPI initialization
     //------------------------------------------------------
     int processors, processRank;
-    MPI_Init( &numberOfArguments, &cmdLineArguments );
+    MPI_Init( &numberOfArguments, &argumentList);
     MPI_Comm_size( MPI_COMM_WORLD, &processors );
     MPI_Comm_rank( MPI_COMM_WORLD, &processRank );
+
+    //------------------------------------------------------
+    // Imported Variables
+    //------------------------------------------------------
+    storage storageFile;
+    vector<double> parameters; // setting up parameter vector to have apropriate size
+    vector<string> parameterNames;
+    vector<double> omegaVec;
+    vector<double> alphaVec;
+    vector<double> betaVec;
+    //if 2nd argument provided, it's the name of the file to store values
+    if( numberOfArguments > 2 )
+    {
+        //string fileName = argumentList[2];
+        storageFile.name(argumentList[2]);
+    }
+    //
+    //if 3rd argument provided, it's the name of the file with the omega array
+    if( numberOfArguments > 3 )
+    {
+        std::string omegaFilename = argumentList[3];
+        storage omegaStore(omegaFilename);
+        omegaStore.in(omegaVec);
+        parameters.push_back(0.0);
+        parameterNames.push_back("omega");
+    }
+    // if 4th argument provided, set alpha start, stop and step from provided file
+    if( numberOfArguments > 4 )
+    {
+        std::string alphaFilename = argumentList[4];
+        storage alphaStore(alphaFilename);
+        alphaStore.in(alphaVec);
+        parameters.push_back(0.0);
+        parameterNames.push_back("alpha");
+    }
+    // if 5th argument provided, set beta start, stop and step from provided file
+    if( numberOfArguments > 5 )
+    {
+        std::string betaFilename = argumentList[5];
+        storage betaStore(betaFilename);
+        betaStore.in(betaVec);
+        parameters.push_back(0.0);
+        parameterNames.push_back("beta");
+    }
+
 
     //------------------------------------------------------
     // Program timer
@@ -58,25 +106,30 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     //------------------------------------------------------
     //      STORAGE INITIATE
     //------------------------------------------------------
-    string fileName;
-    //std::cout << "please provide a filename for storage" << std::endl;
-    std::cin >> fileName;
-    store alphaFile( fileName );
-    alphaFile.open();
-    //
+
+
+
     string headline; //= "alpha E Variance {Acceptance ratio}";
-    cin >> headline;
-    alphaFile.dat(headline);
-    cout << headline;
+    string headBit;
+    int headMembers;
+    cout << "number of head members: " << endl;
+    cin >> headMembers;
+    //cout << "number of elements in headline: " << headMembers << endl;
+    for( int count = 0; count < headMembers; count ++ )
+    {
+        cout << "\nnext head element: ";
+        cin >> headBit;
+        headline += headBit+" ";
+        headBit = "";
+    }
+    storageFile.dat(headline);
+    cout << "\n----------------------------------------------\n"
+        << headline << endl;
 
     //------------------------------------------------------
     //  RUNNING VMC
     //------------------------------------------------------
-    // wavefunction parameters
-    int paramSize;
-    cout << "\nparam.Size:\n";
-    cin >> paramSize;
-    arma::Col<double> parameters = arma::zeros(paramSize);
+
     //------------------------------------------------------
     //      INPUT VALUES
     //------------------------------------------------------
@@ -88,7 +141,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
     arma::Col<double> stepLength = arma::zeros(omega.size());
     for( int index = 0; index < omegaSize; index++ )
     {
-        //cout << "\nomega("<<index<<"): ";
+        cout << "\nomega("<<index<<"): ";
         cin >>  omega(index);
     }
 
@@ -97,22 +150,18 @@ int main( int numberOfArguments, char *cmdLineArguments[])
         std::cout
             << "\n------------------------------------------------------\n"
             << "\n omega = " << omega(index) << "\n";
-        parameters(0) = omega(index);
-        parameters(1) = 1;
+        parameters[0] = omega(index);
+        parameters[1] = 1;
         stepLength(index) = VMC.stepFinder( parameters );
     }
- //   std::cout
- //       << "\n------------------------------------------------------\n";
+    std::cout
+        << "\n------------------------------------------------------\n";
 
-
-    double alphaMin = 0.8;
-    double alphaMax = 1.2;
-    double alphaStep = 0.05;
     cout << headline << endl;
-    for( int index= 0; index < omegaSize; index++ )
+    for( unsigned int index= 0; index < omegaVec.size(); index++ )
     {
         cout << "\n----------------------------------------------------\n";
-        for( double alpha = alphaMin; alpha < alphaMax; alpha += alphaStep )
+        for( double alpha = alphaVec[0]; alpha < alphaVec[1]; alpha += alphaVec[2])
         {
 //            if( processRank == 0 )
 //            {
@@ -121,21 +170,22 @@ int main( int numberOfArguments, char *cmdLineArguments[])
 //                    << " alpha = " << alpha << "\n";
 //            }
             //running variational MC
-            parameters(0) = omega(index);
-            parameters(1) = alpha;
+            parameters[0] = omega(index);
+            parameters[1] = alpha;
             WF -> setParameters( parameters );
             VMC.runVMC( MCCycles, stepLength(index) );
 
             // storing run
             if( processRank == 0 )
             {
-                alphaFile.lineAdd( std::to_string(alpha) );
-                alphaFile.lineAdd( std::to_string(VMC.energy()/double(MCCycles)) );
-                alphaFile.lineAdd( std::to_string( ( VMC.energySquared() - (VMC.energy()*VMC.energy()/MCCycles) )/double(MCCycles) ) );
-                alphaFile.lineAdd( std::to_string( VMC.ratio() ) );
-                cout << alphaFile.getLine() << endl;
-                alphaFile.dat();
-                alphaFile.lineClean();
+                storageFile.lineAdd( std::to_string(omega(index)) );
+                storageFile.lineAdd( std::to_string(alpha) );
+                storageFile.lineAdd( std::to_string(VMC.energy()/double(MCCycles)) );
+                storageFile.lineAdd( std::to_string( ( VMC.energySquared() - (VMC.energy()*VMC.energy()/MCCycles) )/double(MCCycles) ) );
+                storageFile.lineAdd( std::to_string( VMC.ratio() ) );
+                cout << storageFile.getLine() << endl;
+                storageFile.dat();
+                storageFile.lineClean();
             // printout
                // std::cout << std::setprecision(16)
                //     << "Mean energy:       " << VMC.energy()/double(MCCycles) << "\n"
@@ -158,7 +208,7 @@ int main( int numberOfArguments, char *cmdLineArguments[])
         std::cout << "runtime complete. time used: \n"
              << double(programTime.count())/3600.0 << " hrs ("
              << programTime.count() << ")" << std::endl;
-        alphaFile.close();
+        storageFile.oClose();
     }
 
     //------------------------------------------------------
