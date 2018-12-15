@@ -1,0 +1,5 @@
+numberOfProcessors
+../data/filename.dat
+omegaFile
+alphaFile
+betaFile

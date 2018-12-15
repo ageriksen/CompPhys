@@ -1,0 +1,12 @@
+../data/severalomega.dat
+5
+omega
+alpha
+E
+variance
+Ratio
+2
+3
+0.01
+0.5
+1.0
