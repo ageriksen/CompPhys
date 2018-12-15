@@ -1,9 +1,12 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
 
-#include <armadillo>
+//#include <armadillo>
+#include <vector>
 #include <cmath>
 #include <string>
+
+using std::vector;
 
 class Wavefunction
 {
@@ -12,9 +15,10 @@ class Wavefunction
             m_NParticles(NParticles), m_NDimensions(NDimensions)
         {}
 
-        virtual void setParameters( arma::Col<double> parameters ) = 0;
-        virtual double powers( const arma::Mat<double> & positions) = 0;
-        virtual double localEnergy( const arma::Mat<double> & positions) = 0;
+        virtual void setParameters( const vector<double> parameters ) = 0;
+        virtual double powers( const vector< vector<double> > & positions) = 0;
+        virtual double localEnergy( const vector< vector<double> > & positions) = 0;
+        //virtual void loopParameters() = 0;
         //virtual std::string save() = 0;
 
     protected:

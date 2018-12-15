@@ -1,8 +1,10 @@
 #ifndef VMCSYSTEM_H
 #define VMCSYSTEM_H
 
-#include <armadillo>
+#include <vector>
 #include "wavefunctions/wavefunction.h"
+
+using std::vector;
 
 class VMCSystem
 {
@@ -11,10 +13,9 @@ class VMCSystem
             m_NParticles(NParticles), m_NDimensions(NDimensions),
             m_processors(processors), m_rank(rank)
         {
-            m_positionsOld.resize(m_NParticles, m_NDimensions);
-            m_positionsNew.resize(m_NParticles, m_NDimensions);
-            m_positionsNew.zeros();
-            m_positionsOld.zeros();
+            vector<double> dimensions(m_NDimensions, 0.0);
+            m_positionsOld.resize(m_NParticles, dimensions);
+            m_positionsNew.resize(m_NParticles, dimensions);
         }
         //
         void setWaveFunction( Wavefunction * WF )
@@ -23,7 +24,7 @@ class VMCSystem
         }
         //
         void runVMC( int MCCycles, double steplength );
-        double stepFinder( arma::Col<double> param );
+        double stepFinder( vector<double> param );
         void clean()
         {
         m_energy = 0;
@@ -42,7 +43,7 @@ class VMCSystem
         // System variables
         //----------------------------------------
         int m_NParticles, m_NDimensions;
-        arma::Mat<double> m_positionsOld, m_positionsNew;
+        vector< vector<double> > m_positionsOld, m_positionsNew;
         // Wavefunction
         Wavefunction * m_WF = nullptr;
         double m_oldWaveFunction = 0;

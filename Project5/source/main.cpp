@@ -2,6 +2,7 @@
 #include "vmcsystem.h"
 #include "wavefunctions/wavefunction.h"
 #include "wavefunctions/trialwf1naive.h"
+#include "wavefunctions/trialwf1full.h"
 #include <mpi.h>
 #include <iostream>
 #include <iomanip>
@@ -34,155 +35,163 @@ int main( int numberOfArguments, char *argumentList[])
     MPI_Comm_rank( MPI_COMM_WORLD, &processRank );
 
     //------------------------------------------------------
+    // System variables
+    //------------------------------------------------------
+    int NParticles = 2;
+    int NDimensions = 3;
+    // VMC variables
+    int MCCycles = 1e6;
+    //------------------------------------------------------
     // Imported Variables
     //------------------------------------------------------
-    storage storageFile("../data/testrun.dat");
+    string baseFileName = "../data/testrun";
     vector<double> parameters(2); // setting up parameter vector to have apropriate size
     vector<string> parameterNames(2);
     vector<double> omegaVec(3);
     vector<double> alphaVec(3);
     vector<double> betaVec(3);
+    Wavefunction *WF;
+    //
+
     //if 2nd argument provided, it's the name of the file to store values
     if( numberOfArguments > 2 )
     {
-        //string fileName = argumentList[2];
-        storageFile.name(argumentList[2]);
+        cout << "test filename triggered" << endl;
+        baseFileName = argumentList[2];
+        cout << "base filename: " << baseFileName << endl;
     }
-    //
-    //if 3rd argument provided, it's the name of the file with the omega array
+
+    //if 3rd argument provided, choose which wavefunction to use and which loops to run
     if( numberOfArguments > 3 )
     {
-        omegaVec.resize(0);
-        parameters.resize(0);
-        std::string omegaFilename = argumentList[3];
-        storage omegaStore(omegaFilename);
-        omegaStore.in(omegaVec);
-        parameters.push_back(0.0);
-        parameterNames.push_back("omega");
+        cout << "test wavefunction triggered " << endl;
+        int value = atoi(argumentList[3]);
+        if( value == 0 )
+        {
+            cout << "naive hamiltonian" << endl;
+            WF = new trialWF1Naive( NParticles, NDimensions );
+        }
+        else if( value == 1 )
+        {
+            cout << "full hamiltonian." << endl;
+            WF = new trialWF1Full( NParticles, NDimensions );
+        }
     }
-    // if 4th argument provided, set alpha start, stop and step from provided file
+
+    //if 4thd argument provided, it's the name of the file with the omega array
     if( numberOfArguments > 4 )
     {
-        alphaVec.resize(0);
-        std::string alphaFilename = argumentList[4];
-        storage alphaStore(alphaFilename);
-        alphaStore.in(alphaVec);
+        cout << "test omega triggered" << endl;
+        omegaVec.resize(0);
+        parameters.resize(0);
+        std::string omegaFilename = argumentList[4];
+        storage omegaStore(omegaFilename);
+        omegaStore.in(&omegaVec);
         parameters.push_back(0.0);
-        parameterNames.push_back("alpha");
+        parameterNames.push_back("omega");
+        cout << "size of omegaVec is: " << omegaVec.size() << endl;
+        omegaStore.oClose();
+        for( auto i: omegaVec )
+        {
+            cout << i << endl;
+        }
     }
-    // if 5th argument provided, set beta start, stop and step from provided file
+
+    // if 5th argument provided, set alpha start, stop and step from provided file
     if( numberOfArguments > 5 )
     {
+        cout << "test alpha triggered" << endl;
+        alphaVec.resize(0);
+        std::string alphaFilename = argumentList[5];
+        storage alphaStore(alphaFilename);
+        alphaStore.in(&alphaVec);
+        parameters.push_back(0.0);
+        parameterNames.push_back("alpha");
+        cout << "size of alphaVec is: " << alphaVec.size() << endl;
+        alphaStore.oClose();
+        for( auto i: alphaVec )
+        {
+            cout << i << endl;
+        }
+    }
+
+    // if 5th argument provided, set beta start, stop and step from provided file
+    if( numberOfArguments > 6 )
+    {
+        cout << "test beta triggered" << endl;
         betaVec.resize(0);
-        std::string betaFilename = argumentList[5];
+        std::string betaFilename = argumentList[6];
         storage betaStore(betaFilename);
-        betaStore.in(betaVec);
+        betaStore.in(&betaVec);
         parameters.push_back(0.0);
         parameterNames.push_back("beta");
     }
 
+    string headLine;
+    for( unsigned int i = 1; i < parameterNames.size(); i++ )
+    {
+        cout << "parameterName element: " << parameterNames[i] << endl;
+        headLine += parameterNames[i]+" ";
+    }
+    headLine += "E Variance Ratio";
+    cout << "headline set to " << headLine << endl;
 
     //------------------------------------------------------
     // Program timer
     //------------------------------------------------------
     steady_clock::time_point programStart = steady_clock::now();
 
-    //------------------------------------------------------
-    // System variables
-    //------------------------------------------------------
-    int NParticles = 2;
-    int NDimensions = 3;
-    //double omega = 1.0;
-    // VMC variables
-    int MCCycles = 1e6;
-    //double stepLength; //= 1.0; // should give ~50% acceptance
+
+
     //
     VMCSystem VMC( NParticles, NDimensions, processors, processRank );
     //------------------------------------------------------
     //WAVEFUNCTION
     //------------------------------------------------------
-    Wavefunction *WF;
-    //
-    WF = new trialWF1Naive( NParticles, NDimensions );
     //
     VMC.setWaveFunction( WF );
 
-    //------------------------------------------------------
-    //      STORAGE INITIATE
-    //------------------------------------------------------
-
-
-
-    string headline; //= "alpha E Variance {Acceptance ratio}";
-    string headBit;
-    int headMembers;
-    cout << "number of head members: " << endl;
-    cin >> headMembers;
-    //cout << "number of elements in headline: " << headMembers << endl;
-    for( int count = 0; count < headMembers; count ++ )
-    {
-        cout << "\nnext head element: ";
-        cin >> headBit;
-        headline += headBit+" ";
-        headBit = "";
-    }
-    storageFile.dat(headline);
-    cout << "\n----------------------------------------------\n"
-        << headline << endl;
 
     //------------------------------------------------------
-    //  RUNNING VMC
+    //  Setting stepLength
     //------------------------------------------------------
-
-    //------------------------------------------------------
-    //      INPUT VALUES
-    //------------------------------------------------------
-    int omegaSize;
-    cout << "\nomegaSize: \n";
-    cin >> omegaSize;
-    cout << "omegaSize: " << omegaSize << endl;
-    arma::Col<double> omega = arma::zeros(omegaSize);
-    arma::Col<double> stepLength = arma::zeros(omega.size());
-    for( int index = 0; index < omegaSize; index++ )
-    {
-        cout << "\nomega("<<index<<"): ";
-        cin >>  omega(index);
-    }
-
-    for( int index= 0; index < omegaSize; index++ )
+    vector<double> stepLength(omegaVec.size());
+    for( unsigned int index= 0; index < omegaVec.size(); index++ )
     {
         std::cout
             << "\n------------------------------------------------------\n"
-            << "\n omega = " << omega(index) << "\n";
-        parameters[0] = omega(index);
+            << "\n omega = " << omegaVec[index] << "\n";
+        parameters[0] = omegaVec[index];
         parameters[1] = 1;
-        stepLength(index) = VMC.stepFinder( parameters );
+        stepLength[index] = VMC.stepFinder( parameters );
     }
-    std::cout
-        << "\n------------------------------------------------------\n";
 
-    cout << headline << endl;
+    //------------------------------------------------------
+    // looping over variables
+    //------------------------------------------------------
+    cout << headLine << endl;
+    string fileName;
     for( unsigned int index= 0; index < omegaVec.size(); index++ )
     {
-        cout << "\n----------------------------------------------------\n";
+        std::cout
+            << "\n------------------------------------------------------\n";
+        fileName = baseFileName + "Omega" + std::to_string(omegaVec[index]) + ".dat";
+
+        storage storageFile(fileName);
+        storageFile.out();
+        storageFile.dat(headLine);
+
         for( double alpha = alphaVec[0]; alpha < alphaVec[1]; alpha += alphaVec[2])
         {
-//            if( processRank == 0 )
-//            {
-//                std::cout
-//                    << "\n------------------------------------------------------\n"
-//                    << " alpha = " << alpha << "\n";
-//            }
-            //running variational MC
-            parameters[0] = omega(index);
+            //running variationaVecl MC
+            parameters[0] = omegaVec[index];
             parameters[1] = alpha;
             WF -> setParameters( parameters );
-            VMC.runVMC( MCCycles, stepLength(index) );
+            VMC.runVMC( MCCycles, stepLength[index] );
 
             // storing run
             if( processRank == 0 )
             {
-                storageFile.lineAdd( std::to_string(omega(index)) );
                 storageFile.lineAdd( std::to_string(alpha) );
                 storageFile.lineAdd( std::to_string(VMC.energy()/double(MCCycles)) );
                 storageFile.lineAdd( std::to_string( ( VMC.energySquared() - (VMC.energy()*VMC.energy()/MCCycles) )/double(MCCycles) ) );
@@ -190,15 +199,9 @@ int main( int numberOfArguments, char *argumentList[])
                 cout << storageFile.getLine() << endl;
                 storageFile.dat();
                 storageFile.lineClean();
-            // printout
-               // std::cout << std::setprecision(16)
-               //     << "Mean energy:       " << VMC.energy()/double(MCCycles) << "\n"
-               //     << "Variance(Energy):  " << (VMC.energySquared() - (VMC.energy()*VMC.energy()/double(MCCycles))) / double(MCCycles) << "\n"
-               //     << "Acceptance ratio:  " << VMC.ratio()
-               //     << std::endl;
             }
-
         } // end for alpha
+        storageFile.oClose();
     } // end for omega
 
 
@@ -212,7 +215,7 @@ int main( int numberOfArguments, char *argumentList[])
         std::cout << "runtime complete. time used: \n"
              << double(programTime.count())/3600.0 << " hrs ("
              << programTime.count() << ")" << std::endl;
-        storageFile.oClose();
+        //storageFile.oClose();
     }
 
     //------------------------------------------------------

@@ -18,7 +18,7 @@ trialWF1Naive::trialWF1Naive
 
 double trialWF1Naive::sumSquares
 (
- const arma::Mat<double> & positions
+ const vector< vector<double> > & positions
 )
 {
     double sumSquares = 0;
@@ -27,8 +27,8 @@ double trialWF1Naive::sumSquares
     {
         for( int dimension = 0; dimension < m_NDimensions; dimension++)
         {
-            sumSquares += positions(particle, dimension)
-                         *positions(particle, dimension);
+            sumSquares += positions[particle][dimension]
+                         *positions[particle][dimension];
         }
     }
     return sumSquares;

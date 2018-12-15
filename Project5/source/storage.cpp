@@ -2,6 +2,7 @@
 #include <armadillo>
 #include <string>
 #include <sstream>
+#include <vector>
 
 
 void storage::bin(vec Array)
@@ -26,8 +27,9 @@ void storage::bin(vec Array)
 } // end of bin
 
 
-void storage::in( std::vector<double> importVec )
+void storage::in( std::vector<double> *importVec )
 {
+    std::cout << "opening file" << std::endl;
     m_iFile.open(m_fileName);
     std::string str;
     while( std::getline( m_iFile,  str ) )
@@ -37,8 +39,15 @@ void storage::in( std::vector<double> importVec )
             std::istringstream strstream(str);
             double strDouble;
             strstream >> strDouble;
-            importVec.push_back(strDouble);
+            //std::cout << strDouble << std::endl;
+            importVec -> push_back(strDouble);
         }
     }
+    //std::cout << "printing vec "  << std::endl;
+    //for( auto i: importVec )
+    //{
+    //    std::cout << i << std::endl;
+    //}
+    //std::cout << "finished print" << std::endl;
     m_iFile.close();
 } // end if inVector

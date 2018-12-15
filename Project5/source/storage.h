@@ -13,7 +13,7 @@ using arma::vec;
 class storage
 {
     public:
-        storage();  // construtor
+        storage() {}  // construtor
 
         storage(string fileName)
         { // constructor w/ fileName
@@ -30,6 +30,10 @@ class storage
            m_oFile.open(
                    m_fileName, std::ofstream::out
                );
+           if( !m_oFile )
+           {
+                std::cout << "couldn't open file" << m_fileName << std::endl;
+           }
        }
        void dat()
        {
@@ -40,19 +44,22 @@ class storage
            m_oFile << line << "\n";
        }
        void bin(vec Array);
+       //-----------------------------------------------
        // setters and getters?
+       //-----------------------------------------------
        void name(string fileName)
        {
            m_fileName = fileName;
        }
        string getLine() { return m_line; }
+       string getName() { return m_fileName; }
 
 
 
        //-----------------------------------------------
        // Reads
        //-----------------------------------------------
-       void in( std::vector<double> importVec );
+       void in( std::vector<double> *importVec );
 
        //-----------------------------------------------
        // Lines

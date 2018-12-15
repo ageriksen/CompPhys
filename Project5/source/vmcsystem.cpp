@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <random>
 #include <mpi.h>
 
 //------------------------------------------------------
@@ -44,8 +45,10 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
     {
         for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
         {
-            m_positionsOld(particle, dimension) = uniformDistribution( engine );
-            m_positionsNew(particle, dimension) = m_positionsOld(particle, dimension);
+            m_positionsOld[particle][dimension]
+                = uniformDistribution( engine );
+            m_positionsNew[particle][dimension]
+                = m_positionsOld[particle][dimension];
         }
     }
 
@@ -71,7 +74,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
             //Suggest update
             for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
             {
-                m_positionsNew(particle, dimension) = m_positionsOld(particle, dimension)
+                m_positionsNew[particle][dimension] = m_positionsOld[particle][dimension]
                                                     + steplength*uniformDistribution( engine );
             } // end update suggestion
             // and finds new wavefunction exponent
@@ -86,7 +89,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
                 m_oldWaveFunction = m_newWaveFunction;
                 for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
                 {
-                    m_positionsOld(particle, dimension) = m_positionsNew(particle, dimension);
+                    m_positionsOld[particle][dimension] = m_positionsNew[particle][dimension];
                 }
                 // Update acceptance:
                 acceptance++;
@@ -96,7 +99,7 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
                 m_newWaveFunction = m_oldWaveFunction;
                 for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
                 {
-                    m_positionsNew(particle, dimension) = m_positionsOld(particle, dimension);
+                    m_positionsNew[particle][dimension] = m_positionsOld[particle][dimension];
                 }
             }
         } // end of metropolis per particle
@@ -131,16 +134,16 @@ void VMCSystem::runVMC( int MCCycles, double steplength )
 //------------------------------------------------------
 //  STEP FINDER
 //------------------------------------------------------
-double VMCSystem::stepFinder( arma::Col<double> param )
+double VMCSystem::stepFinder( vector<double> param )
 {
     // variable setup
     double trialStep;
     int quickMC = 1e5; // only need acceptance ratio, not exact results
-    double acceptanceMin = 0.45; // lower bound on acceptance ratio
-    double acceptanceMax = 0.55; // upper bound on acceptance ratio
+    double acceptanceMin = 0.48; // lower bound on acceptance ratio
+    double acceptanceMax = 0.53; // upper bound on acceptance ratio
     double currentAccept;
-    double deltaMin = 0.01/double(param(0)); // min delta value tested and step
-    double deltaMax = 10/double(param(0));  // max delta value tested
+    double deltaMin = 0.01/double(param[0]); // min delta value tested and step
+    double deltaMax = 10/double(param[0]);  // max delta value tested
     std::cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  std::endl;
 
     //testing steplengths
