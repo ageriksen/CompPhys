@@ -76,6 +76,23 @@ wed 12/12-18:
     17:57: Mostly up and running. Needed to add another rule to makefile "CC = mpic++" and not include any headers in rule "all".
 Need to make a "stepFinder" function for finding correct steplength based on oscillator frequency. and need to rewrite setParameters so it takes
 vector<double> rather than individual doubles, so I can send in varying amounts of variables.
+    23:46: Probably implemented stepFinder function. Strange error upon execution, not compilation, seeming to come from MPI, or possibly strange access to
+an armadillo vector.
+    00:35: Found error. There was a vector initialized with itself as the input. It has been corrected.
+
+thurs 13/12-18:
+    10:06: looking at implementation of stepfinder, trying to cut fat. Need to implement m_kinetic and m_potential in wavefunction.
+    00:47: Been hectic. Have confirmed functional steplength finder and functional vmc method for case of alpha. Currently working on implementing
+conditional tests for number of variables. Looking into creating implementation of either wavefunction, or vmc system for appropriate amount of loops.
+Perhaps a "runvmc" like method in the appropriate wavefunction, so that the wavefunction decides on the amount of loops.
+
+fri 14/12-18:
+    08:18: From what I understand, there seems to be an issue with the calling of the function. Though I am unsure of what.
+    00:12: I figured out the issue with indexes of std::vectors. I have now written the interactive wavefunction class and can work on implementing the correct
+number of loops.
+    02:00: Debugging of program using vector is now complete and the program is running smoothly for now. I think the current solution will be implementing
+2 functions in main to switch between depending on input. Alternatively, use parameters as a matrix of all the info I send in. The last could get hairy due to
+unequal length of certain variable arrays.
 
 
 ---------------------------------------
@@ -84,12 +101,18 @@ vector<double> rather than individual doubles, so I can send in varying amounts 
 
 Priority A
     x write in calls to "store" class and formulate output to file I can load into report.
-    o Settle at, or decide on stepLength, alphaLength and betaLength for optimal precision
+    x Settle at, or decide on stepLength, alphaLength and betaLength for optimal precision
+    x add stepFinder function for varyin steplength according to omega | according to the project text, stepLength should be found per alpha.
+    x rewrite virtual void setParameters(double, double) to ( vector<double> )
+    x add fileReader function to storage
+    x implement if tests to read values needed
     o Run through steps up untill alpha and beta have been chosen well enough.
-    o implement storing Ek and Ep, not just E and E^2
-    o change table of results to plot of energy vs. alpha or something.
-    o rewrite virtual void setParameters(double, double) to ( vector<double> )
-    o add stepFinder function for varyin steplength according to omega
+    o change table of results to plot.
+    o implement m_kinetic and m_potential for wavefunction class. Currently thinking splitting "calculate" so it returns m_kinetic + m_potential.
+    o implement trial1 interaction and trial 2
+    o implement r_12
+    o rewrite classes to std::vector where necessary
+    o implement conditional loops over possible variables -> varied functions in vmcsystem?
 
 Priority C
     x Rename store class function names to capitalize beginnings of words not at beginning of name, e.g. lineadd to lineAdd.

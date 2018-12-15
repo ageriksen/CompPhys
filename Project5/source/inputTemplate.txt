@@ -1,7 +1,0 @@
-../data/filename.dat
-headline // 1st line to be written into filename.dat
-paramSize//number of parameters impacting wavefunction and energy.
-omegaSize
-omega(i)
-... for omegaSize
-
