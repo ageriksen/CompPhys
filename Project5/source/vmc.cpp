@@ -34,6 +34,9 @@ void VMC::runVMC( int MCCycles, double steplength )
     m_energySquared = 0;
     //reset acceptance as well
     m_acceptRatio = 0;
+    m_distance = 0;
+    m_kinetic = 0;
+    m_potential = 0;
 
     //------------------------------------------------------
     // RNG setup
@@ -114,8 +117,12 @@ void VMC::runVMC( int MCCycles, double steplength )
         // New local energy
         //------------------------------------------------------
         localEnergy = m_WF -> localEnergy(m_positionsNew);
+
         m_energy += localEnergy;
         m_energySquared += localEnergy*localEnergy;
+        m_distance += m_wF->distance();
+        m_kinetic += m_WF->kinetic();
+        m_potential += m_WF->potential();
 
 
     } // end of MCCycles
@@ -128,13 +135,26 @@ void VMC::runVMC( int MCCycles, double steplength )
     double tmpEnergy = 0;
     double tmpEnergySquared = 0;
     double tmpAcceptRatio = 0;
+    double tmpDistance = 0;
+    double tmpKinetic = 0;
+    double tmpPotential = 0;
 
     MPI_Reduce( &m_energy,          &tmpEnergy,         1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce( &m_energySquared,   &tmpEnergySquared,  1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce( &m_acceptRatio,     &tmpAcceptRatio,    1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_distance,        &tmpDistance,       1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_kinetic,         &tmpKinetic,        1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( &m_potential,       &tmpPotential,      1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    m_variance = ( m_energySquared - m_energy*m_energy/double(m_MCCyclesFull))/double(m_MCCyclesFull);
-    m_energyMean = m_energy/double(m_MCCyclesFull);
+    m_energy = tmpEnergy;
+    m_energySquared = tmpEnergySquared;
+    m_acceptRatio = tmpAcceptRatio/m_processors;
+    m_distance = tmpDistance/double(m_MCCyclesFull*m_processors);
+    m_kinetic = tmpKinetic/double(m_MCCyclesFull*m_processors);
+    m_potential= tmpPotential/double(m_MCCyclesFull*m_processors);
+
+    m_variance = ( m_energySquared - m_energy*m_energy/double(m_MCCyclesFull*m_processors))/double(m_MCCyclesFull*m_processors);
+    m_energyMean = m_energy/double(m_MCCyclesFull*m_processors);
 
 
 } // end runVMC

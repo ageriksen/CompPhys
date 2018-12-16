@@ -26,12 +26,17 @@ class trialWF2: public Wavefunction
         double omega() { return m_omega; }
         double alpha() { return m_alpha; }
         double beta() { return m_beta; }
+        double distance() { return m_distance; }
+        double kinetic() { return m_kinetic; }
+        double potential() { return m_potential; }
 
     private:
         double m_omega = 0;
         double m_alpha = 0;
         double m_beta = 0;
-        double m_distanceSquared = 0;
+        double m_distance = 0;
+        double m_kinetic = 0;
+        double m_potential = 0;
 }; // end of trialWF2
 
 inline double trialWF2::distance( const vector< vector<double> > &positions )

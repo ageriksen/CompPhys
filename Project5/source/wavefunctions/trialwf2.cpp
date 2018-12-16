@@ -31,13 +31,14 @@ double trialWF2::sumSquares( const vector< vector<double> > &positions)
 
 double trialWF2::distanceSquared( const vector< vector<double> > &positions )
 {
-    double difference;
+    double difference = 0;
+    double distanceSquared = 0;
     for( int dimension = 0; dimension < m_NDimensions; dimension++ )
     {
         difference += positions[0][dimension] - positions[1][dimension];
-        m_distanceSquared += difference*difference;
+        distanceSquared += difference*difference;
     }
-    return  m_distanceSquared;
+    return  distanceSquared;
 }
 
 double trialWF2::localEnergy( const vector< vector<double> > &positions )
@@ -55,5 +56,8 @@ double trialWF2::localEnergy( const vector< vector<double> > &positions )
     energy.push_back(
             0.5*m_omega*m_omega*sumSquares(positions) + 1.0/r12
                     );
+    m_kinetic = energy[0];
+    m_potential = energy[1];
+    m_distance = r12;
     return energy[0]+energy[1];
 }

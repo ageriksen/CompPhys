@@ -42,7 +42,7 @@ int main( int numberOfArguments, char *argumentList[])
     int NParticles = 2;
     int NDimensions = 3;
     // VMC variables
-    int MCCycles = 1e6;
+    int MCCycles = 1e5;
 
     //------------------------------------------------------
     // Imported Variables

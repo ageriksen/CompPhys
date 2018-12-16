@@ -93,6 +93,9 @@ class VMC
         double m_energySquared = 0;
         double m_variance = 0;
         double m_stepLength = 0;
+        double m_distance = 0;
+        double m_kinetic = 0;
+        double m_potential = 0;
 }; // end VMC class
 
 #endif // end of VMCSYSTEM_H
