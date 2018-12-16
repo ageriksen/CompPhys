@@ -86,10 +86,14 @@ int main( int numberOfArguments, char *argumentList[])
     stepLength.resize(omegaVec.size(), 0 );
 
     parameters.push_back(omegaVec);
-    cout << "size of omegaVec is: " << parameters[0].size() << endl;
-    for( double i: parameters[0] )
+    parameters.push_back(omegaVec); // second one is for the steplength
+    if( processRank == 0 )
     {
-        cout << i << endl;
+        cout << "size of omegaVec is: " << parameters[0].size() << endl;
+        for( double i: parameters[0] )
+        {
+            cout << i << endl;
+        }
     }
 
     //-----------------------------
@@ -104,12 +108,7 @@ int main( int numberOfArguments, char *argumentList[])
     parameterNames.push_back("alpha");
     if( processRank == 0 )
     {
-        cout << "size of alphaVec is: " << alphaVec.size() << endl;
-        for( double element : alphaVec )
-        {
-            cout << element << endl;
-        }
-        cout << "size of parameters is: " << parameters[2].size() << endl;
+        cout << "size of alphaVec is: " << parameters[2].size() << endl;
         for( double i: parameters[2])
         {
             cout << i << endl;
@@ -170,6 +169,12 @@ int main( int numberOfArguments, char *argumentList[])
         cout << "entering stepFinder" << endl;
         parameters[1][index] = vmc.stepFinder( param );
     }
+    storage deltaSaver("./resources/delta.dat");
+    for( double delta: parameter[1] )
+    {
+        deltaSaver.dat( to_string(delta) );
+    }
+    deltaSaver.close();
 
     //------------------------------------------------------
     // Finding ideal alpha, storing variables

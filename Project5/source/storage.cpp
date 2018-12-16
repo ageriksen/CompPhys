@@ -39,7 +39,6 @@ void storage::in( std::vector<double> *importVec )
             std::istringstream strstream(str);
             double strDouble;
             strstream >> strDouble;
-            std::cout << strDouble << std::endl;
             importVec -> push_back(strDouble);
         }
     }

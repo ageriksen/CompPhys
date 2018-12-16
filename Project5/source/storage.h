@@ -9,8 +9,6 @@
 using std::string;
 using arma::mat;
 using arma::vec;
-using std::cout;
-using std::endl;
 
 class storage
 {
@@ -40,6 +38,7 @@ class storage
        void dat()
        {
            m_oFile << m_line << "\n";
+           m_line = "";
        }
        void dat(string line)
        {

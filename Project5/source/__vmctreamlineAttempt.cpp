@@ -57,6 +57,8 @@ void VMC::runVMC( int MCCycles, double steplength )
         }
     }
 
+
+
     //------------------------------------------------------
     // MCCycles split amongst processors:
     //------------------------------------------------------
@@ -121,6 +123,10 @@ void VMC::runVMC( int MCCycles, double steplength )
     } // end of MCCycles
     m_acceptRatio = double(acceptance)/double(m_NParticles*m_MCCycles);
 
+    if( m_rank == 0 )
+    {
+        cout << m_acceptRatio << endl;
+    }
 
     //------------------------------------------------------
     // Gathering data from processors
@@ -143,7 +149,7 @@ void VMC::runVMC( int MCCycles, double steplength )
 //------------------------------------------------------
 //  STEP FINDER
 //------------------------------------------------------
-double VMC::stepFinder( vector<double> param )
+vector<double> VMC::stepFinder( vector<double> parameters )
 {
     // variable setup
     double trialStep;
@@ -151,35 +157,44 @@ double VMC::stepFinder( vector<double> param )
     double acceptanceMin = 0.48; // lower bound on acceptance ratio
     double acceptanceMax = 0.53; // upper bound on acceptance ratio
     double currentAccept;
-    double deltaMin = 0.01/double(param[0]); // min delta value tested and step
-    double deltaMax = 10/double(param[0]);  // max delta value tested
-    std::cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  std::endl;
 
-    //testing steplengths
-    for( double delta = deltaMin; delta < deltaMax; delta += deltaMin )
+    vector<double> deltaVec;
+    vector<double> param(2);
+    param[1] = 1;
+    storage deltaSaver("./resources/delta.dat");
+
+    Wavefunction *WF;
+    WF = new trialWF1Naive( 2, 2 );
+
+    for( double omega: parameters )
     {
-        this -> m_WF -> setParameters( param );
-        this -> runVMC( quickMC, delta );
-
-        //std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
-
-        if(  m_acceptRatio > acceptanceMin && m_acceptRatio < acceptanceMax)
+        param[0] = omega;
+        cout << "omega: " << param[0] << endl;
+        double deltaMin = 0.01/double(omega); // min delta value tested and step
+        double deltaMax = 10/double(omega);  // max delta value tested
+        cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  endl;
+        //testing steplengths
+        for( double delta = deltaMin; delta < deltaMax; delta += deltaMin )
         {
-            currentAccept = m_acceptRatio;
-            trialStep = delta;
-            std::cout << "steplength: " << trialStep << "\n"
-                      << "acceptRatio: " << currentAccept << std::endl;
-            clean();
-            return trialStep;
+            WF -> setParameters( param );
+            this -> runVMC( quickMC, delta );
+
+            if(  m_acceptRatio > acceptanceMin && m_acceptRatio < acceptanceMax)
+            {
+                currentAccept = m_acceptRatio;
+                trialStep = delta;
+                std::cout << "steplength: " << trialStep << "\n"
+                          << "acceptRatio: " << currentAccept << std::endl;
+                deltaVec.push_back(trialStep);
+            }
         }
     }
-    if( m_rank == 0 )
+    for( double delta : deltaVec )
     {
-        std::cout << "could not find a good steplength" << std::endl;
-//        exit(0);
+        deltaSaver.dat(to_string(delta));
     }
-    clean();
-    return 5;
+    deltaSaver.close();
+    return deltaVec;
 }// end stepFinder
 
 //------------------------------------------------------
@@ -225,18 +240,17 @@ vector<double> VMC::alpha0
     string baseName
 )
 {
-    cout << "entered alpha0" << endl;
     double tmpAlpha;
     double varianceMin;
     double delta;
     string tmpLine;
     vector<double> param(2);
     vector<double> alphaMin;
+    vector<string> line;
     for( unsigned int omega = 0; omega < parameters[0].size(); omega++ )
     {
         delta = parameters[1][omega];
         varianceMin = 10; // pretty sure the variance should dip WAY below this.
-        vector<string> line;
         tmpAlpha = 0;
         tmpLine = "";
         for( unsigned int alpha = 0; alpha < parameters[2].size(); alpha++ )
@@ -247,12 +261,12 @@ vector<double> VMC::alpha0
             runVMC( MCCycles, delta );
             if( m_rank == 0 )
             {
-                tmpLine = to_string(parameters[2][alpha]) + " "
+                tmpLine += to_string(parameters[2][alpha]) + " "
                         + to_string(m_energyMean) + " "
                         + to_string(m_variance) + " "
                         + to_string(m_acceptRatio);
+                cout << tmpLine << endl;
                 line.push_back(tmpLine);
-                //cout << tmpLine << endl;
                 if( m_variance < varianceMin )
                 {
                     tmpAlpha = parameters[2][alpha];
@@ -268,8 +282,8 @@ vector<double> VMC::alpha0
             cout << "-------------------------------------" << endl;
             for( string element: line )
             {
+                //cout << element << endl;
                 variableSaver.dat(element);
-                cout << element << endl;
             }
             variableSaver.close();
         }
