@@ -225,7 +225,6 @@ int main( int numberOfArguments, char *argumentList[])
     }
     else
     {
-        cout << " Let's a go a lookin' for the alpha0" << endl;
         alpha0Vec = vmc.alpha0(parameters, MCCycles, baseFileName );
     }
 
@@ -247,6 +246,7 @@ int main( int numberOfArguments, char *argumentList[])
         }
         for( unsigned int index = 0; index < parameters[0].size(); index++ )
         {
+            cout << "optimizing. omega = " << parameters[0][index] << endl;
             omegaName = baseFileName + to_string(parameters[0][index] ) + ".dat";
             optimized[0] = parameters[0][index];
             minima = vmc.optimize( parameters, range, parameters[1][index], alpha0Vec[index] );
