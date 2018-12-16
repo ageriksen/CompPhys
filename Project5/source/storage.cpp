@@ -39,15 +39,9 @@ void storage::in( std::vector<double> *importVec )
             std::istringstream strstream(str);
             double strDouble;
             strstream >> strDouble;
-            //std::cout << strDouble << std::endl;
+            std::cout << strDouble << std::endl;
             importVec -> push_back(strDouble);
         }
     }
-    //std::cout << "printing vec "  << std::endl;
-    //for( auto i: importVec )
-    //{
-    //    std::cout << i << std::endl;
-    //}
-    //std::cout << "finished print" << std::endl;
     m_iFile.close();
 } // end if inVector

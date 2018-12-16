@@ -9,6 +9,8 @@
 using std::string;
 using arma::mat;
 using arma::vec;
+using std::cout;
+using std::endl;
 
 class storage
 {
@@ -73,7 +75,7 @@ class storage
        //-----------------------------------------------
        // Close
        //-----------------------------------------------
-       void oClose()
+       void close()
        {
            m_oFile.close();
        }
