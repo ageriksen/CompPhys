@@ -2,8 +2,11 @@
 #define TRIALWF1FULL_H
 
 #include "wavefunction.h"
+#include <iostream>
 
 //using std::vector;
+using std::cout;
+using std::endl;
 
 class trialWF1Full: public Wavefunction
 {

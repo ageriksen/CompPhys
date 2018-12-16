@@ -158,7 +158,7 @@ double VMC::stepFinder( vector<double> param )
     //testing steplengths
     for( double delta = deltaMin; delta < deltaMax; delta += deltaMin )
     {
-        this -> m_WF -> setParameters( param );
+        m_WF -> setParameters( param );
         this -> runVMC( quickMC, delta );
 
         //std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
@@ -265,6 +265,7 @@ vector<double> VMC::alpha0
         {
             alphaMin.push_back(tmpAlpha);
             storage variableSaver(baseName + to_string(omega) + ".dat");
+            variableSaver.out();
             cout << "-------------------------------------" << endl;
             for( string element: line )
             {
@@ -273,6 +274,13 @@ vector<double> VMC::alpha0
             }
             variableSaver.close();
         }
+    }
+    cout << "time to save this stuff." << endl;
+    storage alpha0Saver("./resources/alpha0.dat");
+    alpha0Saver.out();
+    for( double alpha0: alphaMin )
+    {
+        alpha0Saver.dat(to_string(alpha0));
     }
     return alphaMin;
 } // end alpha0

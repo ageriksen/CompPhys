@@ -34,7 +34,13 @@ class trialWF2: public Wavefunction
         double m_distanceSquared = 0;
 }; // end of trialWF2
 
-double inline trialWF2::distance( const vector< vector<double> > &positions )
+inline double trialWF2::distance( const vector< vector<double> > &positions )
 { return std::sqrt( distanceSquared(positions) ); }
+
+inline double trialWF2::powers( const vector< vector<double> > &positions )
+{
+    return 0.5*( 1.0/( 1.0/distance(positions) + m_beta )
+         - m_alpha*m_omega*sumSquares(positions) );
+}
 
 #endif // end TRIALWF2_H

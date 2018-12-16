@@ -61,6 +61,8 @@ class VMC
         double energy() { return m_energy; }
         double energySquared() { return m_energySquared; }
         double ratio() { return m_acceptRatio; }
+        double meanEnergy() { return m_energyMean; }
+        double variance() { return m_variance; }
         //
         void setWaveFunction( Wavefunction * WF )
         {

@@ -3,6 +3,7 @@
 #include "wavefunctions/wavefunction.h"
 #include "wavefunctions/trialwf1naive.h"
 #include "wavefunctions/trialwf1full.h"
+#include "wavefunctions/trialwf2.h"
 #include <mpi.h>
 #include <iostream>
 #include <iomanip>
@@ -19,6 +20,7 @@ using std::cin;
 using std::endl;
 using std::string;
 using std::vector;
+using std::to_string;
 
 //------------------------------------------------------
 //  MAIN
@@ -42,7 +44,6 @@ int main( int numberOfArguments, char *argumentList[])
     // VMC variables
     int MCCycles = 1e6;
 
-
     //------------------------------------------------------
     // Imported Variables
     //------------------------------------------------------
@@ -50,9 +51,10 @@ int main( int numberOfArguments, char *argumentList[])
     vector< vector<double> > parameters; //
     vector<string> parameterNames;
     vector<double> omegaVec;
-    vector<double> stepLength;
+    vector<double> deltaVec;
     vector<double> alphaVec;
     vector<double> betaVec;
+    vector<double> alpha0Vec;
     Wavefunction *WF;
     //
     //-----------------------------
@@ -75,6 +77,17 @@ int main( int numberOfArguments, char *argumentList[])
         cout << "full hamiltonian." << endl;
         WF = new trialWF1Full( NParticles, NDimensions );
     }
+    else if( value == 2 )
+    {
+        cout << "trial wavefunction 2 " << endl;
+        WF = new trialWF2( NParticles, NDimensions );
+    }
+
+    //------------------------------------------------------
+    // declaring VMC
+    //------------------------------------------------------
+    VMC vmc( NParticles, NDimensions, processors, processRank );
+    vmc.setWaveFunction( WF );
 
     //-----------------------------
     // getting omega values
@@ -83,7 +96,7 @@ int main( int numberOfArguments, char *argumentList[])
     storage omegaFinder(omegaFilename);
     omegaFinder.in(&omegaVec);
     omegaFinder.close();
-    stepLength.resize(omegaVec.size(), 0 );
+    deltaVec.resize(omegaVec.size(), 0 );
 
     parameters.push_back(omegaVec);
     parameters.push_back(omegaVec); // second one is for the steplength
@@ -114,19 +127,59 @@ int main( int numberOfArguments, char *argumentList[])
             cout << i << endl;
         }
     }
+    //------------------------------------------------------
+    //  Setting stepLength
+    //------------------------------------------------------
+    // if test accepts, read from file, else find stepLength
+    if( numberOfArguments > 6 )
+    {
+        cout << "stepLength test triggered" << endl;
+        string deltaFileName = argumentList[6];
+        storage deltaFinder(deltaFileName);
+        deltaFinder.in(&deltaVec);
+        deltaFinder.close();
+
+        cout << "size of deltaVec is: " << parameters[1].size() << endl;
+        for( unsigned int index = 0; index < parameters[1].size(); index++)
+        {
+            parameters[1][index] = deltaVec[index];
+            cout << parameters[1][index] << endl;
+        }
+    }
+    else
+    {
+        vector<double> param(2);
+        for( unsigned int index= 0; index < parameters[0].size(); index++ )
+        {
+            cout
+                << "\n------------------------------------------------------\n"
+                << "\n omega = " << parameters[0][index] << "\n";
+            param[0] = parameters[0][index];
+            param[1] = 1;
+            cout << "entering stepFinder" << endl;
+            parameters[1][index] = vmc.stepFinder( param );
+        }
+        storage deltaSaver("./resources/delta.dat");
+        deltaSaver.out();
+        for( double delta: parameters[1] )
+        {
+            deltaSaver.dat( to_string(delta) );
+        }
+        deltaSaver.close();
+    }
 
     //-----------------------------
     // if 5th argument provided, set
     // beta start, stop and step from
     // provided file
     //-----------------------------
-    if( numberOfArguments > 6 )
+    if( numberOfArguments > 7 )
     {
         cout << "test beta triggered" << endl;
-        std::string betaFilename = argumentList[6];
-        storage betaStore(betaFilename);
-        betaStore.in(&betaVec);
-        betaStore.close();
+        std::string betaFilename = argumentList[7];
+        storage betaFinder(betaFilename);
+        betaFinder.in(&betaVec);
+        betaFinder.close();
 
         parameters.push_back(betaVec);
         parameterNames.push_back("beta");
@@ -145,41 +198,74 @@ int main( int numberOfArguments, char *argumentList[])
 
 
     //------------------------------------------------------
-    // declaring VMC
-    //------------------------------------------------------
-    VMC vmc( NParticles, NDimensions, processors, processRank );
-    //------------------------------------------------------
     //WAVEFUNCTION
     //------------------------------------------------------
     //
     vmc.setWaveFunction( WF );
 
 
-    //------------------------------------------------------
-    //  Setting stepLength
-    //------------------------------------------------------
-    vector<double> param(2);
-    for( unsigned int index= 0; index < parameters[0].size(); index++ )
-    {
-        cout
-            << "\n------------------------------------------------------\n"
-            << "\n omega = " << parameters[0][index] << "\n";
-        param[0] = parameters[0][index];
-        param[1] = 1;
-        cout << "entering stepFinder" << endl;
-        parameters[1][index] = vmc.stepFinder( param );
-    }
-    storage deltaSaver("./resources/delta.dat");
-    for( double delta: parameter[1] )
-    {
-        deltaSaver.dat( to_string(delta) );
-    }
-    deltaSaver.close();
 
     //------------------------------------------------------
     // Finding ideal alpha, storing variables
     //------------------------------------------------------
-    vector<double> alpha0 = vmc.alpha0(parameters, MCCycles, baseFileName );
+    //if test returns true, find minima from file, else run.
+    if( numberOfArguments > 8 )
+    {
+        cout << "test alpha0 triggered" << endl;
+        string alpha0FileName = argumentList[8];
+        storage alpha0Finder(alpha0FileName);
+        alpha0Finder.in(&alpha0Vec);
+        alpha0Finder.close();
+
+        cout << "size of alpha0Vector is: " << alpha0Vec.size() << endl;
+        for( double i: alpha0Vec )
+        {
+            cout << i << endl;
+        }
+    }
+    else
+    {
+        cout << " Let's a go a lookin' for the alpha0" << endl;
+        alpha0Vec = vmc.alpha0(parameters, MCCycles, baseFileName );
+    }
+
+
+    //------------------------------------------------------
+    //  OPTIMIZING ALPHA AND BETA
+    //------------------------------------------------------
+    // only if beta is read in:
+    if( numberOfArguments > 7 )
+    {
+        unsigned int n = 2;
+        vector<int> range(n);
+        vector<double> minima(2);
+        vector<double> optimized(3);
+        string omegaName;
+        for( unsigned int i=0; i<n; i++)
+        {
+            range[i] = i;
+        }
+        for( unsigned int index = 0; index < parameters[0].size(); index++ )
+        {
+            omegaName = baseFileName + to_string(parameters[0][index] ) + ".dat";
+            optimized[0] = parameters[0][index];
+            minima = vmc.optimize( parameters, range, parameters[1][index], alpha0Vec[index] );
+            storage optimalSaver(omegaName);
+            optimized.push_back(minima[0]);
+            optimized.push_back(minima[1]);
+            WF -> setParameters( optimized );
+            vmc.runVMC( MCCycles*100, parameters[1][index] );
+            optimalSaver.out();
+            optimalSaver.lineAdd(
+                    to_string(optimized[1]) + " "
+                  + to_string(optimized[2]) + " "
+                  + to_string(vmc.meanEnergy()) + " "
+                  + to_string(vmc.variance()) + " "
+                  + to_string(vmc.ratio())
+                                );
+            optimalSaver.dat();
+        }
+    }
 
     //------------------------------------------------------
     // printing runtime
