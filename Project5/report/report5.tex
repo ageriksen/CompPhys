@@ -17,15 +17,19 @@
 
 \pgfplotsset{compat=1.15}
 
+%\pgfplotstableset{
+%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+%    every last row/.style={after row=\hline \bottomrule},
+%    every first column/.style={
+%        column type/.add={|}{}
+%        },
+%    every last column/.style={
+%        column type/.add={}{|}
+%        },
+%}
 \pgfplotstableset{
     every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
-    every last row/.style={after row=\hline \bottomrule},
-    every first column/.style={
-        column type/.add={|}{}
-        },
-    every last column/.style={
-        column type/.add={}{|}
-        },
+    every last row/.style={after row=\hline \bottomrule}
 }
 
 %\begin{figure}[hbtp]
@@ -142,20 +146,82 @@ symetric to accomodate the Pauli exclusion principle. % REFERENCE
 this fits well with the chosen trial wave functions, as they are symetric under spatial parity. For the variational method, we need to find the trial
 energy,
 \begin{align}
-    \ev{H} &= \frac{ \ev{H}{\Psi_T} }{ \braket{\Psi_T} }\ref{App:trialEnergy} \nonumber \\
+    \ev{H} &= \frac{ \ev{H}{\Psi_T} }{ \braket{\Psi_T} } \qq{see appendix} (\ref{App:trialEnergy}) \nonumber \\
         &= \int\dd\vec{r} E_L\qty(\vec{r}) P\qty(\vec{r}) \qq{which discretizes to } \nonumber \\
         &= \frac{1}{N_{MC}}\sum_i^{N_{MC}} P(\vec{r}) \, E_L(\vec{r}) \qq{with possibly extra variational parameters.}
 \end{align}
 
+For the MC sample, there needs to be an acceptance rule as well as a method for samping each step. The metropilis sampling equation is a decent way of deciding,
+considering the possibility of finding ratios between probabilities from the wavefunction. As a sampling rule, the basic uniform distribution works.
+Though this means discarding values outside the acceptance, it gives an acceptable result.
+
+%----------------------------------------------------------------------------------------------------------------------------------------------
+%   ALGORITHMS. SAMPLE FROM MC SIMULATINO OF LATTICE MAGNET
+%----------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{algorithm}
+    \For{ each particle }{
+        \For{ each dimension }{
+             Take a random step of length $rnd\vdot \delta$, $rnd \in [-1,1]$ \\
+             check the energetic gain in taking the step.\\
+             compare probability ratio between the 2 positions to a stochastic number $ a \in {0.0, 1.0}$\\
+            \If{ $a <= \Pr{\Delta E}$ }{
+                apply change\\
+                update positions and count
+                as an accepted configuration
+                }
+            \Else{ Keep old positions }
+
+        }
+    }
+    | Calculate forces.
+    \caption{The algorithm for 1 MC cycle. }
+\end{algorithm}
+
+The stepLength is found by running through a shorter sequence, minimizing the variance during runtime and stoping once the acceptance rate is
+acceptably close to $50\%$.
+%\begin{algorithm}
+%    1: set $\delta_{\min} =1/10\omega$ and $\delta_{\max}=10/\omega$.\\
+%    $\delta_{\min}$ also acts as step length for the loop. \\
+%    \For{ \delta{} \in{} \qty[ \delta_{\min}, \delta_{\max} ] }{
+%            \state run VMC over the given parameters, using $10^5$ samples\\
+%            \If{ Acceptance ratio \in \qty[ 0.48, 0.52 ] }{
+%                \state{} return $\delta$ and Acceptance ratio
+%            }\EndIf
+%    }\EndFor
+%\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}[1]
+    \For{ each particle }
+        \For{ each dimension }
+            \State Take a random step of length $rnd \cdot \delta$, $rnd \in [-1,1]$
+            \State check the energetic gain in taking the step.
+            \State compare probability ratio between the 2 positions to a stochastic number $a \in {0.0, 1.0}$
+            \If{ $a <= \Pr{\Delta E}$ }
+                \State apply change
+                \State update positions and count
+                \State as an accepted configuration
+            \Else
+                \State Keep old positions
+            \EndIf
+        \EndFor
+    \EndFor
+    \end{algorithmic}
+    % | Calculate forces.
+    \caption{The algorithm for 1 MC cycle. }
+\end{algorithm}
+%----------------------------------------------------------------------------------------------------------------------------------------------
+
+The program setup is of a base wavefunction class and more specific inheritors, depending on the system as well as a VMC class for Monte Carlo
 
 \section{Results}
 
 
-\begin{table}[h!tb]
-    \centering
-    \caption{Table of first run}
-    \pgfplotstabletypeset[sci]{../data/TwoParticlesNonInteractiveWF.dat}
-\end{table}
+\begin{figure}[hbtp]
+\includegraphics[scale=0.7]{../graphics/meanEnergyAndVariance.pdf}
+\caption{}
+%\label{fig:}
+\end{figure}
 
 \section{Conclusion}
 
@@ -183,28 +249,28 @@ and the last $\omega^2 ( r_1^2 + r_2^2 )$ is from the positional potential eleme
         &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:naiveLocalEnergyExpanded}
 \end{align}
 
-\subsection{second trial wavefunction local energy}
-This is a more complicated differentiation. It is eased somewhat by the fact that
-\[ \nabla_i^2 = \pdv[2]{x_i} + \pdv[2]{y_i} + \pdv[2]{z_i} \]
-gives the same result per particle, from $r_{12} = \qty| \va{r_1} - \va{r_2} | = \sqrt{ (x_1 - x_2)^2 + (y_1 - y_2) + (z_1 - z_2)^2 }$ due to the
-double derivative negating negatives. We also see a close symmetry between $x, y, z$ in that the only difference is in the direct differentiation of
-$r_{12}$. $\pdv{r_{12i}}{q} = \frac{1}{2r_{12}}(q_1 - q_2)$. Further, we have the product rule which makes the wave equation differentiation separable into
-the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2]{x_1}$, the rest can be extrapolated.
-\begin{align}
-    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
-        &= \pdv{x_1} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \frac{1}{2}\pdv{x_1}\qty( \frac{r_{12}}{1 + \beta r_{12}} ) )\nonumber \\
-    \text{using the equality } \frac{r_{12}}{1 + \beta r_{12} } = \frac{1}{\frac{1}{r_{12}} + \beta } \label{eq:equivalence} \\
-    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
-        &= -\qty( \frac{1}{r_{12}} + \beta )^{-2} \vdot \pdv{x_1} \qty( \frac{1}{r_{12}} ) \nonumber\\
-    \pdv{x_1}\qty( \frac{1}{r_{12}} ) &= -\frac{1}{r_{12}^2}(x_1 - x_2)\nonumber \\
-    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
-        &= - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} \qq{writing back into \ref{eq:equivalence}} \nonumber \\
-    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
-        &= \frac{1}{2} \pdv{x} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \qty( - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} ) ) \nonumber\\
-        &= \frac{1}{2} \qty( \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2}))^2 - \pdv{x_1} \qty( \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} )
-\end{align}
+%\subsection{second trial wavefunction local energy}
+%This is a more complicated differentiation. It is eased somewhat by the fact that
+%\[ \nabla_i^2 = \pdv[2]{x_i} + \pdv[2]{y_i} + \pdv[2]{z_i} \]
+%gives the same result per particle, from $r_{12} = \qty| \va{r_1} - \va{r_2} | = \sqrt{ (x_1 - x_2)^2 + (y_1 - y_2) + (z_1 - z_2)^2 }$ due to the
+%double derivative negating negatives. We also see a close symmetry between $x, y, z$ in that the only difference is in the direct differentiation of
+%$r_{12}$. $\pdv{r_{12i}}{q} = \frac{1}{2r_{12}}(q_1 - q_2)$. Further, we have the product rule which makes the wave equation differentiation separable into
+%the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2]{x_1}$, the rest can be extrapolated.
+%\begin{align}
+%    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
+%        &= \pdv{x_1} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \frac{1}{2}\pdv{x_1}\qty( \frac{r_{12}}{1 + \beta r_{12}} ) )\nonumber \\
+%    \text{using the equality } \frac{r_{12}}{1 + \beta r_{12} } = \frac{1}{\frac{1}{r_{12}} + \beta } \label{eq:equivalence} \\
+%    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
+%        &= -\qty( \frac{1}{r_{12}} + \beta )^{-2} \vdot \pdv{x_1} \qty( \frac{1}{r_{12}} ) \nonumber\\
+%    \pdv{x_1}\qty( \frac{1}{r_{12}} ) &= -\frac{1}{r_{12}^2}(x_1 - x_2)\nonumber \\
+%    \pdv{x_1} \qty( \frac{r_{12}}{1 + \beta r_{12}} )
+%        &= - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} \qq{writing back into \ref{eq:equivalence}} \nonumber \\
+%    \pdv[2]{x_1} \qty( e^{\frac{1}{2}\frac{r_{12}}{1 + \beta r_{12}}})
+%        &= \frac{1}{2} \pdv{x} \qty( e^{\frac{1}{2} \frac{r_{12}}{1 + \beta r_{12}}} \vdot \qty( - \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} ) ) \nonumber\\
+%        &= \frac{1}{2} \qty( \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2}))^2 - \pdv{x_1} \qty( \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} )
+%\end{align}
 
-\subsection{Trial energy transformation\label{App:trialEnergy}
+\subsection{Trial energy transformation\label{App:trialEnergy}}
 \begin{align}
     \ev{H} &= \frac{ \ev{H}{\Psi_T} }{ \braket{\Psi_T} } \nonumber \\
         &= \frac{
@@ -217,6 +283,23 @@ the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2
         &= \frac{1}{A} \int\dd\vec{r} E_L(\vec{r}) P\qty(\vec{r})\, A \qq{using} P\qty(\vec{r})\equiv \frac{\Psi_T^*\Psi_T}{A} \nonumber\\
         &= \int\dd\vec{r} E_L\qty(\vec{r}) P\qty(\vec{r})
 \end{align}
+
+\subsection{ $\Psi_{T_1}$ with electron electron interaction }
+
+
+\begin{table}[h!tb]
+    \centering
+    \caption{Table of first run}
+    \pgfplotstabletypeset[
+        sci,
+        columns/alpha/.style={column name={$\alpha$}},
+        columns/energy/.style={column name={$\langle E \rangle$}},
+        columns/variance/.style={column name={$\sigma^2$}},
+        columns/distance/.style={column name={$|r_{12}|$}},
+        columns/accept/.style={column name={acceptance}},
+    ]{../data/trial1Full/trialwf1fullomega1.dat}
+\end{table}
+
 
 \bibliography{\string~/Documents/bibliography/Bibliography}
 \end{document}
