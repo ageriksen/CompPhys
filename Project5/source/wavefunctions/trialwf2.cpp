@@ -15,6 +15,19 @@ Wavefunction( NParticles, NDimensions )
 
 }
 
+
+void trialWF2::setParameters( vector<double> parameters )
+{
+    if( parameters.size() < 3 )
+    {
+        cout << "Needs omega, alpha AND beta" << endl;
+    }
+    m_omega = parameters[0];
+    m_alpha = parameters[1];
+    m_beta = parameters[2];
+}
+
+
 double trialWF2::sumSquares( const vector< vector<double> > &positions)
 {
     double sumSquares = 0;

@@ -21,7 +21,10 @@ class trialWF1Full: public Wavefunction
         double sumSquares( const vector< vector<double> > & positions );
         double distanceSquared( const vector< vector<double> > & positions );
         double distance( const vector< vector<double> > & positions )
-        { return std::sqrt(distanceSquared(positions)); }
+        {
+            m_distance = std::sqrt(distanceSquared(positions));
+            return m_distance;
+        }
 
         double powers( const vector< vector<double> > & positions );
         double localEnergy( const vector< vector<double> > & positions );
@@ -29,11 +32,18 @@ class trialWF1Full: public Wavefunction
         // getters and setters
         double omega() {return m_omega; }
         double alpha() {return m_alpha; }
+        double kinetic() {return m_kinetic; }
+        double potential() {return m_potential; }
+        double distance() { return m_distance; }
+
 
     private:
         double m_omega = 0;
         double m_alpha = 0;
         double m_distanceSquared = 0;
+        double m_distance = 0;
+        double m_kinetic = 0;
+        double m_potential = 0;
 
 }; // end class
 
@@ -59,6 +69,8 @@ inline double trialWF1Full::localEnergy
         (
          0.5*m_omega*m_omega*sumSquares( positions ) + 1/distance(positions)
         );
+    m_kinetic = energy[0];
+    m_potential = energy[1];
     return energy[0] + energy[1];
 }
 

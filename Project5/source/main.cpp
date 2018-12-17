@@ -1,7 +1,7 @@
 #include "storage.h"
 #include "vmc.h"
 #include "wavefunctions/wavefunction.h"
-#include "wavefunctions/trialwf1naive.h"
+//#include "wavefunctions/trialwf1naive.h"
 #include "wavefunctions/trialwf1full.h"
 #include "wavefunctions/trialwf2.h"
 #include <mpi.h>
@@ -42,7 +42,7 @@ int main( int numberOfArguments, char *argumentList[])
     int NParticles = 2;
     int NDimensions = 3;
     // VMC variables
-    int MCCycles = 1e5;
+    int MCCycles = 1e3;
 
     //------------------------------------------------------
     // Imported Variables
@@ -54,7 +54,7 @@ int main( int numberOfArguments, char *argumentList[])
     vector<double> deltaVec;
     vector<double> alphaVec;
     vector<double> betaVec;
-    vector<double> alpha0Vec;
+    double alpha0;
     Wavefunction *WF;
     //
     //-----------------------------
@@ -70,7 +70,7 @@ int main( int numberOfArguments, char *argumentList[])
     if( value == 0 )
     {
         cout << "naive hamiltonian" << endl;
-        WF = new trialWF1Naive( NParticles, NDimensions );
+        //WF = new trialWF1Naive( NParticles, NDimensions );
     }
     else if( value == 1 )
     {
@@ -81,6 +81,11 @@ int main( int numberOfArguments, char *argumentList[])
     {
         cout << "trial wavefunction 2 " << endl;
         WF = new trialWF2( NParticles, NDimensions );
+    }
+    else
+    {
+        cout << "Please provide a wavefunction to run for" << endl;
+        return 1;
     }
 
     //------------------------------------------------------
@@ -213,19 +218,16 @@ int main( int numberOfArguments, char *argumentList[])
     {
         cout << "test alpha0 triggered" << endl;
         string alpha0FileName = argumentList[8];
+        vector<double> tmpVec;
         storage alpha0Finder(alpha0FileName);
-        alpha0Finder.in(&alpha0Vec);
+        alpha0Finder.in(&tmpVec);
         alpha0Finder.close();
-
-        cout << "size of alpha0Vector is: " << alpha0Vec.size() << endl;
-        for( double i: alpha0Vec )
-        {
-            cout << i << endl;
-        }
+        alpha0 = tmpVec[0];
+        cout << "alpha0 = " << alpha0 << endl;
     }
     else
     {
-        alpha0Vec = vmc.alpha0(parameters, MCCycles, baseFileName );
+        alpha0 = vmc.alpha0(parameters, MCCycles, baseFileName );
     }
 
 
@@ -239,25 +241,35 @@ int main( int numberOfArguments, char *argumentList[])
         vector<int> range(n);
         vector<double> minima(2);
         vector<double> optimized(3);
-        string omegaName;
         for( unsigned int i=0; i<n; i++)
         {
             range[i] = i;
         }
+
+        string omegaName = baseFileName + "optimized.dat";
+        storage optimalSaver(omegaName);
+        string headLine = "omega alpha beta E variance acceptance";
+        optimalSaver.out();
+        optimalSaver.dat(headLine);
+
         for( unsigned int index = 0; index < parameters[0].size(); index++ )
         {
             cout << "optimizing. omega = " << parameters[0][index] << endl;
-            omegaName = baseFileName + to_string(parameters[0][index] ) + ".dat";
-            optimized[0] = parameters[0][index];
-            minima = vmc.optimize( parameters, range, parameters[1][index], alpha0Vec[index] );
-            storage optimalSaver(omegaName);
+
+            optimized.clear();
+            optimized.push_back(parameters[0][index]);
+            minima = vmc.optimize( parameters, range, parameters[1][index], alpha0 );
             optimized.push_back(minima[0]);
             optimized.push_back(minima[1]);
+
+            cout << "optimal values for omega " << optimized[0] << " are alpha=" << optimized[1]
+                 << " and beta=" << optimized[2] << endl;
             WF -> setParameters( optimized );
             vmc.runVMC( MCCycles*100, parameters[1][index] );
-            optimalSaver.out();
+
             optimalSaver.lineAdd(
-                    to_string(optimized[1]) + " "
+                    to_string(optimized[0]) + " "
+                  + to_string(optimized[1]) + " "
                   + to_string(optimized[2]) + " "
                   + to_string(vmc.meanEnergy()) + " "
                   + to_string(vmc.variance()) + " "
@@ -265,6 +277,7 @@ int main( int numberOfArguments, char *argumentList[])
                                 );
             optimalSaver.dat();
         }
+        optimalSaver.close();
     }
 
     //------------------------------------------------------

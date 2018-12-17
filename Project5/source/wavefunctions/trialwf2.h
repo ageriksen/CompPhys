@@ -8,12 +8,7 @@ class trialWF2: public Wavefunction
     public:
         trialWF2( int NParticles, int NDimensions);
 
-        void setParameters( vector<double> parameters )
-        {
-            m_omega = parameters[0];
-            m_alpha = parameters[1];
-            m_beta = parameters[2];
-        }
+        void setParameters( vector<double> parameters );
 
         double sumSquares( const vector< vector<double> > &positions );
         double distanceSquared( const vector< vector<double> > &positions );

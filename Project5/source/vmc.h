@@ -2,6 +2,7 @@
 #define VMC_H
 
 #include "wavefunctions/wavefunction.h"
+#include <random>
 #include <vector>
 #include <string>
 
@@ -44,14 +45,12 @@ class VMC
         );
         double beta0
         ( //find optimal alpha, trial wavefunction 1
-         vector< vector<double> > parameters,
          double alpha0,
-         int MCCycles,
-         string baseName
+         int MCCycles
         );
 
-        double findAlpha( double beta  ); // find best alpha given beta
-        double findBeta ( double alpha ); // find best beta given alpha
+        double findAlpha( vector<double> param ); // find best alpha given beta
+        double findBeta ( vector<double> param ); // find best beta given alpha
 
         void clean()
         {// set all private variables to 0
