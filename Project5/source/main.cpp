@@ -144,11 +144,11 @@ int main( int numberOfArguments, char *argumentList[])
         deltaFinder.in(&deltaVec);
         deltaFinder.close();
 
-        cout << "size of deltaVec is: " << parameters[1].size() << endl;
-        for( unsigned int index = 0; index < parameters[1].size(); index++)
+        cout << "size of deltaVec is: " << deltaVec.size() << endl;
+        parameters[1] = deltaVec;
+        for( double element: parameters[1] )
         {
-            parameters[1][index] = deltaVec[index];
-            cout << parameters[1][index] << endl;
+            cout << element << endl;
         }
     }
     else
@@ -237,7 +237,7 @@ int main( int numberOfArguments, char *argumentList[])
     // only if beta is read in:
     if( numberOfArguments > 7 )
     {
-        unsigned int n = 2;
+        unsigned int n = 4;
         vector<int> range(n);
         vector<double> minima(2);
         vector<double> optimized(3);
@@ -252,15 +252,11 @@ int main( int numberOfArguments, char *argumentList[])
         optimalSaver.out();
         optimalSaver.dat(headLine);
 
-        for( unsigned int index = 0; index < parameters[0].size(); index++ )
+        for( unsigned index = 0; index < parameters[0].size(); index++ )
         {
             cout << "optimizing. omega = " << parameters[0][index] << endl;
 
-            optimized.clear();
-            optimized.push_back(parameters[0][index]);
-            minima = vmc.optimize( parameters, range, parameters[1][index], alpha0 );
-            optimized.push_back(minima[0]);
-            optimized.push_back(minima[1]);
+            optimized = vmc.optimize( WF, parameters, range, index, alpha0 );
 
             cout << "optimal values for omega " << optimized[0] << " are alpha=" << optimized[1]
                  << " and beta=" << optimized[2] << endl;

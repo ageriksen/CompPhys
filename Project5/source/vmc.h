@@ -31,9 +31,10 @@ class VMC
 
         vector<double> optimize
         (
+            Wavefunction *WF,
             vector< vector<double> > parameters,
             vector<int> range,
-            double delta, // stepLength
+            unsigned index,
             double alpha0 // best alpha for trial1
         );
 

@@ -210,23 +210,22 @@ vector<double> VMC::optimize
     Wavefunction *WF,
     vector< vector<double> > parameters,
     vector<int> range,
-    unsigned index,
+    double delta,
     double alpha0
 )
 {
+    m_stepLength = delta;
     m_parameters = parameters;
-    vector<double> minima(3);
-    minima[0] = m_parameters[0][index];
-    minima[1] = alpha0;
+    vector<double> minima(2);
+    minima[0] = alpha0;
     setWaveFunction( WF );
-    minima[2] = beta0( minima[0], m_MCCyclesFull );
-    m_stepLength = stepFinder(minima);
+    minima[1] = beta0( minima[0], m_MCCyclesFull );
     for( unsigned int i = 1; i < range.size(); i++ )
     {
         double alpha = findAlpha( minima );
         double beta = findBeta( minima );
-        minima[1] = alpha;
-        minima[2] = beta;
+        minima[0] = alpha;
+        minima[1] = beta;
     }
     return minima;
 } // end optimize
@@ -312,18 +311,22 @@ double VMC::beta0
     double delta = m_parameters[1].back();
     double energyMin = 1e6;
     double beta0 = 0;
+    cout << "delta, energyMin, beta0: " << delta << ", " << energyMin <<  ", " << beta0 << endl;
 
     string tmpLine = "";
 
     for( double beta: m_parameters[3] )
     {
-        param[2] = beta;
+        param[3] = beta;
         m_WF -> setParameters( param );
+        cout << "in the loop" << endl;
         runVMC( MCCycles, delta );
 
+        cout << "is it in m_eneryMean? glitch if yes" << endl;
+        cout << "no, it's: " << m_energyMean << endl;
         if( m_energyMean < energyMin )
         {
-            beta0 = param[2];
+            beta0 = param[3];
         }
 
     }
@@ -335,14 +338,29 @@ double VMC::beta0
 
 double VMC::findAlpha( vector<double> param)
 {
+    //double varianceMin;
+    //double alphaMin;
+    //vector<double> param(2);
+    //param[1] = beta;
+    //for( double alpha: m_parameters[1] )
+    //{
+    //    param[0] = alpha;
+    //    m_WF -> setParameters( param );
+    //    runVMC( m_MCCyclesFull, m_stepLength );
+    //    if( m_variance < varianceMin )
+    //    {
+    //        varianceMin = m_variance;
+    //        alphaMin = param[0];
+    //    }
+    //}
+
     double oldMin = param[0];
+    int counter=0;
     double epsilon = 1;
-    double ratio=epsilon*2;// ensuring ratio is greater than epsilon initially
+    double ratio=epsilon*2;
     double energyOld = 0;
     double width = param[0]*0.05; // half the width of integration;
     double delta = width*0.01;
-    int counter=0;
-
     param[0] -= width;
 
     cout << "entering alpha whileLoop" << endl;
