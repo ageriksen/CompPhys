@@ -160,9 +160,16 @@ Though this means discarding values outside the acceptance, it gives an acceptab
 %----------------------------------------------------------------------------------------------------------------------------------------------
 The stepLength is found by running through a shorter sequence, minimizing the variance during runtime and stoping once the acceptance rate is
 acceptably close to $50\%$.
-%\begin{algorithm}
-%
-%\end{algorithm}
+\begin{algorithm}
+    1: set $\delta_{\min} =1/10\omega$ and $\delta_{\max}=10/\omega$.\\
+    $\delta_{\min}$ also acts as step length for the loop. \\
+    \For{ \delta \in \qty[ \delta_{\min}, \delta{\max} ] }{
+%        i. run VMC over the given parameters, using $10^5$ samples\\
+%        \If{ Acceptance ratio \in \qty[ 0.48, 0.52 ] }{
+%            i. return $\delta$ and Acceptance ratio
+%        }
+    }
+\end{algorithm}
 
 \begin{algorithm}
     \For{ each particle }{
@@ -257,22 +264,17 @@ and the last $\omega^2 ( r_1^2 + r_2^2 )$ is from the positional potential eleme
 \subsection{ $\Psi_{T_1}$ with electron electron interaction }
 
 
-%\begin{table}[h!tb]
-%    \centering
-%    \caption{$\Psi_{T_1}$ with Hamiltonian including electro-electron interaction}
-%    \pgfplotstabletypeset[sci]{../data/trial1Full/trialwf1fullomega1.dat}
-%\end{table}
 \begin{table}[h!tb]
     \centering
     \caption{Table of first run}
     \pgfplotstabletypeset[
         sci,
-        columns/alpha/.style={column name={$\alpha$},
-        columns/energy/.style={column name={$\langle E \rangle$},
-        columns/variance/.style={column name={$\sigma^2$},
-        columns/distance/.style={column name={$|r_{12}|$},
-        columns/accept/.style={column name={acceptance}}
-    ]{../data/TwoParticlesNonInteractiveWF.dat}
+        columns/alpha/.style={column name={$\alpha$}},
+        columns/energy/.style={column name={$\langle E \rangle$}},
+        columns/variance/.style={column name={$\sigma^2$}},
+        columns/distance/.style={column name={$|r_{12}|$}},
+        columns/accept/.style={column name={acceptance}},
+    ]{../data/trial1Full/trialwf1fullomega1.dat}
 \end{table}
 
 
