@@ -158,25 +158,13 @@ Though this means discarding values outside the acceptance, it gives an acceptab
 %----------------------------------------------------------------------------------------------------------------------------------------------
 %   ALGORITHMS. SAMPLE FROM MC SIMULATINO OF LATTICE MAGNET
 %----------------------------------------------------------------------------------------------------------------------------------------------
-The stepLength is found by running through a shorter sequence, minimizing the variance during runtime and stoping once the acceptance rate is
-acceptably close to $50\%$.
-\begin{algorithm}
-    1: set $\delta_{\min} =1/10\omega$ and $\delta_{\max}=10/\omega$.\\
-    $\delta_{\min}$ also acts as step length for the loop. \\
-    \For{ \delta \in \qty[ \delta_{\min}, \delta{\max} ] }{
-%        i. run VMC over the given parameters, using $10^5$ samples\\
-%        \If{ Acceptance ratio \in \qty[ 0.48, 0.52 ] }{
-%            i. return $\delta$ and Acceptance ratio
-%        }
-    }
-\end{algorithm}
 
 \begin{algorithm}
     \For{ each particle }{
         \For{ each dimension }{
-            1: Take a random step of length $rnd\vdot \delta$, $rnd \in [-1,1]$ \\
-            2: check the energetic gain in taking the step.\\
-            3: compare probability ratio between the 2 positions to a stochastic number $ a \in {0.0, 1.0}$\\
+             Take a random step of length $rnd\vdot \delta$, $rnd \in [-1,1]$ \\
+             check the energetic gain in taking the step.\\
+             compare probability ratio between the 2 positions to a stochastic number $ a \in {0.0, 1.0}$\\
             \If{ $a <= \Pr{\Delta E}$ }{
                 apply change\\
                 update positions and count
@@ -189,7 +177,42 @@ acceptably close to $50\%$.
     | Calculate forces.
     \caption{The algorithm for 1 MC cycle. }
 \end{algorithm}
+
+The stepLength is found by running through a shorter sequence, minimizing the variance during runtime and stoping once the acceptance rate is
+acceptably close to $50\%$.
+%\begin{algorithm}
+%    1: set $\delta_{\min} =1/10\omega$ and $\delta_{\max}=10/\omega$.\\
+%    $\delta_{\min}$ also acts as step length for the loop. \\
+%    \For{ \delta{} \in{} \qty[ \delta_{\min}, \delta_{\max} ] }{
+%            \state run VMC over the given parameters, using $10^5$ samples\\
+%            \If{ Acceptance ratio \in \qty[ 0.48, 0.52 ] }{
+%                \state{} return $\delta$ and Acceptance ratio
+%            }\EndIf
+%    }\EndFor
+%\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}[1]
+    \For{ each particle }
+        \For{ each dimension }
+            \State Take a random step of length $rnd \cdot \delta$, $rnd \in [-1,1]$
+            \State check the energetic gain in taking the step.
+            \State compare probability ratio between the 2 positions to a stochastic number $a \in {0.0, 1.0}$
+            \If{ $a <= \Pr{\Delta E}$ }
+                \State apply change
+                \State update positions and count
+                \State as an accepted configuration
+            \Else
+                \State Keep old positions
+            \EndIf
+        \EndFor
+    \EndFor
+    \end{algorithmic}
+    % | Calculate forces.
+    \caption{The algorithm for 1 MC cycle. }
+\end{algorithm}
 %----------------------------------------------------------------------------------------------------------------------------------------------
+
+The program setup is of a base wavefunction class and more specific inheritors, depending on the system as well as a VMC class for Monte Carlo
 
 \section{Results}
 
