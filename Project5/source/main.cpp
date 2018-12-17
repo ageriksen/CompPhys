@@ -41,8 +41,9 @@ int main( int numberOfArguments, char *argumentList[])
     //------------------------------------------------------
     int NParticles = 2;
     int NDimensions = 3;
+    double r12 = 0;
     // VMC variables
-    int MCCycles = 1e5;
+    int MCCycles = 1e6;
 
     //------------------------------------------------------
     // Imported Variables
@@ -261,7 +262,7 @@ int main( int numberOfArguments, char *argumentList[])
             cout << "optimal values for omega " << optimized[0] << " are alpha=" << optimized[1]
                  << " and beta=" << optimized[2] << endl;
             WF -> setParameters( optimized );
-            vmc.runVMC( MCCycles*100, vmc.stepFinder( optimized ) );
+            vmc.runVMC( MCCycles*100, vmc.stepFinder( optimized ), r12 );
 
             optimalSaver.lineAdd(
                     to_string(optimized[0]) + " "
@@ -269,6 +270,7 @@ int main( int numberOfArguments, char *argumentList[])
                   + to_string(optimized[2]) + " "
                   + to_string(vmc.meanEnergy()) + " "
                   + to_string(vmc.variance()) + " "
+                  + to_string(r12) + " "
                   + to_string(vmc.ratio())
                                 );
             optimalSaver.dat();

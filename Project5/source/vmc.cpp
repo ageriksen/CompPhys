@@ -13,7 +13,7 @@ using std::endl;
 //------------------------------------------------------
 //  VRUN MC
 //------------------------------------------------------
-void VMC::runVMC( int MCCycles, double steplength )
+void VMC::runVMC( int MCCycles, double steplength, double distance )
 {
     /*
      * Implementation of the variational Monte Carlo method for finding the
@@ -34,7 +34,7 @@ void VMC::runVMC( int MCCycles, double steplength )
     m_energySquared = 0;
     //reset acceptance as well
     m_acceptRatio = 0;
-    m_distance = 0;
+    distance = 0;
     m_kinetic = 0;
     m_potential = 0;
 
@@ -120,6 +120,13 @@ void VMC::runVMC( int MCCycles, double steplength )
 
         m_energy += localEnergy;
         m_energySquared += localEnergy*localEnergy;
+
+        double difference;
+        for( int dim=0; dim<3; dim++)
+        {
+            difference = m_positionsNew[0][dim]-m_positionsOld[1][dim];
+            distance += difference*difference;
+        }
         //m_distance += m_WF->distance();
         //m_kinetic += m_WF->kinetic();
         //m_potential += m_WF->potential();
@@ -175,11 +182,13 @@ double VMC::stepFinder( vector<double> param )
     double deltaMax = 10/double(param[0]);  // max delta value tested
     std::cout << "min and step: " << deltaMin << ", max: " << deltaMax <<  std::endl;
 
+    double dummyDistance=0;
+
     //testing steplengths
     for( double delta = deltaMin; delta < deltaMax; delta += deltaMin )
     {
         m_WF -> setParameters( param );
-        this -> runVMC( quickMC, delta );
+        this -> runVMC( quickMC, delta, dummyDistance );
 
         //std::cout << "delta, acceptratio: " << delta << ", " << m_acceptRatio << "\n";
 
@@ -252,21 +261,38 @@ double VMC::alpha0
     double energyMin = m_energyMean;
     double alpha0 = 0;
 
+    double dummyDistance = 0;
+
+    storage meanTimeSaver(baseName + "omega1.dat");
+    meanTimeSaver.out();
+    string headline = "$\\alpha$ $\\langle{}E\\rangle{}$ $\\sigma^2$ $|r_{12}|$ acceptance";
+    meanTimeSaver.dat(headline);
     for( double alpha: parameters[2] )
     {
         param[1] = alpha;
 
         m_WF -> setParameters( param );
-        runVMC( MCCycles, delta );
+        runVMC( MCCycles, delta, dummyDistance );
 
         if( m_energyMean < energyMin )
         {
             alpha0 = param[1];
         }
 
-    }
+        if( m_rank == 0 )
+            {
+                tmpLine = to_string(alpha) + " "
+                        + to_string(m_energyMean) + " "
+                        + to_string(m_variance) + " "
+                        + to_string(dummyDistance) + " "
+                        + to_string(m_acceptRatio);
 
-if( m_rank == 0 )
+                meanTimeSaver.dat(tmpLine);
+                cout << tmpLine << endl;
+    }       }
+    meanTimeSaver.close();
+
+    if( m_rank == 0 )
     {
         tmpLine = to_string(alpha0) + " "
                 + to_string(m_energyMean) + " "
@@ -315,11 +341,13 @@ double VMC::beta0
 
     string tmpLine = "";
 
+    double dummyDistance = 0;
+
     for( double beta: m_parameters[3] )
     {
         param[2] = beta;
         m_WF -> setParameters( param );
-        runVMC( MCCycles, delta );
+        runVMC( MCCycles, delta, dummyDistance);
 
         if( m_energyMean < energyMin )
         {
@@ -343,6 +371,8 @@ double VMC::findAlpha( vector<double> param)
     double delta = width*0.01;
     int counter=0;
 
+    double dummyDistance = 0;
+
     param[0] -= width;
 
     cout << "entering alpha whileLoop" << endl;
@@ -359,7 +389,7 @@ double VMC::findAlpha( vector<double> param)
         oldMin = param[0];
         param[0] += delta;
         m_WF -> setParameters( param );
-        runVMC( m_MCCyclesFull, m_stepLength );
+        runVMC( m_MCCyclesFull, m_stepLength, dummyDistance );
         ratio = m_energy/energyOld;
         if(ratio > 1)
         {
@@ -367,7 +397,7 @@ double VMC::findAlpha( vector<double> param)
             delta *= -0.5;
             param[0] += delta;
             m_WF -> setParameters( param );
-            runVMC( m_MCCyclesFull, m_stepLength );
+            runVMC( m_MCCyclesFull, m_stepLength, dummyDistance );
             ratio = m_energy/energyOld;
         }
         counter++;
@@ -379,21 +409,6 @@ double VMC::findAlpha( vector<double> param)
 
 double VMC::findBeta( vector<double> param )
 {
-    //double varianceMin;
-    //double betaMin;
-    //vector<double> param(2);
-    //param[1] = alpha;
-    //for( double beta: m_parameters[2] )
-    //{
-    //    param[1] = beta;
-    //    m_WF -> setParameters( param );
-    //    runVMC( m_MCCyclesFull, m_stepLength );
-    //    if( m_variance < varianceMin )
-    //    {
-    //        varianceMin = m_variance;
-    //        betaMin = param[1];
-    //    }
-    //}
     double firstMin = param[1];
     double oldMin = param[1];
     int counter=0;
@@ -403,6 +418,8 @@ double VMC::findBeta( vector<double> param )
     double width = param[1]*0.05; // half the width of integration;
     double delta = width*0.01;
     param[1] -= width;
+
+    double dummyDistance = 0;
 
     cout << "entering beta whileLoop" << endl;
     while( !(ratio<epsilon) )
@@ -418,7 +435,7 @@ double VMC::findBeta( vector<double> param )
         oldMin = param[1];
         param[1] += delta;
         m_WF -> setParameters( param );
-        runVMC( m_MCCyclesFull, m_stepLength );
+        runVMC( m_MCCyclesFull, m_stepLength, dummyDistance );
         ratio = m_energy/energyOld;
         if(ratio > 1)
         {
@@ -426,7 +443,7 @@ double VMC::findBeta( vector<double> param )
             delta *= -0.5;
             param[1] += delta;
             m_WF -> setParameters( param );
-            runVMC( m_MCCyclesFull, m_stepLength );
+            runVMC( m_MCCyclesFull, m_stepLength, dummyDistance );
             ratio = m_energy/energyOld;
         }
         counter++;

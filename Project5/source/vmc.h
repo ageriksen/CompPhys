@@ -25,7 +25,7 @@ class VMC
         //------------------------------
         // class objects
         //------------------------------
-        void runVMC( int MCCycles, double steplength );
+        void runVMC( int MCCycles, double steplength, double distance );
 
         double stepFinder( vector<double> parameters ); // find optimal step for given param
 
