@@ -24,9 +24,10 @@ class trialWF1Naive: public Wavefunction
         //getters and setters
         double omega()  { return m_omega; }
         double alpha()  { return m_alpha; }
-        double m_distance() { return 0; }
-        double m_kinetic() { return 0; }
-        double m_potential() { return 0; }
+
+        double m_distance() { return 0.0; }
+        double m_kinetic() { return 0.0; }
+        double m_potential() { return 0.0; }
 
 //------------------------------------------------------
     private:

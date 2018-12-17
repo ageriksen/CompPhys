@@ -47,7 +47,7 @@ void VMC::runVMC( int MCCycles, double steplength )
     std::uniform_real_distribution<double> acceptanceDistribution(0, 1);
 
     //------------------------------------------------------
-    // initial value for system
+    // initial state
     //------------------------------------------------------
     for( int particle = 0; particle < m_NParticles; particle ++ )
     {
@@ -104,7 +104,7 @@ void VMC::runVMC( int MCCycles, double steplength )
                 acceptance++;
             }
             else
-            {//reset parameters
+            {//rejectiion
                 m_newExponent = m_oldExponent;
                 for( int dimension = 0; dimension < m_NDimensions; dimension ++ )
                 {
@@ -120,9 +120,9 @@ void VMC::runVMC( int MCCycles, double steplength )
 
         m_energy += localEnergy;
         m_energySquared += localEnergy*localEnergy;
-        m_distance += m_WF->distance();
-        m_kinetic += m_WF->kinetic();
-        m_potential += m_WF->potential();
+        //m_distance += m_WF->distance();
+        //m_kinetic += m_WF->kinetic();
+        //m_potential += m_WF->potential();
 
 
     } // end of MCCycles

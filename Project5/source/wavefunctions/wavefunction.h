@@ -18,9 +18,9 @@ class Wavefunction
         virtual void setParameters( const vector<double> parameters ) = 0;
         virtual double powers( const vector< vector<double> > & positions) = 0;
         virtual double localEnergy( const vector< vector<double> > & positions) = 0;
-        virtual double kinetic() = 0;
-        virtual double potential() = 0;
-        virtual double distance() = 0;
+        //virtual double kinetic() = 0;
+        //virtual double potential() = 0;
+        //virtual double distance() = 0;
         //virtual void loopParameters() = 0;
         //virtual std::string save() = 0;
 

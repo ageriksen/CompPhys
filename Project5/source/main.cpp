@@ -1,7 +1,7 @@
 #include "storage.h"
 #include "vmc.h"
 #include "wavefunctions/wavefunction.h"
-//#include "wavefunctions/trialwf1naive.h"
+#include "wavefunctions/trialwf1naive.h"
 #include "wavefunctions/trialwf1full.h"
 #include "wavefunctions/trialwf2.h"
 #include <mpi.h>
@@ -42,7 +42,7 @@ int main( int numberOfArguments, char *argumentList[])
     int NParticles = 2;
     int NDimensions = 3;
     // VMC variables
-    int MCCycles = 1e3;
+    int MCCycles = 1e5;
 
     //------------------------------------------------------
     // Imported Variables
@@ -55,7 +55,7 @@ int main( int numberOfArguments, char *argumentList[])
     vector<double> alphaVec;
     vector<double> betaVec;
     double alpha0;
-    Wavefunction *WF;
+    Wavefunction *WF = nullptr;
     //
     //-----------------------------
     // establishing base file name
@@ -70,7 +70,7 @@ int main( int numberOfArguments, char *argumentList[])
     if( value == 0 )
     {
         cout << "naive hamiltonian" << endl;
-        //WF = new trialWF1Naive( NParticles, NDimensions );
+        WF = new trialWF1Naive( NParticles, NDimensions );
     }
     else if( value == 1 )
     {
@@ -261,7 +261,7 @@ int main( int numberOfArguments, char *argumentList[])
             cout << "optimal values for omega " << optimized[0] << " are alpha=" << optimized[1]
                  << " and beta=" << optimized[2] << endl;
             WF -> setParameters( optimized );
-            vmc.runVMC( MCCycles*100, parameters[1][index] );
+            vmc.runVMC( MCCycles*100, vmc.stepFinder( optimized ) );
 
             optimalSaver.lineAdd(
                     to_string(optimized[0]) + " "

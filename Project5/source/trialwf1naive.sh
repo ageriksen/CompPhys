@@ -1,2 +1,2 @@
 #!/bin/bash
-./main 8 ../data/trialwf1naive 0 ./resources/omega.dat ./resources/alpha.dat
+./main 8 ../data/trial1Naive/trial1naive 0 ./resources/omega.dat ./resources/alpha.dat
