@@ -12,5 +12,5 @@ def makeBeta(start, stop, step):
     np.savetxt("resources/beta.dat", betaRange, fmt='%.2f')
 
 # initial arays:
-makeAlpha(0.8, 1.23, 0.05)
-makeBeta(0.8, 1.23, 0.05)
+makeAlpha(0.2, 2.23, 0.05)
+makeBeta(0.2, 2.23, 0.05)

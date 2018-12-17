@@ -238,71 +238,120 @@ vector<double> VMC::optimize
 //------------------------------------------------------
 // FINDERS
 //------------------------------------------------------
-vector<double> VMC::alpha0
+double VMC::alpha0
 (
     vector< vector<double> > parameters,
     int MCCycles,
     string baseName
 )
-{
-    cout << "entered alpha0" << endl;
-    double tmpAlpha;
-    double varianceMin;
-    double delta;
-    string tmpLine;
+{ // no change in minimal alpha per omega. Set it to 1.0
+
+    cout << "finding alpha0" << endl;
+
     vector<double> param(2);
-    vector<double> alphaMin;
-    for( unsigned int omega = 0; omega < parameters[0].size(); omega++ )
+    param[0] = parameters[0].back(); // omega == 1.0
+    string tmpLine = "";
+
+    double delta = parameters[1].back();
+    double varianceMin = 1e6; // pretty sure the variance should dip WAY below this.
+    double alpha0 = 0;
+    double alphaMin = 0;
+
+    for( double alpha: parameters[2] )
     {
-        delta = parameters[1][omega];
-        varianceMin = 10; // pretty sure the variance should dip WAY below this.
-        vector<string> line;
-        tmpAlpha = 0;
-        tmpLine = "";
-        for( unsigned int alpha = 0; alpha < parameters[2].size(); alpha++ )
-        {
-            param[0] = parameters[0][omega];
-            param[1] = parameters[2][alpha];
-            m_WF -> setParameters( param );
-            runVMC( MCCycles, delta );
-            if( m_rank == 0 )
-            {
-                tmpLine = to_string(parameters[2][alpha]) + " "
-                        + to_string(m_energyMean) + " "
-                        + to_string(m_variance) + " "
-                        + to_string(m_acceptRatio);
-                line.push_back(tmpLine);
-                //cout << tmpLine << endl;
-                if( m_variance < varianceMin )
-                {
-                    tmpAlpha = parameters[2][alpha];
-                }
-            }
+        param[1] = alpha;
 
+        m_WF -> setParameters( param );
+        runVMC( MCCycles, delta );
+
+        if( m_variance < varianceMin )
+        {
+            alpha0 = param[1];
         }
 
-        if( m_rank == 0 )
-        {
-            alphaMin.push_back(tmpAlpha);
-            storage variableSaver(baseName + to_string(omega) + ".dat");
-            variableSaver.out();
-            cout << "-------------------------------------" << endl;
-            for( string element: line )
-            {
-                variableSaver.dat(element);
-                cout << element << endl;
-            }
-            variableSaver.close();
-        }
+
     }
-    cout << "time to save this stuff." << endl;
-    storage alpha0Saver("./resources/alpha0.dat");
-    alpha0Saver.out();
-    for( double alpha0: alphaMin )
+if( m_rank == 0 )
     {
+        tmpLine = to_string(parameters[2][alpha]) + " "
+                + to_string(m_energyMean) + " "
+                + to_string(m_variance) + " "
+                + to_string(m_acceptRatio);
+
+        storage variableSaver(baseName + "alpha0.dat");
+        variableSaver.out();
+        variableSaver.dat(tmpLine);
+        cout << tmpLine << endl;
+        variableSaver.close();
+
+        cout << "-------------------------------------" << endl;
+        cout << "saving alpha0" << alpha0 << endl;
+        storage alpha0Saver("./resources/alpha0.dat");
+        alpha0Saver.out();
         alpha0Saver.dat(to_string(alpha0));
+        alpha0Saver.close();
     }
-    return alphaMin;
+    return alpha0;
+} // end alpha0
+
+
+double VMC::beta0
+(
+    vector< vector<double> > parameters,
+    double alpha0
+    int MCCycles,
+    string baseName
+)
+{ // no change in minimal alpha per omega. Set it to 1.0
+
+    cout << "finding alpha0" << endl;
+
+    vector<double> param(3);
+    param[0] = parameters[0].back(); // omega == 1.0
+    param[1] = alpha0
+
+    double delta = parameters[1].back();
+    double varianceMin = 1e6; // pretty sure the variance should dip WAY below this.
+    double beta0 = 0;
+
+    string tmpLine = "";
+
+    for( double beta: parameters[3] )
+    {
+        param[3] = beta;
+        m_WF -> setParameters( param );
+        runVMC( MCCycles, delta );
+
+        if( m_variance < varianceMin )
+        {
+            beta0 = param[3];
+        }
+
+    }
+
+    if( m_rank == 0 )
+    {
+        tmpLine = to_string(param[1]) + " "
+                + to_string(beta0) + " "
+                + to_string(m_energyMean) + " "
+                + to_string(m_variance) + " "
+                + to_string(m_acceptRatio);
+
+        storage variableSaver(baseName + to_string(omega) + ".dat");
+        variableSaver.out();
+        variableSaver.dat(tmpLine);
+        cout << tmpLine << endl;
+        variableSaver.close();
+
+        cout << "-------------------------------------" << endl;
+        cout << "saving beta0: " << beta0 << endl;
+        storage beta0Saver("./resources/beta0.dat");
+        beta0Saver.out();
+        beta0Saver.dat(to_string(beta0));
+        beta0Saver.clos();
+
+    }
+    return beta0;
 } // end alpha0
 
 double VMC::findAlpha( double beta )

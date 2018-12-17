@@ -36,23 +36,31 @@ class VMC
             double alpha0 // best alpha for trial1
         );
 
-        vector<double> alpha0
+        double alpha0
         ( //find optimal alpha, trial wavefunction 1
          vector< vector<double> > parameters,
          int MCCycles,
          string baseName
         );
+        double beta0
+        ( //find optimal alpha, trial wavefunction 1
+         vector< vector<double> > parameters,
+         double alpha0,
+         int MCCycles,
+         string baseName
+        );
+
         double findAlpha( double beta  ); // find best alpha given beta
         double findBeta ( double alpha ); // find best beta given alpha
 
         void clean()
         {// set all private variables to 0
-        m_energy = 0;
-        m_energySquared = 0;
-        m_oldExponent = 0;
-        m_newExponent = 0;
-        m_stepLength = 0;
-        m_variance = 0;
+            m_energy = 0;
+            m_energySquared = 0;
+            m_oldExponent = 0;
+            m_newExponent = 0;
+            m_stepLength = 0;
+            m_variance = 0;
         }
 
         //------------------------------

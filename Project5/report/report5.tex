@@ -119,16 +119,32 @@ The energy at a given distance, $r_1$, $r1_2$ is our local energy
     E_{L_1} &= \frac{H \Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}{\Psi_{T_1} \qty(\vec{r}_1, \vec{r}_2, \alpha )}\nonumber \\
         &= \frac{1}{2}\omega^2 (r_1^2 + r_2^2)\qty(1 -\alpha^2 ) + 3\alpha \omega \label{eq:naiveLocalEnergy}
 \end{align}
-The road there is found in (\ref{eq:naiveLocalEnergyExpanded}). As the repulsive Coloumb interaction is purely dependent on positions
+The road there is found in (\ref{eq:naiveLocalEnergyExpanded}). As this has a well defined and simple energy function, it is a good target for benchmarking.
+As the repulsive Coloumb interaction is purely dependent on positions
 and works between particles, adding it to our simple 2-particle state results in
 \begin{align}
     E_{L_1} = \frac{1}{2} \omega^2 \qty(r_1^2 + r_2^2) \qty( 1 -\alpha^2 ) + 3\alpha \omega + \frac{1}{ r_{12} } \label{eq:firstLocalEnergy}
 \end{align}
+Which is eschewed somewhat by the electron interaction. We can approach a best estimate by varying $\alpha$. The results of this can also be used to compare
+the second trial function once total energy has been found for both.
 
 The second trial wavefunction, (\ref{eq:trial2}) gives a few extra products, but thanks to the product rule, they separate into
 \begin{align}
     E_{L_2} = E_{L_1} + \frac{1}{ 2 \qty( 1 + \beta r_{12} )^{2} }
     \qty[ \alpha \omega r_{12} - \frac{ 1 }{ 2 \qty( 1 + \beta r_{2} )^{2} } - \frac{ 2 }{ r_{12} } + \frac{ 2 \beta }{ 1 + \beta r_{12} } ]
+\end{align}
+
+And has an exact energy for $\omega = 1$ of $3.558a.u$. this can be compared to the eigenvalue approach to the quantum dot\cite{project2pdf}.
+
+The chosen integrator over these quantum states is the variational Monte Carlo method. We thus want to apply the variational principle for approaching
+the ground state of a pair of electrons in a harmonic oscillator potential, assuming a singlet spin state. this means the spatial equations need to be
+symetric to accomodate the Pauli exclusion principle. % REFERENCE
+this fits well with the chosen trial wave functions, as they are symetric under spatial parity. For the variational method, we need to find the trial
+energy,
+\begin{align}
+    \ev{H} &= \frac{ \ev{H}{\Psi_T} }{ \braket{\Psi_T} }\ref{App:trialEnergy} \nonumber \\
+        &= \int\dd\vec{r} E_L\qty(\vec{r}) P\qty(\vec{r}) \qq{which discretizes to } \nonumber \\
+        &= \frac{1}{N_{MC}}\sum_i^{N_{MC}} P(\vec{r}) \, E_L(\vec{r}) \qq{with possibly extra variational parameters.}
 \end{align}
 
 
@@ -188,5 +204,19 @@ the form from \ref{eq:trial1} and the new exponent. Thus, beginning with $\pdv[2
         &= \frac{1}{2} \qty( \qty(\frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2}))^2 - \pdv{x_1} \qty( \frac{(x_1 - x_2)}{\qty( 1 + \beta r_{12} )^2} )
 \end{align}
 
+\subsection{Trial energy transformation\label{App:trialEnergy}
+\begin{align}
+    \ev{H} &= \frac{ \ev{H}{\Psi_T} }{ \braket{\Psi_T} } \nonumber \\
+        &= \frac{
+        \int \dd\vec{r} \Psi_T^* ( \vec{r} ) H ( \vec{r} ) \Psi_{T} ( \vec{r} )
+        }{
+            \int \dd\vec{r} \Psi_T^* ( \vec{r} ) \Psi_{T} ( \vec{r} ) } \\
+        &= \frac{ \int \dd\vec{r} \Psi_T^* E_L \Psi_T }{ A }
+        \qq{rewriting} H\Psi_T = E_L\Psi_T
+        \qq{and} \int\dd\vec{r} \Psi_T^* \Psi_T = A \nonumber \\
+        &= \frac{1}{A} \int\dd\vec{r} E_L(\vec{r}) P\qty(\vec{r})\, A \qq{using} P\qty(\vec{r})\equiv \frac{\Psi_T^*\Psi_T}{A} \nonumber\\
+        &= \int\dd\vec{r} E_L\qty(\vec{r}) P\qty(\vec{r})
+\end{align}
 
+\bibliography{\string~/Documents/bibliography/Bibliography}
 \end{document}
