@@ -1,0 +1,162 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+CC	makefile	/^CC = mpic++$/;"	m
+LDLIBS	makefile	/^LDLIBS = -larmadillo$/;"	m
+RANDOM_H	random.h	/^#define RANDOM_H$/;"	d
+STORAGE_G	storage.h	/^#define STORAGE_G$/;"	d
+TRIALWF1FULL_H	wavefunctions/trialwf1full.h	/^#define TRIALWF1FULL_H$/;"	d
+TRIALWF1NAIVE_H	wavefunctions/trialwf1naive.h	/^#define TRIALWF1NAIVE_H$/;"	d
+TRIALWF2_H	wavefunctions/trialwf2.h	/^#define TRIALWF2_H$/;"	d
+UniformDistribution	random.h	/^        void UniformDistribution()$/;"	f	class:random	typeref:typename:void
+UniformDistribution	random.h	/^        void UniformDistribution(double min, double max)$/;"	f	class:random	typeref:typename:void
+UniformDistribution	random.h	/^        void UniformDistribution(int min, int max)$/;"	f	class:random	typeref:typename:void
+VMC	vmc.h	/^        VMC( int NParticles, int NDimensions, int processors, int rank):$/;"	f	class:VMC
+VMC	vmc.h	/^class VMC$/;"	c
+VMC_H	vmc.h	/^#define VMC_H$/;"	d
+WAVEFUNCTION_H	wavefunctions/wavefunction.h	/^#define WAVEFUNCTION_H$/;"	d
+Wavefunction	wavefunctions/wavefunction.h	/^        Wavefunction(int NParticles, int NDimensions):$/;"	f	class:Wavefunction
+Wavefunction	wavefunctions/wavefunction.h	/^class Wavefunction$/;"	c
+alpha	datPlot.py	/^alpha = getValues( data, 0 )$/;"	v
+alpha	wavefunctions/trialwf1full.h	/^        double alpha() {return m_alpha; }$/;"	f	class:trialWF1Full	typeref:typename:double
+alpha	wavefunctions/trialwf1naive.h	/^        double alpha()  { return m_alpha; }$/;"	f	class:trialWF1Naive	typeref:typename:double
+alpha	wavefunctions/trialwf2.h	/^        double alpha() { return m_alpha; }$/;"	f	class:trialWF2	typeref:typename:double
+alpha0	inputs/__vmctreamlineAttempt.cpp	/^vector<double> VMC::alpha0$/;"	f	class:VMC	typeref:typename:vector<double>
+alpha0	vmc.cpp	/^double VMC::alpha0$/;"	f	class:VMC	typeref:typename:double
+beta	wavefunctions/trialwf2.h	/^        double beta() { return m_beta; }$/;"	f	class:trialWF2	typeref:typename:double
+beta0	vmc.cpp	/^double VMC::beta0$/;"	f	class:VMC	typeref:typename:double
+bin	storage.cpp	/^void storage::bin(vec Array)$/;"	f	class:storage	typeref:typename:void
+clean	vmc.h	/^        void clean()$/;"	f	class:VMC	typeref:typename:void
+close	storage.h	/^       void close()$/;"	f	class:storage	typeref:typename:void
+cutElements	datPlot.py	/^def cutElements( dataMatrix, controlColumn ):$/;"	f
+dat	storage.h	/^       void dat()$/;"	f	class:storage	typeref:typename:void
+dat	storage.h	/^       void dat(string line)$/;"	f	class:storage	typeref:typename:void
+data	datPlot.py	/^data = getData( fileName )$/;"	v
+distance	wavefunctions/trialwf1full.h	/^        double distance( const vector< vector<double> > & positions )$/;"	f	class:trialWF1Full	typeref:typename:double
+distance	wavefunctions/trialwf1full.h	/^        double distance() { return m_distance; }$/;"	f	class:trialWF1Full	typeref:typename:double
+distance	wavefunctions/trialwf2.h	/^        double distance() { return m_distance; }$/;"	f	class:trialWF2	typeref:typename:double
+distance	wavefunctions/trialwf2.h	/^inline double trialWF2::distance( const vector< vector<double> > &positions )$/;"	f	class:trialWF2	typeref:typename:double
+distanceSquared	wavefunctions/trialwf1full.cpp	/^double trialWF1Full::distanceSquared(const vector<vector<double> > &positions)$/;"	f	class:trialWF1Full	typeref:typename:double
+distanceSquared	wavefunctions/trialwf2.cpp	/^double trialWF2::distanceSquared( const vector< vector<double> > &positions )$/;"	f	class:trialWF2	typeref:typename:double
+energy	datPlot.py	/^energy = getValues( data, 1 )$/;"	v
+energy	vmc.h	/^        double energy() { return m_energy; }$/;"	f	class:VMC	typeref:typename:double
+energySquared	vmc.h	/^        double energySquared() { return m_energySquared; }$/;"	f	class:VMC	typeref:typename:double
+fileName	datPlot.py	/^fileName = "..\/data\/trial1Full\/trialwf1fullOmega1.000000.dat"$/;"	v
+findAlpha	inputs/__vmctreamlineAttempt.cpp	/^double VMC::findAlpha( double beta )$/;"	f	class:VMC	typeref:typename:double
+findAlpha	vmc.cpp	/^double VMC::findAlpha( vector<double> param)$/;"	f	class:VMC	typeref:typename:double
+findBeta	inputs/__vmctreamlineAttempt.cpp	/^double VMC::findBeta( double alpha )$/;"	f	class:VMC	typeref:typename:double
+findBeta	vmc.cpp	/^double VMC::findBeta( vector<double> param )$/;"	f	class:VMC	typeref:typename:double
+getData	datPlot.py	/^def getData( fileName ):$/;"	f
+getLabels	datPlot.py	/^def getLabels( fileName ):$/;"	f
+getLine	storage.h	/^       string getLine() { return m_line; }$/;"	f	class:storage	typeref:typename:string
+getName	storage.h	/^       string getName() { return m_fileName; }$/;"	f	class:storage	typeref:typename:string
+getUniformReal	random.h	/^        double getUniformReal()$/;"	f	class:random	typeref:typename:double
+getValues	datPlot.py	/^def getValues( dataMatrix, i ):$/;"	f
+in	storage.cpp	/^void storage::in( std::vector<double> *importVec )$/;"	f	class:storage	typeref:typename:void
+kinetic	wavefunctions/trialwf1full.h	/^        double kinetic() {return m_kinetic; }$/;"	f	class:trialWF1Full	typeref:typename:double
+kinetic	wavefunctions/trialwf2.h	/^        double kinetic() { return m_kinetic; }$/;"	f	class:trialWF2	typeref:typename:double
+labels	datPlot.py	/^labels = getLabels( fileName )$/;"	v
+lineAdd	storage.h	/^       void lineAdd(string element)$/;"	f	class:storage	typeref:typename:void
+lineClean	storage.h	/^       void lineClean() { m_line = ""; }$/;"	f	class:storage	typeref:typename:void
+localEnergy	wavefunctions/trialwf1full.h	/^inline double trialWF1Full::localEnergy$/;"	f	class:trialWF1Full	typeref:typename:double
+localEnergy	wavefunctions/trialwf1naive.h	/^inline double trialWF1Naive::localEnergy$/;"	f	class:trialWF1Naive	typeref:typename:double
+localEnergy	wavefunctions/trialwf2.cpp	/^double trialWF2::localEnergy( const vector< vector<double> > &positions )$/;"	f	class:trialWF2	typeref:typename:double
+m_MCCycles	vmc.h	/^        int m_MCCycles;$/;"	m	class:VMC	typeref:typename:int
+m_MCCyclesFull	vmc.h	/^        int m_MCCyclesFull;$/;"	m	class:VMC	typeref:typename:int
+m_NDimensions	vmc.h	/^        int m_NParticles, m_NDimensions;$/;"	m	class:VMC	typeref:typename:int
+m_NDimensions	wavefunctions/wavefunction.h	/^        int m_NParticles, m_NDimensions;$/;"	m	class:Wavefunction	typeref:typename:int
+m_NParticles	vmc.h	/^        int m_NParticles, m_NDimensions;$/;"	m	class:VMC	typeref:typename:int
+m_NParticles	wavefunctions/wavefunction.h	/^        int m_NParticles, m_NDimensions;$/;"	m	class:Wavefunction	typeref:typename:int
+m_WF	vmc.h	/^        Wavefunction * m_WF = nullptr;$/;"	m	class:VMC	typeref:typename:Wavefunction *
+m_acceptRatio	vmc.h	/^        double m_acceptRatio;$/;"	m	class:VMC	typeref:typename:double
+m_alpha	wavefunctions/trialwf1full.h	/^        double m_alpha = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_alpha	wavefunctions/trialwf1naive.h	/^        double m_alpha = 0;$/;"	m	class:trialWF1Naive	typeref:typename:double
+m_alpha	wavefunctions/trialwf2.h	/^        double m_alpha = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_beta	wavefunctions/trialwf2.h	/^        double m_beta = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_distance	vmc.h	/^        double m_distance = 0;$/;"	m	class:VMC	typeref:typename:double
+m_distance	wavefunctions/trialwf1full.h	/^        double m_distance = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_distance	wavefunctions/trialwf1naive.h	/^        double m_distance() { return 0.0; }$/;"	f	class:trialWF1Naive	typeref:typename:double
+m_distance	wavefunctions/trialwf2.h	/^        double m_distance = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_distanceSquared	wavefunctions/trialwf1full.h	/^        double m_distanceSquared = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_energy	vmc.h	/^        double m_energy = 0;$/;"	m	class:VMC	typeref:typename:double
+m_energyMean	vmc.h	/^        double m_energyMean = 0;$/;"	m	class:VMC	typeref:typename:double
+m_energySquared	vmc.h	/^        double m_energySquared = 0;$/;"	m	class:VMC	typeref:typename:double
+m_engine	random.h	/^        std::mt19937_64 m_engine;$/;"	m	class:random	typeref:typename:std::mt19937_64
+m_fileName	storage.h	/^        string m_fileName;$/;"	m	class:storage	typeref:typename:string
+m_iFile	storage.h	/^        std::ifstream m_iFile;$/;"	m	class:storage	typeref:typename:std::ifstream
+m_kinetic	vmc.h	/^        double m_kinetic = 0;$/;"	m	class:VMC	typeref:typename:double
+m_kinetic	wavefunctions/trialwf1full.h	/^        double m_kinetic = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_kinetic	wavefunctions/trialwf1naive.h	/^        double m_kinetic() { return 0.0; }$/;"	f	class:trialWF1Naive	typeref:typename:double
+m_kinetic	wavefunctions/trialwf2.h	/^        double m_kinetic = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_line	storage.h	/^        string m_line;$/;"	m	class:storage	typeref:typename:string
+m_newExponent	vmc.h	/^        double m_newExponent = 0;$/;"	m	class:VMC	typeref:typename:double
+m_oFile	storage.h	/^        std::ofstream m_oFile;$/;"	m	class:storage	typeref:typename:std::ofstream
+m_oldExponent	vmc.h	/^        double m_oldExponent = 0;$/;"	m	class:VMC	typeref:typename:double
+m_omega	wavefunctions/trialwf1full.h	/^        double m_omega = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_omega	wavefunctions/trialwf1naive.h	/^        double m_omega = 0;$/;"	m	class:trialWF1Naive	typeref:typename:double
+m_omega	wavefunctions/trialwf2.h	/^        double m_omega = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_parameters	vmc.h	/^        vector< vector<double> > m_parameters;$/;"	m	class:VMC	typeref:typename:vector<vector<double>>
+m_positionsNew	vmc.h	/^        vector< vector<double> > m_positionsNew;$/;"	m	class:VMC	typeref:typename:vector<vector<double>>
+m_positionsOld	vmc.h	/^        vector< vector<double> > m_positionsOld;$/;"	m	class:VMC	typeref:typename:vector<vector<double>>
+m_potential	vmc.h	/^        double m_potential = 0;$/;"	m	class:VMC	typeref:typename:double
+m_potential	wavefunctions/trialwf1full.h	/^        double m_potential = 0;$/;"	m	class:trialWF1Full	typeref:typename:double
+m_potential	wavefunctions/trialwf1naive.h	/^        double m_potential() { return 0.0; }$/;"	f	class:trialWF1Naive	typeref:typename:double
+m_potential	wavefunctions/trialwf2.h	/^        double m_potential = 0;$/;"	m	class:trialWF2	typeref:typename:double
+m_processors	vmc.h	/^        int m_processors, m_rank;$/;"	m	class:VMC	typeref:typename:int
+m_rank	vmc.h	/^        int m_processors, m_rank;$/;"	m	class:VMC	typeref:typename:int
+m_seed	random.h	/^        int m_seed = 0;$/;"	m	class:random	typeref:typename:int
+m_stepLength	vmc.h	/^        double m_stepLength = 0;$/;"	m	class:VMC	typeref:typename:double
+m_uniform_real	random.h	/^        std::uniform_real_distribution<double> m_uniform_real;$/;"	m	class:random	typeref:typename:std::uniform_real_distribution<double>
+m_variance	vmc.h	/^        double m_variance = 0;$/;"	m	class:VMC	typeref:typename:double
+main	main.cpp	/^int main( int numberOfArguments, char *argumentList[])$/;"	f	typeref:typename:int
+main	makefile	/^main: main.o vmc.o storage.o wavefunctions\/trialwf1naive.o wavefunctions\/trialwf1full.o wavefu/;"	t
+makeAlpha	rangeMaker.py	/^def makeAlpha(start, stop, step):$/;"	f
+makeBeta	rangeMaker.py	/^def makeBeta(start, stop, step):$/;"	f
+meanEnergy	vmc.h	/^        double meanEnergy() { return m_energyMean; }$/;"	f	class:VMC	typeref:typename:double
+minColumn	datPlot.py	/^def minColumn( dataMatrix, i ):$/;"	f
+name	storage.h	/^       void name(string fileName)$/;"	f	class:storage	typeref:typename:void
+np	datPlot.py	/^import numpy as np$/;"	I
+np	rangeMaker.py	/^import numpy as np$/;"	I
+omega	wavefunctions/trialwf1full.h	/^        double omega() {return m_omega; }$/;"	f	class:trialWF1Full	typeref:typename:double
+omega	wavefunctions/trialwf1naive.h	/^        double omega()  { return m_omega; }$/;"	f	class:trialWF1Naive	typeref:typename:double
+omega	wavefunctions/trialwf2.h	/^        double omega() { return m_omega; }$/;"	f	class:trialWF2	typeref:typename:double
+optimize	inputs/__vmctreamlineAttempt.cpp	/^vector<double> VMC::optimize$/;"	f	class:VMC	typeref:typename:vector<double>
+optimize	vmc.cpp	/^vector<double> VMC::optimize$/;"	f	class:VMC	typeref:typename:vector<double>
+out	storage.h	/^       void out()$/;"	f	class:storage	typeref:typename:void
+plt	datPlot.py	/^import matplotlib.pyplot as plt$/;"	I
+potential	wavefunctions/trialwf1full.h	/^        double potential() {return m_potential; }$/;"	f	class:trialWF1Full	typeref:typename:double
+potential	wavefunctions/trialwf2.h	/^        double potential() { return m_potential; }$/;"	f	class:trialWF2	typeref:typename:double
+powers	wavefunctions/trialwf1full.h	/^inline double trialWF1Full::powers$/;"	f	class:trialWF1Full	typeref:typename:double
+powers	wavefunctions/trialwf1naive.h	/^inline double trialWF1Naive::powers$/;"	f	class:trialWF1Naive	typeref:typename:double
+powers	wavefunctions/trialwf2.h	/^inline double trialWF2::powers( const vector< vector<double> > &positions )$/;"	f	class:trialWF2	typeref:typename:double
+random	random.h	/^        random( int seed ) : m_seed(seed)$/;"	f	class:random
+random	random.h	/^        random()$/;"	f	class:random
+random	random.h	/^class random$/;"	c
+ratio	vmc.h	/^        double ratio() { return m_acceptRatio; }$/;"	f	class:VMC	typeref:typename:double
+runVMC	inputs/__vmctreamlineAttempt.cpp	/^void VMC::runVMC( int MCCycles, double steplength )$/;"	f	class:VMC	typeref:typename:void
+runVMC	vmc.cpp	/^void VMC::runVMC( int MCCycles, double steplength, double distance )$/;"	f	class:VMC	typeref:typename:void
+setParameters	wavefunctions/trialwf1full.h	/^        void setParameters( vector<double> parameters )$/;"	f	class:trialWF1Full	typeref:typename:void
+setParameters	wavefunctions/trialwf1naive.h	/^        void setParameters( vector<double> parameters )$/;"	f	class:trialWF1Naive	typeref:typename:void
+setParameters	wavefunctions/trialwf2.cpp	/^void trialWF2::setParameters( vector<double> parameters )$/;"	f	class:trialWF2	typeref:typename:void
+setWaveFunction	vmc.h	/^        void setWaveFunction( Wavefunction * WF )$/;"	f	class:VMC	typeref:typename:void
+stepFinder	inputs/__vmctreamlineAttempt.cpp	/^vector<double> VMC::stepFinder( vector<double> parameters )$/;"	f	class:VMC	typeref:typename:vector<double>
+stepFinder	vmc.cpp	/^double VMC::stepFinder( vector<double> param )$/;"	f	class:VMC	typeref:typename:double
+storage	storage.h	/^        storage() {}  \/\/ construtor$/;"	f	class:storage
+storage	storage.h	/^        storage(string fileName)$/;"	f	class:storage
+storage	storage.h	/^class storage$/;"	c
+sumSquares	wavefunctions/trialwf1full.cpp	/^double trialWF1Full::sumSquares$/;"	f	class:trialWF1Full	typeref:typename:double
+sumSquares	wavefunctions/trialwf1naive.cpp	/^double trialWF1Naive::sumSquares$/;"	f	class:trialWF1Naive	typeref:typename:double
+sumSquares	wavefunctions/trialwf2.cpp	/^double trialWF2::sumSquares( const vector< vector<double> > &positions)$/;"	f	class:trialWF2	typeref:typename:double
+trialWF1Full	wavefunctions/trialwf1full.cpp	/^trialWF1Full::trialWF1Full$/;"	f	class:trialWF1Full
+trialWF1Full	wavefunctions/trialwf1full.h	/^class trialWF1Full: public Wavefunction$/;"	c
+trialWF1Naive	wavefunctions/trialwf1naive.cpp	/^trialWF1Naive::trialWF1Naive$/;"	f	class:trialWF1Naive
+trialWF1Naive	wavefunctions/trialwf1naive.h	/^class trialWF1Naive: public Wavefunction$/;"	c
+trialWF2	wavefunctions/trialwf2.cpp	/^trialWF2::trialWF2( int NParticles, int NDimensions ):$/;"	f	class:trialWF2
+trialWF2	wavefunctions/trialwf2.h	/^class trialWF2: public Wavefunction$/;"	c
+variance	datPlot.py	/^variance = getValues( data, 2 )$/;"	v
+variance	vmc.h	/^        double variance() { return m_variance; }$/;"	f	class:VMC	typeref:typename:double
